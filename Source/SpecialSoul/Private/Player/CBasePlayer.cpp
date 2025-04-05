@@ -16,7 +16,7 @@ class UEnhancedInputLocalPlayerSubsystem;
 // Sets default values
 ACBasePlayer::ACBasePlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
@@ -33,6 +33,7 @@ ACBasePlayer::ACBasePlayer()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -49,7 +50,8 @@ ACBasePlayer::ACBasePlayer()
 
 	MoveComp = CreateDefaultSubobject<UCMovementComponent>(TEXT("MoveComp"));
 
-	ConstructorHelpers::FObjectFinder<UInputMappingContext> tempIMC(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Input/IMC_Player.IMC_Player'"));
+	ConstructorHelpers::FObjectFinder<UInputMappingContext> tempIMC(
+		TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Input/IMC_Player.IMC_Player'"));
 	if (tempIMC.Succeeded())
 		IMC_Player = tempIMC.Object;
 }
@@ -58,14 +60,12 @@ ACBasePlayer::ACBasePlayer()
 void ACBasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ACBasePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -85,4 +85,3 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	if (input)
 		OnInputBindingDel.Broadcast(input);
 }
-

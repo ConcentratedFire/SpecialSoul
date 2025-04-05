@@ -13,5 +13,9 @@ UCLASS()
 class SPECIALSOUL_API ACPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
+private:
+	ACPlayerController();
+
+	virtual void BeginPlay() override;
 };

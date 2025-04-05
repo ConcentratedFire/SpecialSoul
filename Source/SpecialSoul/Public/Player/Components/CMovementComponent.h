@@ -7,12 +7,12 @@
 #include "CMovementComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SPECIALSOUL_API UCMovementComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UCMovementComponent();
 
@@ -20,14 +20,17 @@ protected:
 	virtual void InitializeComponent() override;
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	UPROPERTY()
-	class ACBasePlayer* BaseOwner;
-	
+	class ACBasePlayer* BaseOwnerCharacter;
+	UPROPERTY()
+	class ACPlayerController* PC;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* IA_Move;
@@ -36,4 +39,10 @@ private:
 	void SetInputBinding(class UEnhancedInputComponent* Input);
 	UFUNCTION()
 	void Move(const struct FInputActionValue& Value);
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = Rotation)
+	float RoationInteropSpeed = 5.f;
+	
+	void RotationToMouseCursor(const float& DeltaTime);
 };

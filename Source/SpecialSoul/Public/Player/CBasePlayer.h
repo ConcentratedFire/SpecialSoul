@@ -51,6 +51,6 @@ private: // Component
 	class USpringArmComponent* CameraBoom;
 	
 private: // Actor Component
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 	class UCMovementComponent* MoveComp;
 };

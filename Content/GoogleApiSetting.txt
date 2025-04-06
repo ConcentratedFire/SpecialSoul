@@ -1,0 +1,6 @@
+{
+	"googleApiIdMap":
+	{
+		"NewDataTable": "https://docs.google.com/spreadsheets/d/1jDDDp-0KEwhWuXAKkKeoljX5N8G2za3HqO0F8c1oQRY/edit?usp=sharing"
+	}
+}

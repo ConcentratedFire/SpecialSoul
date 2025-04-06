@@ -11,7 +11,7 @@ public class SpecialSoul : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput",
-			"UMG"
+			"UMG", "HTTP", "Json", "JsonUtilities"
 		});
 	}
 }

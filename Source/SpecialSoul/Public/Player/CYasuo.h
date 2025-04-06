@@ -20,8 +20,12 @@ private:
 	virtual void Attack() override;
 
 private:
+	int32 MP = 0;
 	bool bUseAOE = false;
 	float AOERange = 0.f;
 	float AOEDamage = 0.f;
 	float AOECoolTime = 0.f;
+
+private:
+	FVector GetAttackVector();
 };

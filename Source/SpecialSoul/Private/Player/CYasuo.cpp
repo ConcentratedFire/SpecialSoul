@@ -3,6 +3,7 @@
 
 #include "Player/CYasuo.h"
 
+#include "SpecialSoul.h"
 #include "Utility/CDataSheetUtility.h"
 
 void ACYasuo::BeginPlay()
@@ -23,8 +24,28 @@ void ACYasuo::BeginPlay()
 void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	Attack();
+	// if (MP >= 100)
+	// {
+	// 	MP = 0;
+	// }
 }
 
 void ACYasuo::Attack()
 {
+	FVector AttackVector = GetAttackVector();
+}
+
+FVector ACYasuo::GetAttackVector()
+{
+	FVector forwardVec = GetActorForwardVector();
+	FVector Velocity = GetVelocity().GetSafeNormal();
+
+	FVector Dir = forwardVec;
+	if (Velocity != FVector::ZeroVector)
+	{
+		Dir = (forwardVec + Velocity) * 0.5f;
+	}
+	return Dir;
 }

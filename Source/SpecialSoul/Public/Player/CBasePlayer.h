@@ -31,11 +31,13 @@ public:
 public: // Input
 	FInputBindingDelegate OnInputBindingDel;
 
-public:	// Return Component
+public: // Return Component
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	virtual void Attack() PURE_VIRTUAL(); // Attack 기본 함수
 
 private: // Input
 	UPROPERTY(VisibleAnywhere, Category = Input)
@@ -49,7 +51,7 @@ private: // Component
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
-	
+
 private: // Actor Component
 	UPROPERTY(EditDefaultsOnly)
 	class UCMovementComponent* MoveComp;

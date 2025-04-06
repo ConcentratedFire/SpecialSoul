@@ -3,7 +3,11 @@
 
 #include "Player/CYasuo.h"
 
+#include <ranges>
+
 #include "SpecialSoul.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/AttackActors/CTornado.h"
 #include "Utility/CDataSheetUtility.h"
 
 void ACYasuo::BeginPlay()
@@ -19,13 +23,18 @@ void ACYasuo::BeginPlay()
 	// 리소스 해제
 	DataSheetUtility->ConditionalBeginDestroy();
 	DataSheetUtility = nullptr;
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [&](){Attack();}, 3.f, true);
 }
 
 void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Attack();
+	
+	
+	
 	// if (MP >= 100)
 	// {
 	// 	MP = 0;
@@ -39,6 +48,12 @@ void ACYasuo::Attack()
 	// Test
 	for (const FVector& Vector : AttackVectors)
 	{
+		FTransform Transform = GetActorTransform();
+		Transform.SetRotation(FQuat::Identity);
+		Transform.SetScale3D(FVector(1.f));
+		ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>(TornadoFactory, Transform, GetOwner());
+		Tornado->TornadoDirection = Vector;
+		UGameplayStatics::FinishSpawningActor(Tornado, Transform);
 		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + Vector * 100.f, FColor::Red, false, 0.f, 0,
 		              10.f);
 	}

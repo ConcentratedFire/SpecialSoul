@@ -27,8 +27,10 @@ private:
 	float AOECoolTime = 0.f;
 
 private:
+	UPROPERTY(EditDefaultsOnly, category=Attack)
+	TSubclassOf<class ACTornado> TornadoFactory;
 	UPROPERTY(VisibleAnywhere, Category=Attack)
-	int32 AttackCnt = 1;
-	
+	int32 AttackCnt = 3;
+
 	TArray<FVector> GetAttackVector();
 };

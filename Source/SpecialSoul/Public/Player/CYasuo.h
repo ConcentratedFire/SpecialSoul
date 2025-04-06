@@ -27,5 +27,8 @@ private:
 	float AOECoolTime = 0.f;
 
 private:
-	FVector GetAttackVector();
+	UPROPERTY(VisibleAnywhere, Category=Attack)
+	int32 AttackCnt = 1;
+	
+	TArray<FVector> GetAttackVector();
 };

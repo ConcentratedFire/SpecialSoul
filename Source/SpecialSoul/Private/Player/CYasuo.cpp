@@ -34,10 +34,17 @@ void ACYasuo::Tick(float DeltaTime)
 
 void ACYasuo::Attack()
 {
-	FVector AttackVector = GetAttackVector();
+	TArray<FVector> AttackVectors = GetAttackVector();
+
+	// Test
+	for (const FVector& Vector : AttackVectors)
+	{
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + Vector * 100.f, FColor::Red, false, 0.f, 0,
+		              10.f);
+	}
 }
 
-FVector ACYasuo::GetAttackVector()
+TArray<FVector> ACYasuo::GetAttackVector()
 {
 	FVector forwardVec = GetActorForwardVector();
 	FVector Velocity = GetVelocity().GetSafeNormal();
@@ -47,5 +54,18 @@ FVector ACYasuo::GetAttackVector()
 	{
 		Dir = (forwardVec + Velocity) * 0.5f;
 	}
-	return Dir;
+	Dir.Normalize();
+
+	float AngleStep = 360.f / static_cast<float>(AttackCnt);
+	TArray<FVector> AttackVectors;
+
+	for (int32 i = 0; i < AttackCnt; ++i)
+	{
+		float AngleOffset = -AngleStep * (AttackCnt - 1) / 2 + AngleStep * i;
+		FRotator RotationOffset(0.0f, AngleOffset, 0.0f);
+		FVector RotatedVector = RotationOffset.RotateVector(Dir);
+		AttackVectors.Add(RotatedVector);
+	}
+
+	return AttackVectors;
 }

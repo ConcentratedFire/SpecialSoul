@@ -19,8 +19,11 @@ void UCYasuoAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 void UCYasuoAnim::PlayAttackMontage()
 {
-	if (!AttackMontage) return;
-	Montage_Play(AttackMontage, 1.f);
+	if (!AttackMontage || !Owner) return;
+	if (Speed < KINDA_SMALL_NUMBER)
+		Owner->PlayAnimMontage(AttackMontage, 1, FName("IdleAttack"));
+	else
+		Owner->PlayAnimMontage(AttackMontage, 1, FName("MoveAttack"));
 }
 
 void UCYasuoAnim::AnimNotify_YasuoDefaultAttack()

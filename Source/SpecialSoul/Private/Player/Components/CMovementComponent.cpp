@@ -67,6 +67,8 @@ void UCMovementComponent::Move(const FInputActionValue& Value)
 
 void UCMovementComponent::RotationToMouseCursor(const float& DeltaTime)
 {
+	if (!PC) return;
+	
 	FHitResult HitResult;
 	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	if (bHit)

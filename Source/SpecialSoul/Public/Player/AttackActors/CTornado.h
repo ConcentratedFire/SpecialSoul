@@ -25,4 +25,12 @@ public:
 
 public:
 	FVector TornadoDirection;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	class UBoxComponent* TornadoBox;
+	UPROPERTY(EditDefaultsOnly)
+	class UStaticMeshComponent* TornadoMesh1;
+	UPROPERTY(EditDefaultsOnly)
+	class UStaticMeshComponent* TornadoMesh2;
 };

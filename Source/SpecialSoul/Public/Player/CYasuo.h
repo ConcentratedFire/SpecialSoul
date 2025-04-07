@@ -15,8 +15,13 @@ class SPECIALSOUL_API ACYasuo : public ACBasePlayer
 	GENERATED_BODY()
 
 private:
+	ACYasuo();
+
+private:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+public:
 	virtual void Attack() override;
 
 private:
@@ -26,11 +31,15 @@ private:
 	float AOEDamage = 0.f;
 	float AOECoolTime = 0.f;
 
-private:
+private: // Attack
 	UPROPERTY(EditDefaultsOnly, category=Attack)
 	TSubclassOf<class ACTornado> TornadoFactory;
 	UPROPERTY(VisibleAnywhere, Category=Attack)
 	int32 AttackCnt = 3;
 
 	TArray<FVector> GetAttackVector();
+
+private: // Anim
+	UPROPERTY()
+	class UCYasuoAnim* Anim;
 };

@@ -7,8 +7,13 @@
 
 #include "SpecialSoul.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
 #include "Utility/CDataSheetUtility.h"
+
+ACYasuo::ACYasuo()
+{	
+}
 
 void ACYasuo::BeginPlay()
 {
@@ -24,17 +29,16 @@ void ACYasuo::BeginPlay()
 	DataSheetUtility->ConditionalBeginDestroy();
 	DataSheetUtility = nullptr;
 
+	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
+
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [&](){Attack();}, 3.f, true);
+	GetWorldTimerManager().SetTimer(TimerHandle, [&](){Anim->PlayAttackMontage();}, 3.f, true);
 }
 
 void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
-	
-	
 	// if (MP >= 100)
 	// {
 	// 	MP = 0;
@@ -44,7 +48,6 @@ void ACYasuo::Tick(float DeltaTime)
 void ACYasuo::Attack()
 {
 	TArray<FVector> AttackVectors = GetAttackVector();
-
 	// Test
 	for (const FVector& Vector : AttackVectors)
 	{

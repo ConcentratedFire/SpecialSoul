@@ -13,8 +13,8 @@ struct FFlowFieldCell
 
 	FVector WorldPosition {FVector::ZeroVector}; // 셀의 월드 좌표
 	
-	float Cost {1.f}; // 이동 비용 (Cost Field)
-	float Integration = MAX_FLT; // 타겟까지의 누적 비용 (Integration Field)
+	float MoveCost {1.f}; // 이동 비용 (Cost Field)
+	float IntegrationCost = MAX_FLT; // 타겟까지의 누적 비용 (Integration Field)
 	FVector2D FlowDirection {FVector2D::ZeroVector}; // 방향(Flow Field)
 };
 
@@ -51,25 +51,31 @@ public:
 	UFUNCTION(CallInEditor, Category = FlowField)
 	void GenerateField();
 
+	UPROPERTY(EditAnywhere, Category = FlowField)
+	float GenerationUpdateTime {0.2}; // 0.2초마다 갱신
+
 	UPROPERTY(EditAnywhere, Category = FlowFieldDebug)
 	bool bShowCostField {false};
 	UPROPERTY(EditAnywhere, Category = FlowFieldDebug)
 	bool bShowIntegrationField {false};
 	UPROPERTY(EditAnywhere, Category = FlowFieldDebug)
 	bool bShowFlowField {false};
+	
+	void StartGenTimer();
+	void EndGenTimer();
 
 protected:
-
-	void FindPlayerPoints();
-	void FindObstaclePoints();
 	
 	void InitializeGrid();
 	void GenerateCostField();
 	void GenerateIntegrationField();
 	void GenerateFlowField();
 
-	//void DrawDebugCostField();
-	//void DrawDebugIntegrationField();
+	void FindPlayerPoints();
+	void FindObstaclePoints();
+
+	void DrawDebugCostField();
+	void DrawDebugIntegrationField();
 	void DrawDebugFlowField();
 
 	bool IsValidCell(FIntPoint CellCoord) const;
@@ -81,11 +87,12 @@ private:
  	 // TMap인 이유) FIntPoint를 key로 넣으면 그에 맞는 Cell을 얻기위해
 	 // unordered_map 해시테이블
 	TMap<FIntPoint, FFlowFieldCell> Grid;
-
 	 // 12시부터 시계방향
 	const TArray<FIntPoint> Directions = {
 		{1,0}, {1,1}, {0, 1}, {-1, 1},
 		{-1, 0}, {-1, -1}, {0, -1}, {1, -1}
 	};
+	
+	FTimerHandle GenTimer;
 };
 

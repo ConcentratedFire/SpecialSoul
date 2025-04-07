@@ -17,37 +17,33 @@ void AFlowFieldActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 런타임에 한번 호출되도록
-	// (에디터에서는 수동 호출)
-#if !WITH_EDITOR
-	GenerateField();
-#endif
+	StartGenTimer();
+	
+	FindObstaclePoints();
+	InitializeGrid();
 }
 
 void AFlowFieldActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// if (bShowCostField)
-	// 	DrawDebugCostField();
-	// if (bShowIntegrationField)
-	// 	DrawDebugIntegrationField();
-
-	GenerateField();
-	if (bShowFlowField)
-		DrawDebugFlowField();
 }
 
 void AFlowFieldActor::GenerateField()
 {
-GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Flow field")));
 	FindPlayerPoints();
-	FindObstaclePoints();
 	
-	InitializeGrid();
 	GenerateCostField();
 	GenerateIntegrationField();
 	GenerateFlowField();
+	
+	if (bShowCostField)
+		DrawDebugCostField();
+	
+	if (bShowIntegrationField)
+		DrawDebugIntegrationField();
+	
+	if (bShowFlowField)
+		DrawDebugFlowField();
 }
 
 void AFlowFieldActor::FindPlayerPoints()
@@ -75,7 +71,7 @@ void AFlowFieldActor::FindObstaclePoints()
 		FIntPoint Point = Pair.Key;
 		FFlowFieldCell Cell = Pair.Value;
 
-		// 2m 위에서 쏜다
+		// [-2m, +2m] LineTrace 
 		FVector StartPos = CellToWorldCoord(Point) + FVector(0, 0, 200);
 		FVector EndPos = StartPos + FVector(0 , 0, -400);
 
@@ -97,9 +93,9 @@ void AFlowFieldActor::InitializeGrid()
 {
 	Grid.Empty();
 
-	for (int32 y = 0; y < GridHeight; y++)
+	for (int32 y = -(GridHeight/2); y < (GridHeight/2); y++) // 0 ~ 99 -> // -50 ~ 49
 	{
-		for (int32 x = 0; x < GridWidth; x++)
+		for (int32 x =-(GridWidth/2); x < (GridWidth/2); x++)
 		{
 			FIntPoint Pos(x, y);
 			FVector WorldPos = GetActorLocation() + FVector(x*TileSize, y*TileSize, 0);
@@ -113,21 +109,23 @@ void AFlowFieldActor::InitializeGrid()
 
 void AFlowFieldActor::GenerateCostField()
 {
-	for (TTuple<FIntPoint, FFlowFieldCell>& Pair : Grid)
+	for (auto& pair : Grid)
 	{
 		 //  Pair.Value == FFlowFieldCell
 		 // 장애물 -> 255
 		 // 일반   -> 1
-		Pair.Value.Cost = ObstaclePoints.Contains(Pair.Key) ? 255.f : 1.f;
+		FIntPoint& Point = pair.Key;
+		FFlowFieldCell& Cell = pair.Value;
+		Cell.MoveCost = ObstaclePoints.Contains(Point) ? 255.f : 1.f;
 	}
 }
 
 void AFlowFieldActor::GenerateIntegrationField()
 {
-	 // IntegrationField 초기화
-	for (auto& Pair : Grid)
+	 // IntegrationField Max로 초기화
+	for (auto& pair : Grid)
 	{
-		Pair.Value.Integration = FLT_MAX;
+		pair.Value.IntegrationCost = FLT_MAX;
 	}
 
 	 // 타겟 지점들로부터 Queue BFS를 돌린다.
@@ -137,7 +135,8 @@ void AFlowFieldActor::GenerateIntegrationField()
 	for (FIntPoint Point : TargetPoints)
 	{
 		if (!IsValidCell(Point)) continue;
-		Grid[Point].Integration = 0.f; // 타겟지점은 0
+		
+		Grid[Point].IntegrationCost = 0.f; // 타겟지점은 0
 		Queue.Enqueue(Point);
 	}
 
@@ -145,7 +144,7 @@ void AFlowFieldActor::GenerateIntegrationField()
 	{
 		FIntPoint CurrPoint;
 		Queue.Dequeue(CurrPoint); // Pop하고 Curr에 반환
-		float CurrCost = Grid[CurrPoint].Integration;
+		float CurrIntegCost = Grid[CurrPoint].IntegrationCost;
 
 		 // 8방향에 대해 확인 
 		for (FIntPoint Dir : Directions)
@@ -153,15 +152,17 @@ void AFlowFieldActor::GenerateIntegrationField()
 			FIntPoint NextPoint = CurrPoint + Dir;
 			if (!IsValidCell(NextPoint)) continue;
 
-			float NewIntegCost = CurrCost + Grid[NextPoint].Cost;
+			 // 다음 통합비용 = 현지점의 통합비용 + 다음지점 이동비용
+			float NewIntegCost = CurrIntegCost + Grid[NextPoint].MoveCost;
 
 			 // 이전 값보다 작으면 갱신
-			if (NewIntegCost >= Grid[NextPoint].Integration)
-				continue;
-
-			Grid[NextPoint].Integration = NewIntegCost;
-			Queue.Enqueue(NextPoint);
+			if (NewIntegCost < Grid[NextPoint].IntegrationCost)
+			{
+				Grid[NextPoint].IntegrationCost = NewIntegCost;
+				Queue.Enqueue(NextPoint);
+			}
 		}
+		
 	}
 }
 
@@ -169,11 +170,11 @@ void AFlowFieldActor::GenerateFlowField()
 {
 	for (auto& Pair : Grid)
 	{
-		FIntPoint CurrPoint = Pair.Key;
-		FFlowFieldCell CurrCell = Pair.Value;
+		FIntPoint& CurrPoint = Pair.Key;
+		FFlowFieldCell& CurrCell = Pair.Value;
 
 		 // 현재 Cell의 Integratin Cost
-		float MinCost = CurrCell.Integration;
+		float MinIntegCost = FLT_MAX;
 		FVector2D BestDir = FVector2D::ZeroVector;
 
 		 // 8방향 중에 어떤 방향으로의 Integration Cost가 가장 적은지 찾는다
@@ -183,10 +184,12 @@ void AFlowFieldActor::GenerateFlowField()
 			FIntPoint NextPoint = CurrPoint + DirOffset;
 			if (!IsValidCell(NextPoint)) continue;
 
-			float IntegrationCost = Grid[NextPoint].Integration;
-			if (IntegrationCost < MinCost)
+			float IntegrationCost = Grid[NextPoint].IntegrationCost;
+
+			 // 통합비용이 더 작은 쪽으로 향한다
+			if (IntegrationCost < MinIntegCost)
 			{
-				MinCost = IntegrationCost;
+				MinIntegCost = IntegrationCost;
 				BestDir = FVector2D(DirOffset);
 			}
 		}
@@ -196,22 +199,63 @@ void AFlowFieldActor::GenerateFlowField()
 	}
 }
 
+void AFlowFieldActor::StartGenTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(GenTimer, this, &AFlowFieldActor::GenerateField, GenerationUpdateTime,
+		true, GenerationUpdateTime);
+}
+
+void AFlowFieldActor::EndGenTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(GenTimer);
+}
+
 void AFlowFieldActor::DrawDebugFlowField()
 {
 	// 그리드의 모든 셀의 Flow Direction을 그린다.
 	for (auto& Pair : Grid)
 	{
-		FIntPoint CurrPoint = Pair.Key;
-		FFlowFieldCell CurrCell = Pair.Value;
+		FIntPoint& CurrPoint = Pair.Key;
+		FFlowFieldCell& CurrCell = Pair.Value;
 		FVector Pos = CurrCell.WorldPosition + FVector(0,0,10);
 
 		FVector Dir = FVector(CurrCell.FlowDirection, 0) * 40.f; // 40cm로 그리기
 		FColor ArrowColor = ObstaclePoints.Contains(CurrPoint) ? FColor::Red :
 			TargetPoints.Contains(CurrPoint) ? FColor::Blue : FColor::Green;
 
-		DrawDebugDirectionalArrow(GetWorld(), Pos, Pos+Dir, 20.f, ArrowColor);
-		
+		DrawDebugDirectionalArrow(GetWorld(), Pos, Pos+Dir, 20.f, ArrowColor, false, GenerationUpdateTime);
 	}
+	UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugFlowField"));
+}
+
+void AFlowFieldActor::DrawDebugCostField()
+{
+	for (auto& Pair : Grid)
+	{
+		FIntPoint& CurrPoint = Pair.Key;
+		FFlowFieldCell& CurrCell = Pair.Value;
+		FVector Pos = CurrCell.WorldPosition + FVector(0,0,20);
+
+		uint32 MoveCost = CurrCell.MoveCost;
+		FString MoveCostString = FString::Printf(TEXT("%u"),MoveCost);
+		DrawDebugString(GetWorld(), Pos, *MoveCostString, nullptr, FColor::Yellow, GenerationUpdateTime * 0.9f, false, 1.f);
+	}
+	UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugCostField"));
+}
+
+void AFlowFieldActor::DrawDebugIntegrationField()
+{
+	for (auto& Pair : Grid)
+	{
+		FIntPoint& CurrPoint = Pair.Key;
+		FFlowFieldCell& CurrCell = Pair.Value;
+		FVector Pos = CurrCell.WorldPosition + FVector(0,0,40);
+
+		uint32 IntegrationCost = CurrCell.IntegrationCost;
+		FString IntegrationCostString = FString::Printf(TEXT("%u"),IntegrationCost);
+		DrawDebugString(GetWorld(), Pos, IntegrationCostString, nullptr, FColor::Green);
+	}
+	UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugIntegrationField"));
 }
 
 bool AFlowFieldActor::IsValidCell(FIntPoint Coord) const
@@ -224,11 +268,10 @@ FIntPoint AFlowFieldActor::WorldToCellCoord(const FVector& WorldPos) const
 	 // Grid에서의 WorldPos의 local좌표 
 	FVector LocalPos = WorldPos - GetActorLocation();
 	return FIntPoint(
-		FMath::FloorToInt(LocalPos.X / TileSize),
-		FMath::FloorToInt(LocalPos.Y / TileSize)
+			FMath::FloorToInt(LocalPos.X / TileSize),
+			FMath::FloorToInt(LocalPos.Y / TileSize)
 		);
 }
-
 
 FVector AFlowFieldActor::CellToWorldCoord(FIntPoint CellPos) const
 {

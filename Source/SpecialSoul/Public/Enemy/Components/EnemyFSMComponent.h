@@ -48,9 +48,6 @@ protected:
 	virtual void DieTick(float DeltaTime);
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-	TObjectPtr<AActor> Target;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
 	float ElapsedTime {0.0f}; // 현재 상태에서의 경과시간
 
@@ -66,7 +63,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	float HP { MaxHP };
 
-	
 
 public: // GET SET
 	virtual void SetState(EEnemyState NewState);

@@ -22,16 +22,27 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-protected:	
+protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-	TObjectPtr<UEnemyFSMComponent> FSMComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
+	TObjectPtr<AActor> Target;
+
+	FTimerHandle FindTargetTimerHandle; // 가장 가까운 타겟을 찾는 Timer
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
+	float FindTargetInterval {2.f};
+
+	void StartFindingTarget();
+	void FindTarget();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim")
 	TObjectPtr<UEnemyAnimInstance> AnimInstance;
 
-	UFUNCTION()
-	void OnFSMStateChanged(EEnemyState NewState);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
+	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
+	TObjectPtr<UAnimMontage> DieMontage;
 
 	UFUNCTION()
 	virtual void HandleAttack();
@@ -42,10 +53,6 @@ protected:
 	UFUNCTION()
 	virtual void HandleDie();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
-	TObjectPtr<UAnimMontage> AttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
-	TObjectPtr<UAnimMontage> DieMontage;
 };
 

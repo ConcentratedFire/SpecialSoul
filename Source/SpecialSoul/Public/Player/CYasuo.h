@@ -35,7 +35,7 @@ private: // Attack
 	UPROPERTY(EditDefaultsOnly, category=Attack)
 	TSubclassOf<class ACTornado> TornadoFactory;
 	UPROPERTY(VisibleAnywhere, Category=Attack)
-	int32 AttackCnt = 3;
+	int32 AttackCnt = 5;
 
 	TArray<FVector> GetAttackVector();
 

@@ -3,9 +3,6 @@
 
 #include "Player/CYasuo.h"
 
-#include <ranges>
-
-#include "SpecialSoul.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
@@ -18,7 +15,7 @@ ACYasuo::ACYasuo()
 void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	// TODO Init Data Settings
 	// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
 	// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경

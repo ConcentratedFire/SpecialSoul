@@ -13,5 +13,11 @@ UCLASS()
 class SPECIALSOUL_API AMainBoss : public ABaseEnemy
 {
 	GENERATED_BODY()
-	
+
+public:
+	AMainBoss();
+	virtual void Tick(float DeltaTime) override;
+
+protected:
+	virtual void BeginPlay() override;
 };

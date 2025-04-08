@@ -17,6 +17,7 @@ ABaseEnemy::ABaseEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 
 	ConstructorHelpers::FClassFinder<ACEnemyController> tempController(
 		TEXT("/Script/Engine.Blueprint'/Game/Enemy/AI/BP_AIController.BP_AIController_C'"));

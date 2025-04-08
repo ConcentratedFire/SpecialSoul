@@ -59,6 +59,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
 	TObjectPtr<UAnimMontage> DieMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Move")
+	float MoveSpeed {600.f};
+
 private: // Montage CallBack
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);

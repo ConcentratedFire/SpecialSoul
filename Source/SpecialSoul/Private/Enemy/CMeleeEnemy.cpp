@@ -1,12 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CMeleeEnemy.h"
+#include "Enemy/CMeleeEnemy.h"
 
-#include "EngineUtils.h"
 #include "Components/CapsuleComponent.h"
-#include "Enemy/EnemyAnimInstance.h"
-#include "Enemy/Components/EnemyFSMComponent.h"
 
 class ACBasePlayer;
 

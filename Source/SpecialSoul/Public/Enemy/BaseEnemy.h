@@ -19,6 +19,10 @@ public:
 	ABaseEnemy();
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	UPROPERTY()
+	class ACEnemyController* MyController;	
+	
 protected:
 	virtual void BeginPlay() override;
 

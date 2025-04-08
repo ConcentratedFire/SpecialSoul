@@ -48,7 +48,9 @@ void ACYasuo::Attack()
 	// Test
 	for (const FVector& Vector : AttackVectors)
 	{
-		FTransform Transform = GetActorTransform();
+		FTransform Transform;
+		FVector curLocation = GetActorLocation();
+		Transform.SetLocation(FVector(curLocation.X,curLocation.Y, 0));
 		Transform.SetRotation(FQuat::Identity);
 		Transform.SetScale3D(FVector(1.f));
 		ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>(TornadoFactory, Transform, GetOwner());

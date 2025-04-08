@@ -19,7 +19,7 @@ ACTornado::ACTornado()
 	TornadoMesh1->SetRelativeScale3D(FVector(.3f));
 	TornadoMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TornadoMesh2"));
 	TornadoMesh2->SetupAttachment(TornadoBox);
-	TornadoMesh2->SetRelativeScale3D(FVector(.4f, .4f, .3f));
+	TornadoMesh2->SetRelativeScale3D(FVector(.45f, .45f, .3f));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tmpTornado(TEXT("/Script/Engine.StaticMesh'/Game/Asset/Tornado/Mesh/SM_Circle_size04.SM_Circle_size04'"));
 	if (tmpTornado.Succeeded())

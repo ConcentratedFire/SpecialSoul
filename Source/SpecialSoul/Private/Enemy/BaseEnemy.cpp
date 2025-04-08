@@ -3,6 +3,7 @@
 
 #include "Enemy/BaseEnemy.h"
 
+#include "EngineUtils.h"
 #include "Enemy/EnemyAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -53,7 +54,9 @@ void ABaseEnemy::FindTarget()
 	Target = nullptr;
 	
 	TArray<AActor*> FoundPlayers;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACBasePlayer::StaticClass(), FoundPlayers);
+	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACBasePlayer::StaticClass(), FoundPlayers);
+	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
+		FoundPlayers.Add(*It);
 
 	AActor* ClosestPlayer = nullptr;
 	float ClosestDist = FLT_MAX;

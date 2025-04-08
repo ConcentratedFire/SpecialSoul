@@ -3,13 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interface/SkillStrategy.h"
 #include "Player/CBasePlayer.h"
 #include "Jinx.generated.h"
 
+class UJinxAnim;
 class ISkillStrategy;
-/**
- * 
- */
+
+UENUM(BlueprintType)
+enum class ESkillKey : uint8
+{
+	Attack, Passive, E, R
+};
+
+
 UCLASS()
 class SPECIALSOUL_API AJinx : public ACBasePlayer
 {
@@ -23,13 +30,13 @@ public:
 
 public:
 
-	UFUNCTION()
-	void CastSkill()
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
+	TObjectPtr<UJinxAnim> Anim;
+
+	void CastSkill(ESkillKey Key);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skills")
-	TScriptInterface<ISkillStrategy> ESkill;
+	TMap<ESkillKey, TScriptInterface<ISkillStrategy>> SkillMap;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skills")
-	TScriptInterface<ISkillStrategy> RSkill;
 	
 };

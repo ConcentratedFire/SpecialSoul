@@ -13,5 +13,19 @@ UCLASS()
 class SPECIALSOUL_API ARangedEnemy : public ABaseEnemy
 {
 	GENERATED_BODY()
-	
+
+public:
+	ARangedEnemy();
+	virtual void Tick(float DeltaTime) override;
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
+	TObjectPtr<UEnemyFSMComponent> FSMComponent;
+
+
+	UFUNCTION()
+	void OnFSMStateChanged(EEnemyState NewState);
+
 };

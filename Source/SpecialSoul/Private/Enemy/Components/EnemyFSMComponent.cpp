@@ -3,23 +3,19 @@
 
 #include "Enemy/Components/EnemyFSMComponent.h"
 
-// Sets default values for this component's properties
+#include "EngineUtils.h"
+#include "Player/CBasePlayer.h"
+
 UEnemyFSMComponent::UEnemyFSMComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	
 }
 
 
-// Called when the game starts
 void UEnemyFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
 }
 
@@ -43,13 +39,14 @@ void UEnemyFSMComponent::SetState(EEnemyState NewState)
 	if (CurrentState != NewState)
 	{
 		CurrentState = NewState;
+		OnStateChange.Broadcast(CurrentState);
 	}
 }
 
 
 void UEnemyFSMComponent::IdleTick(float DeltaTime) { }
 
-void UEnemyFSMComponent::MoveTick(float DeltaTime){ }
+void UEnemyFSMComponent::MoveTick(float DeltaTime) { }
 
 void UEnemyFSMComponent::AttackTick(float DeltaTime) { }
 

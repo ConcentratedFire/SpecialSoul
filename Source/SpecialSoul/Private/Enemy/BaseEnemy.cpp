@@ -25,11 +25,6 @@ ABaseEnemy::ABaseEnemy()
 
 	// 레벨 배치시 or 런타임 스폰시에 자동으로 Possess 되도록 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-	if (auto Anim = GetMesh()->GetAnimInstance())
-	{
-		AnimInstance = Cast<UEnemyAnimInstance>(Anim);
-	}
 }
 
 void ABaseEnemy::BeginPlay()
@@ -37,6 +32,13 @@ void ABaseEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	MyController = Cast<ACEnemyController>(GetController());
+
+	if (auto Anim = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance = Cast<UEnemyAnimInstance>(Anim);
+		AnimInstance->OnMontageEnded.AddDynamic(this, &ABaseEnemy::OnMontageEnded);
+	}
+	
 	StartFindingTarget();
 }
 
@@ -86,10 +88,20 @@ void ABaseEnemy::FindTarget()
 
 void ABaseEnemy::HandleAttack()
 {
-	PlayAnimMontage(AttackMontage);
+	// PlayAnimMontage(AttackMontage);
+	AnimInstance->Montage_Play(AttackMontage);
 }
 
 void ABaseEnemy::HandleDie()
 {
 	PlayAnimMontage(DieMontage);
+}
+
+void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	// 공격 몽타주가 끝났다면
+	if (Montage == AttackMontage)
+	{
+		MyController->bEndAttack = true;
+	}
 }

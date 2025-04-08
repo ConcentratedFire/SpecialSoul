@@ -22,6 +22,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class AActor* TargetPlayer;
 	
+	bool bEndAttack;
+	
 private:	// Behavior Tree, For Melee Enemy & Middle Boss
 	UPROPERTY(EditDefaultsOnly)
 	class UBehaviorTree* BT_Enemy;

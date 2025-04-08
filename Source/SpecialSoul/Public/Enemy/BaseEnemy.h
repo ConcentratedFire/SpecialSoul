@@ -21,7 +21,16 @@ public:
 
 public:
 	UPROPERTY()
-	class ACEnemyController* MyController;	
+	class ACEnemyController* MyController;
+
+	UFUNCTION()
+	virtual void HandleAttack();
+
+	// UFUNCTION()
+	// virtual void HandleDamaged();
+	
+	UFUNCTION()
+	virtual void HandleDie();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -48,15 +57,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
 	TObjectPtr<UAnimMontage> DieMontage;
 
+private: // Montage CallBack
 	UFUNCTION()
-	virtual void HandleAttack();
-
-	// UFUNCTION()
-	// virtual void HandleDamaged();
-	
-	UFUNCTION()
-	virtual void HandleDie();
-
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 };
 

@@ -19,6 +19,21 @@ public:
 	ABaseEnemy();
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	UPROPERTY()
+	class ACEnemyController* MyController;
+	UPROPERTY(EditDefaultsOnly, Category = "AI|MoveDistance")
+	float MoveDistance {100.f};
+	
+	UFUNCTION()
+	virtual void HandleAttack();
+
+	// UFUNCTION()
+	// virtual void HandleDamaged();
+	
+	UFUNCTION()
+	virtual void HandleDie();
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -44,15 +59,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
 	TObjectPtr<UAnimMontage> DieMontage;
 
-	UFUNCTION()
-	virtual void HandleAttack();
+	UPROPERTY(EditDefaultsOnly, Category = "Move")
+	float MoveSpeed {600.f};
 
-	// UFUNCTION()
-	// virtual void HandleDamaged();
-	
+private: // Montage CallBack
 	UFUNCTION()
-	virtual void HandleDie();
-
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 };
 

@@ -29,7 +29,7 @@ void ACYasuo::BeginPlay()
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [&](){Anim->PlayAttackMontage();}, 3.f, true);
+	// GetWorldTimerManager().SetTimer(TimerHandle, [&](){Anim->PlayAttackMontage();}, 3.f, true);
 }
 
 void ACYasuo::Tick(float DeltaTime)

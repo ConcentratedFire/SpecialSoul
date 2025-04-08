@@ -13,9 +13,23 @@ void UEnemyAnimInstance::NativeInitializeAnimation()
 void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
-	
+
 	APawn* OwnerPawn = TryGetPawnOwner();
 	if (!OwnerPawn) return;
-	
+
 	Speed = OwnerPawn->GetVelocity().Size();
+}
+
+void UEnemyAnimInstance::AnimNotify_EnemyAttack()
+{
+	APawn* OwnerPawn = TryGetPawnOwner();
+	if (!OwnerPawn || !ProjectileActor) return;
+	
+	FVector SpawnPoint = OwnerPawn->GetActorLocation();
+	SpawnPoint += OwnerPawn->GetActorForwardVector() * 300;
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = OwnerPawn;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	GetWorld()->SpawnActor<AActor>(ProjectileActor, SpawnPoint, OwnerPawn->GetActorRotation(), SpawnParams);
 }

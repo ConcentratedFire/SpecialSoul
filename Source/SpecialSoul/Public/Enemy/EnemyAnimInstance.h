@@ -36,4 +36,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
 	bool bIsDead { false };
 
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> ProjectileActor;
+
+	UFUNCTION()
+	void AnimNotify_EnemyAttack();
 };

@@ -7,13 +7,17 @@
 #include "Enemy/BaseEnemy.h"
 #include "Enemy/AI/CEnemyController.h"
 
+UCBTTAttack::UCBTTAttack()
+{
+	bNotifyTick = true;
+}
+
 EBTNodeResult::Type UCBTTAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	if (ABaseEnemy* MyEnemy = Cast<
 		ABaseEnemy>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(FName("SelfActor"))))
 	{
-		MyEnemy->HandleAttack();
-		bNotifyTick = true;
+		MyEnemy->HandleAttack();		
 		return EBTNodeResult::InProgress;
 	}
 	else

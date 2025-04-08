@@ -3,19 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
-#include "CBTTAttack.generated.h"
+#include "BehaviorTree/Tasks/BTTask_MoveTo.h"
+#include "CBTTMoveTo.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SPECIALSOUL_API UCBTTAttack : public UBTTaskNode
+class SPECIALSOUL_API UCBTTMoveTo : public UBTTask_MoveTo
 {
 	GENERATED_BODY()
 
 private:
-	UCBTTAttack();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+	UPROPERTY(EditAnywhere, Category = "MoveTo")
+	float DefaultAcceptableRadius = 100.0f;
 };

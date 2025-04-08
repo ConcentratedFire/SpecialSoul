@@ -22,7 +22,9 @@ public:
 public:
 	UPROPERTY()
 	class ACEnemyController* MyController;
-
+	UPROPERTY(EditDefaultsOnly, Category = "AI|MoveDistance")
+	float MoveDistance {100.f};
+	
 	UFUNCTION()
 	virtual void HandleAttack();
 

@@ -21,7 +21,7 @@ void ACYasuo::BeginPlay()
 	// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
 	UCDataSheetUtility* DataSheetUtility = NewObject<UCDataSheetUtility>();
 	if (DataSheetUtility)
-		DataSheetUtility->FetchGoogleSheetData("Yasuo", "B2", "H7");
+		//DataSheetUtility->FetchGoogleSheetData("Yasuo", "B2", "H7");
 	// 리소스 해제
 	DataSheetUtility->ConditionalBeginDestroy();
 	DataSheetUtility = nullptr;

@@ -31,7 +31,6 @@ void UCDataSheetUtility::FetchGoogleSheetData(const FString& SheetName, const FS
 
 	// Request 실행
 	Request->ProcessRequest();
-
 	UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager Fetching Google Sheet Data"));
 }
 
@@ -42,6 +41,7 @@ void UCDataSheetUtility::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived valid"));
 		FString ResponseString = Response->GetContentAsString();
+		
 
 		// JSON 파싱
 		TSharedPtr<FJsonObject> JsonObject;
@@ -57,19 +57,28 @@ void UCDataSheetUtility::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 
 				UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager getarrayfield"));
             
-
+				uint32 Key = 1;
 				for (const TSharedPtr<FJsonValue>& RowValue : *Rows)
 				{
 					const TArray<TSharedPtr<FJsonValue>>& Row = RowValue->AsArray();
-					if (Row.Num() == 2)
+					for (const TSharedPtr<FJsonValue>& Value : Row)
 					{
-						FString Key = Row[0]->AsString();
+						if (Value.IsValid())
+						{
+							UE_LOG(LogTemp, Log, TEXT("Json Value: %s"), *Value->AsString());
+						}
+					}
+
+					//if (Row.Num() == 2)
+					//{
+						//FString Key = Row[0]->AsString();
 						float Value = FCString::Atof(*Row[1]->AsString());
 
-						DataMap.Add(Key, Value);
+						//DataMap.Add(Key, Value);
+						Key++;
 
-						// UE_LOG(LogTemp, Log, TEXT("UPAHttpDownloadManager DataMap added: %s - %f"), *Key, Value);
-					}
+						UE_LOG(LogTemp, Log, TEXT("UPAHttpDownloadManager DataMap added: %d - %f"), Key, Value);
+					//}
 				}
 
 				// 데이터 로그 출력

@@ -16,6 +16,30 @@ enum class ESkillKey : uint8
 	Attack, Passive, E, R
 };
 
+USTRUCT(BlueprintType)
+struct FJinxAttackData // 징크스 기본공격 데이터
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
+	int32	ProjectileCount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
+	float	ProjectileRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
+	float	Damage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
+	float	Cooltime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
+	bool	bUseAP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
+	float	APDamage;
+
+	FJinxAttackData(){}
+	
+	FJinxAttackData(int32 projectileCount, float projectileRange, float damage, float cooltime, bool buseAP, float apDamage )
+		: ProjectileCount(projectileCount), ProjectileRange(projectileRange), Damage(damage), Cooltime(cooltime),bUseAP(buseAP), APDamage(apDamage)
+	{}
+};
 
 UCLASS()
 class SPECIALSOUL_API AJinx : public ACBasePlayer
@@ -33,10 +57,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	TObjectPtr<UJinxAnim> Anim;
 
-	void CastSkill(ESkillKey Key);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	FJinxAttackData AttackData; // 기본공격 데이터
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skills")
 	TMap<ESkillKey, TScriptInterface<ISkillStrategy>> SkillMap;
+
+	void CastSkill(ESkillKey Key);
 	
-	
+private:
+	void BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill);
+
+	FTimerHandle AttackTimer;
+	void StartAttack();
 };

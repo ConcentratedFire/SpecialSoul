@@ -24,8 +24,7 @@ void ACObjectPoolManager::BeginPlay()
 	// {
 	// 	for (int i = 0; i < 4; ++i)
 	// 		PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
-	// }, 1.5f, true);
-	
+	// }, 1.5f, true);	
 }
 
 void ACObjectPoolManager::ReturnEnemy(class ACMeleeEnemy* Enemy)
@@ -35,6 +34,7 @@ void ACObjectPoolManager::ReturnEnemy(class ACMeleeEnemy* Enemy)
 	Enemy->SetActorTickEnabled(false);
 
 	EnemyGotoPool_Dele.Broadcast();
+	// LOG_S(Warning, TEXT("Enemy Add : %p\tName : %s"), Enemy, Enemy==nullptr?TEXT("nullptr"):*Enemy->GetName());
 	MeleePool.Push(Enemy);
 }
 
@@ -56,6 +56,7 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 		PoolObj->SetActorTickEnabled(false);
 		
 		UGameplayStatics::FinishSpawningActor(PoolObj, Transform);
+		// LOG_S(Warning, TEXT("Enemy Add : %p\tName : %s"), PoolObj, PoolObj==nullptr?TEXT("nullptr"):*PoolObj->GetName());
 		PoolArray.Push(PoolObj);
 	}
 

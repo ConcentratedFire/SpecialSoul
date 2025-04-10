@@ -28,7 +28,7 @@ protected:
 public:
 	FEnemyOutFromPool EnemyOutFromPool_Dele;
 	FEnemyGotoPool EnemyGotoPool_Dele;
-	
+
 	// Return To ObjectPool
 	void ReturnEnemy(class ACMeleeEnemy* Enemy);
 
@@ -47,7 +47,7 @@ private: // Object Pool
 	// 원거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ARangedEnemy*> RangePool;
-	
+
 	/**
 	 * Initializes an object pool with a specified number of objects of a given class.
 	 *
@@ -63,7 +63,7 @@ private: // Object Pool
 	template <typename T>
 	void InitPool(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class);
 
-	template<>
+	template <>
 	void InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<ABaseEnemy>& Class);
 
 private: // Place
@@ -85,11 +85,12 @@ void ACObjectPoolManager::InitPool(TArray<T*>& PoolArray, const int32& AddPoolSi
 		FTransform Transform(FRotator::ZeroRotator, FVector(-1000, 2000, 500), FVector(1));
 		FActorSpawnParameters SpawnParam;
 		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		T* PoolObj = GetWorld()->SpawnActorDeferred<T>(Class,Transform,nullptr,nullptr,ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		T* PoolObj = GetWorld()->SpawnActorDeferred<T>(Class, Transform, nullptr, nullptr,
+		                                               ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		PoolObj->SetActorEnableCollision(false);
 		PoolObj->SetActorHiddenInGame(true);
 		PoolObj->SetActorTickEnabled(false);
-		
+
 		UGameplayStatics::FinishSpawningActor(PoolObj, Transform);
 		PoolArray.Push(PoolObj);
 	}
@@ -119,19 +120,22 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 		InitPool(PoolArray, AddPoolSize, Class);
 
 	// Pool에 들어가는 시점과 추가되는 시점이 겹치면 Null값이 배열에 들어가는 경우 발생
-	// 만약 Top이 Null이라면 요소를 하나 빼고 다시 수행하도록 재귀 호출
-	if (!PoolArray.Top())
+	// 만약 Top이 Null이라면 요소를 제거하고 다시 수행하도록 재귀 호출
+	bool bIsNullEnemy = false;
+	while (!PoolArray.Top())
 	{
+		bIsNullEnemy = true;
 		PoolArray.Pop();
-		PlaceEnemyRandomPlace(PoolArray, AddPoolSize, Class);
-		return;
 	}
-	
+
+	if (bIsNullEnemy)
+		PlaceEnemyRandomPlace(PoolArray, AddPoolSize, Class);
+
 	T* PoolObj = PoolArray.Pop();
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);
 	PoolObj->SetActorTickEnabled(true);
 	PoolObj->SetActorLocation(SpawnLocation);
-	
+
 	EnemyOutFromPool_Dele.Broadcast();
 }

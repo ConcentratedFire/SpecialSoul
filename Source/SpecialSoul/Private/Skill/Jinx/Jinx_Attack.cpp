@@ -3,3 +3,6 @@
 
 #include "Skill/Jinx/Jinx_Attack.h"
 
+void UJinx_Attack::UseSkill(AActor* Caster)
+{
+}

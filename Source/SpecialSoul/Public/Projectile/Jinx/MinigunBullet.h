@@ -6,6 +6,7 @@
 #include "Projectile/Projectile.h"
 #include "MinigunBullet.generated.h"
 
+class UProjectileMovementComponent;
 /**
  * 
  */
@@ -14,7 +15,12 @@ class SPECIALSOUL_API AMinigunBullet : public AProjectile
 {
 	GENERATED_BODY()
 	
-
-public:
+	AMinigunBullet();
 	
+public:
+	virtual void BeginPlay() override;
+
+	// 사거리
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackRange {1500.f};
 };

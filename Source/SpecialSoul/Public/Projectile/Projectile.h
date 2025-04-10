@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+class UProjectileMovementComponent;
+
 UCLASS()
 class SPECIALSOUL_API AProjectile : public AActor
 {
@@ -18,6 +20,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<UStaticMeshComponent> MeshComp;
 	
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComp;
+
+	// UPROPERTY(VisibleAnywhere, Category = "Components")
+	// TObjectPtr<Niagara> ;
 };

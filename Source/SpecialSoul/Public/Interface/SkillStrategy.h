@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "SkillStrategy.generated.h"
 
+class ACBasePlayer;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class USkillStrategy : public UInterface
@@ -21,5 +22,5 @@ class SPECIALSOUL_API ISkillStrategy
 	GENERATED_BODY()
 
 public:
-	virtual void UseSkill(AActor* Caster) = 0;
+	virtual void UseSkill(ACBasePlayer* Caster) = 0;
 };

@@ -3,6 +3,6 @@
 
 #include "Skill/Jinx/Jinx_Passive.h"
 
-void UJinx_Passive::UseSkill(AActor* Caster)
+void UJinx_Passive::UseSkill(ACBasePlayer* Caster)
 {
 }

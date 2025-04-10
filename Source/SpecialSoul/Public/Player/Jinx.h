@@ -57,7 +57,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	
+	virtual void Attack() override;
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
@@ -78,6 +78,9 @@ public:
 	void CastSkill(ESkillKey Key);
 
 	UFUNCTION()
+	void SetAttackData(); // 임시
+	
+	UFUNCTION()
 	void PrintAttackDataMap(); // 임시
 	
 private:
@@ -89,4 +92,9 @@ private:
 
 	FTimerHandle AttackTimer;
 	void StartAttack();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> AttackMontage;
+	
 };
+

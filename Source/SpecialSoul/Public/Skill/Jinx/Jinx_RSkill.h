@@ -16,7 +16,7 @@ class SPECIALSOUL_API UJinx_RSkill : public UObject, public ISkillStrategy
 	GENERATED_BODY()
 
 public:
-	virtual void UseSkill(AActor* Caster) override;
+	virtual void UseSkill(ACBasePlayer* Caster) override;
 
 	UPROPERTY(EditAnywhere, Category = "Jinx")
 	TSubclassOf<AMegaRocketBullet> MegaRocketBullet;

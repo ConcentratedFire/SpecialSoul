@@ -21,3 +21,8 @@ void UJinxAnim::NativeUpdateAnimation(float DeltaSeconds)
 	if (!Jinx) return;
 	Speed = Jinx->GetVelocity().Size();
 }
+
+void UJinxAnim::AnimNotify_Attack()
+{
+	Jinx->Attack();
+}

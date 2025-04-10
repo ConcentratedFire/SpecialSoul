@@ -31,6 +31,12 @@ void AJinx::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+void AJinx::Attack()
+{
+	CastSkill(ESkillKey::Attack); // 기본공격
+}
+
 void AJinx::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,13 +48,16 @@ void AJinx::BeginPlay()
 	BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
 	
-	 // TODO Init Data Settings
-	 // 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
-	 // Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
+	// 데이터
 	DataSheetUtility = NewObject<UCDataSheetUtility>(this); // Outer인 this를 기준으로 객체 생명주기를 관리 (Outer가 죽을 때 자동으로 GC 됨)
-	DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", AttackDataMap);
+	DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", AttackDataMap); // 기본공격 데이터
 	
-	DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::PrintAttackDataMap);
+	DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::SetAttackData);
+}
+
+void AJinx::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill)
+{
+	SkillMap.Add(Key, Skill);
 }
 
 // 플레이어의 키 입력에 따른 스킬 캐스팅
@@ -59,8 +68,13 @@ void AJinx::CastSkill(ESkillKey Key)
 		UE_LOG(LogTemp, Warning, TEXT("CastSkill) Skill does not exist"));
 		return;
 	}
-	
 	SkillMap[Key]->UseSkill(this); // 캐릭터(this)를 넣어줌으로써, 스킬에서 캐릭터의 데이터를 사용할 수 있다
+}
+
+void AJinx::SetAttackData()
+{
+	AttackData = AttackDataMap.FindRef(1);
+	StartAttack();
 }
 
 void AJinx::PrintAttackDataMap()
@@ -72,13 +86,11 @@ void AJinx::PrintAttackDataMap()
 	}
 }
 
-void AJinx::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill)
-{
-	SkillMap.Add(Key, Skill);
-}
-
 void AJinx::StartAttack()
 {
-	//GetWorld()->GetTimerManager().SetTimer(AttackTimer, this,
-	//	FTimerDelegate::CreateLambda([this]() {}))
+	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
+	{
+		PlayAnimMontage(AttackMontage); // AttackMontage의 AnimNotify에서 애니메이션의 특정 프레임에 Attack 호출
+		UE_LOG(LogTemp, Log, TEXT("Attack"));
+	}), AttackData.Cooltime, true, AttackData.Cooltime);
 }

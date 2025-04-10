@@ -152,11 +152,11 @@ void UCDataSheetUtility::PaserSheetRowsToStructArray(const TArray<TSharedPtr<FJs
 			FString Type = Types[ColIndex]->AsString();
 			FString ValueStr = DataRow[ColIndex]->AsString();
 
-			if (Type == "bool")
-			{
-				FString vStr = ValueStr.ToUpper();
-				ValueStr = (vStr == "Y" || vStr == "true") ? TEXT("true") : TEXT("false");
-			}
+			// if (Type == "bool")
+			// {
+			// 	FString vStr = ValueStr.ToUpper();
+			// 	ValueStr = (vStr == "Y" || vStr == "true") ? TEXT("true") : TEXT("false");
+			// }
 
 			 // struct 에서 프로퍼티를 가져온다
 			FProperty* Property = StructDef->FindPropertyByName(ColumnName);

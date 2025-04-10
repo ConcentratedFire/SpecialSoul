@@ -25,4 +25,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "JinxAnim")
 	float Speed;
 
+	// 애님 노티파이
+	UFUNCTION()
+	void AnimNotify_Attack();
 };

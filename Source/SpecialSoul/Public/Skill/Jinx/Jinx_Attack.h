@@ -17,8 +17,21 @@ class SPECIALSOUL_API UJinx_Attack : public UObject, public ISkillStrategy
 	GENERATED_BODY()
 
 public:
-	virtual void UseSkill(AActor* Caster) override;
+	UJinx_Attack();
 	
-	UPROPERTY(EditAnywhere, Category = "Jinx")
+	virtual void UseSkill(ACBasePlayer* Caster) override;
+	
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AMinigunBullet> MinigunBullet;
+	
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	int32 BulletNum = 5;
+	
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float FireDelay = 0.1;
+	
+private:
+	FTimerHandle FireTimer;
+	int32 FiredBulletNum {0};
+
 };

@@ -16,5 +16,5 @@ class SPECIALSOUL_API UJinx_Passive : public UObject, public ISkillStrategy
 	GENERATED_BODY()
 
 public:
-	virtual void UseSkill(AActor* Caster) override;
+	virtual void UseSkill(ACBasePlayer* Caster) override;
 };

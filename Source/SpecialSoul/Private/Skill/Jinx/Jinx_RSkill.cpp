@@ -3,7 +3,7 @@
 
 #include "Skill/Jinx/Jinx_RSkill.h"
 
-void UJinx_RSkill::UseSkill(AActor* Caster)
+void UJinx_RSkill::UseSkill(ACBasePlayer* Caster)
 {
 	// 시전시간 동안 Progressbar UI를 띄우고
 

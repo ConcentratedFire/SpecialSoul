@@ -53,7 +53,7 @@ void ACYasuo::Attack()
 		Transform.SetLocation(FVector(curLocation.X,curLocation.Y, 0));
 		Transform.SetRotation(FQuat::Identity);
 		Transform.SetScale3D(FVector(1.f));
-		ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>(TornadoFactory, Transform, GetOwner());
+		ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>( TornadoFactory, Transform, GetOwner());
 		Tornado->TornadoDirection = Vector;
 		UGameplayStatics::FinishSpawningActor(Tornado, Transform);
 		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + Vector * 100.f, FColor::Red, false, 0.f, 0,

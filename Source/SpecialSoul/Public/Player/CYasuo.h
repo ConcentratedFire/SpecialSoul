@@ -8,7 +8,7 @@
 
 
 USTRUCT(BlueprintType)
-struct FYasuoAttackData // 징크스 기본공격 데이터
+struct FYasuoAttackData // 야스오 기본공격 데이터
 {
 	GENERATED_BODY()
 
@@ -65,11 +65,10 @@ public:
 	virtual void Attack() override;
 
 private:
-	int32 MP = 0;
-	bool bUseAOE = false;
-	float AOERange = 0.f;
-	float AOEDamage = 0.f;
-	float AOECoolTime = 0.f;
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
+	FYasuoAttackData YasuoStat;
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
+	int32 PassiveEnergy = 0;
 
 private: // Attack
 	UPROPERTY(EditDefaultsOnly, category=Attack)
@@ -86,4 +85,17 @@ private: // Anim
 private: // Spec
 	UFUNCTION()
 	void PrintAttackDataMap(); // 임시
+
+	UPROPERTY()
+	class UCDataSheetUtility* DataSheetUtility;
+
+	void UpdateYasuoStat(const int32 Level);
+
+private: // Passive Energy
+	const int32 PassiveEnergyMax = 100;
+	const int32 PassiveEnergyRegen = 4;
+	FTimerHandle ChargePassiveEnergyTimer;
+
+	UFUNCTION()
+	void ChargePassiveEnergy();
 };

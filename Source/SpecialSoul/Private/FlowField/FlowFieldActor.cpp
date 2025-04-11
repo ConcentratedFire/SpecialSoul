@@ -25,6 +25,17 @@ void AFlowFieldActor::BeginPlay()
 	InitializeGrid();
 }
 
+FVector2D AFlowFieldActor::FindFlowDirection(const FVector& WorldPos) const
+{
+	FIntPoint CellPos = WorldToCellCoord(WorldPos);
+	if (!IsValidCell(CellPos))
+		return FVector2D::ZeroVector;
+
+	const FFlowFieldCell& FlowDir = Grid[CellPos];
+	
+	return FlowDir.FlowDirection;
+}
+
 void AFlowFieldActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

@@ -6,6 +6,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyAnimInstance.h"
 #include "Enemy/Components/EnemyFSMComponent.h"
+#include "FlowField/FlowFieldActor.h"
+#include "Kismet/GameplayStatics.h"
 
 ARangedEnemy::ARangedEnemy()
 {
@@ -27,10 +29,10 @@ ARangedEnemy::ARangedEnemy()
 void ARangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FlowField = Cast<AFlowFieldActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AFlowFieldActor::StaticClass()));
 	
-	 // 델리게이트 (중재자 역할)
-	 // (FSM과 AnimInstance 간의 결합도를 낮춰주기 위함)
-	 // FSM과 AnimInstance가 서로의 코드를 몰라도 되도록 !!
+	
 	if (FSMComponent)
 	{
 		FSMComponent->OnStateChange.AddDynamic(this, &ARangedEnemy::OnFSMStateChanged);

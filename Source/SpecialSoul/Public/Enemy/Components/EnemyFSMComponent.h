@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "EnemyFSMComponent.generated.h"
 
+class ABaseEnemy;
+
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
@@ -33,7 +35,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<ABaseEnemy> Enemy;
+	
 	FOnStateChange OnStateChange;
 	FOnAttack OnAttack;
 	FOnDamaged OnDamaged;

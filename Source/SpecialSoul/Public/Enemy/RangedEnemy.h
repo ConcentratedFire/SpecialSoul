@@ -6,6 +6,7 @@
 #include "Enemy/BaseEnemy.h"
 #include "RangedEnemy.generated.h"
 
+class AFlowFieldActor;
 /**
  * 
  */
@@ -18,6 +19,9 @@ public:
 	ARangedEnemy();
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FlowField)
+	TObjectPtr<AFlowFieldActor> FlowField;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -28,4 +32,7 @@ protected:
 	UFUNCTION()
 	void OnFSMStateChanged(EEnemyState NewState);
 
+
+	// 애니메이션
+	
 };

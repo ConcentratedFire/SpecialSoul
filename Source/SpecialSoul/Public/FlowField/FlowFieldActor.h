@@ -30,7 +30,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
+	 // WorldPos에 맞는 FlowField Direction을 반환
+	FVector2D FindFlowDirection(const FVector& WorldPos) const;
 
 	UPROPERTY(EditAnywhere, Category = FlowField)
 	int32 GridWidth {100};
@@ -61,10 +64,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = FlowFieldDebug)
 	bool bShowFlowField {false};
 	
+protected:
 	void StartGenTimer();
 	void EndGenTimer();
-
-protected:
 	
 	void InitializeGrid();
 	void GenerateCostField();

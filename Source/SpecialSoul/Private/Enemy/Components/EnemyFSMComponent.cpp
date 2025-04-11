@@ -4,6 +4,7 @@
 #include "Enemy/Components/EnemyFSMComponent.h"
 
 #include "EngineUtils.h"
+#include "Enemy/BaseEnemy.h"
 #include "Player/CBasePlayer.h"
 
 UEnemyFSMComponent::UEnemyFSMComponent()
@@ -16,6 +17,8 @@ UEnemyFSMComponent::UEnemyFSMComponent()
 void UEnemyFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Enemy = Cast<ABaseEnemy>(GetOwner());
 	
 }
 
@@ -23,6 +26,12 @@ void UEnemyFSMComponent::BeginPlay()
 void UEnemyFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// if (!Enemy)
+	// {
+	// 	Enemy = Cast<ABaseEnemy>(GetOwner());
+	// 	return;
+	// }
 
 	switch (CurrentState)
 	{
@@ -46,7 +55,9 @@ void UEnemyFSMComponent::SetState(EEnemyState NewState)
 
 void UEnemyFSMComponent::IdleTick(float DeltaTime) { }
 
-void UEnemyFSMComponent::MoveTick(float DeltaTime) { }
+void UEnemyFSMComponent::MoveTick(float DeltaTime)
+{
+}
 
 void UEnemyFSMComponent::AttackTick(float DeltaTime) { }
 

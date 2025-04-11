@@ -7,6 +7,7 @@
 #include "Enemy/RangedEnemy.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/AttackActors/CTornado.h"
 #include "CObjectPoolManager.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FEnemyGotoPool);
@@ -35,6 +36,10 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ABaseEnemy> MeleeEnemy;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ABaseEnemy> RangeEnemy;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACTornado> TornadoActor;
 
 private: // Object Pool
 	// 한번에 스폰시킬 Enemy 마리수
@@ -46,23 +51,21 @@ private: // Object Pool
 	TArray<ABaseEnemy*> MeleePool;
 	// 원거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
-	TArray<ARangedEnemy*> RangePool;
+	TArray<ABaseEnemy*> RangePool;
 
 	/**
-	 * Initializes an object pool with a specified number of objects of a given class.
+	 * 오브젝트 풀의 크기를 늘리고 UClass를 이용하여 오브젝트 생성
 	 *
 	 * @tparam T 스폰시킬 오브젝트 타입
-	 * @param PoolArray A reference to the array that holds the pooled objects.
-	 * @param AddPoolSize The number of new objects to add to the pool.
-	 * @param Class The class type of the objects to spawn into the pool.
+	 * @param PoolArray 오브젝트 풀 배열
+	 * @param AddPoolSize 추가할 배열 크기
+	 * @param Class 생성할 클래스 UClass
 	 *
-	 * This function spawns a specified number of objects of the given class and
-	 * adds them to the pool array. The objects are initialized as invisible, with
-	 * collisions and ticking disabled, and placed in a default spawn location.
 	 */
 	template <typename T>
 	void InitPool(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class);
 
+	// 템플릿 특수화 (Enemy 용도)
 	template <>
 	void InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<ABaseEnemy>& Class);
 
@@ -90,6 +93,7 @@ void ACObjectPoolManager::InitPool(TArray<T*>& PoolArray, const int32& AddPoolSi
 		PoolObj->SetActorEnableCollision(false);
 		PoolObj->SetActorHiddenInGame(true);
 		PoolObj->SetActorTickEnabled(false);
+		PoolObj->SetManager(this);
 
 		UGameplayStatics::FinishSpawningActor(PoolObj, Transform);
 		PoolArray.Push(PoolObj);

@@ -26,6 +26,12 @@ public:
 public:
 	FVector TornadoDirection;
 
+	UPROPERTY()
+	class ACObjectPoolManager* ObjectPoolManager;
+	
+public:
+	void SetManager(class ACObjectPoolManager* Manager){ObjectPoolManager = Manager;}
+	
 private:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* TornadoBox;

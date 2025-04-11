@@ -50,7 +50,7 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 		FActorSpawnParameters SpawnParam;
 		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		ABaseEnemy* PoolObj = GetWorld()->SpawnActorDeferred<ABaseEnemy>(Class,Transform,nullptr,nullptr,ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-		PoolObj->SetManager(this);	// BaseEnemy에 존재하는 함수
+		PoolObj->SetManager(this);
 		PoolObj->SetActorEnableCollision(false);
 		PoolObj->SetActorHiddenInGame(true);
 		PoolObj->SetActorTickEnabled(false);
@@ -60,5 +60,5 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 		PoolArray.Push(PoolObj);
 	}
 
-	EnemyGotoPool_Dele.Broadcast();
+	EnemyGotoPool_Dele.Broadcast();	// 특수화 목적
 }

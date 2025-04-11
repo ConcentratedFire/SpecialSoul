@@ -17,4 +17,3 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSpecialSoul, Log, All);
 // Screen에다가 LOG를 직접 찍는 매크로, 인덱스, 색 추가
 #define	LOG_SCREEN_IDX(idx, color, fmt, ...) GEngine->AddOnScreenDebugMessage(idx, 5.f, color, FString::Printf(TEXT(fmt), ##__VA_ARGS__))
 
-#define ECC_FlowField ECC_GameTraceChannel1

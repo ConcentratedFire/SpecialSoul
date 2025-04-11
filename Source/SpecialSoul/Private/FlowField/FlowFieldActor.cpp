@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/CBasePlayer.h"
 
+#define ECC_FF_Obstacle ECC_GameTraceChannel5
+
 AFlowFieldActor::AFlowFieldActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -31,6 +33,7 @@ void AFlowFieldActor::Tick(float DeltaTime)
 void AFlowFieldActor::GenerateField()
 {
 	FindPlayerPoints();
+	FindObstaclePoints();
 	
 	GenerateCostField();
 	GenerateIntegrationField();
@@ -72,16 +75,16 @@ void AFlowFieldActor::FindObstaclePoints()
 		FFlowFieldCell Cell = Pair.Value;
 
 		// [-2m, +2m] LineTrace 
-		FVector StartPos = CellToWorldCoord(Point) + FVector(0, 0, 200);
-		FVector EndPos = StartPos + FVector(0 , 0, -400);
+		FVector StartPos = CellToWorldCoord(Point) + FVector(0, 0, 1000);
+		FVector EndPos = StartPos + FVector(0 , 0, -1100);
 
 		FHitResult Hit;
 		FCollisionQueryParams Params;
 		Params.bTraceComplex = true; // Complex Collision와도 체크!
-
+		
 		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,
-			StartPos, EndPos, ECC_FlowField, Params);
-
+			StartPos, EndPos, ECC_FF_Obstacle, Params);
+		
 		if (bHit)
 		{
 			ObstaclePoints.Add(Point);
@@ -153,7 +156,8 @@ void AFlowFieldActor::GenerateIntegrationField()
 			if (!IsValidCell(NextPoint)) continue;
 
 			 // 다음 통합비용 = 현지점의 통합비용 + 다음지점 이동비용
-			float NewIntegCost = CurrIntegCost + Grid[NextPoint].MoveCost;
+			float DiagonalWeight = (FMath::Abs(Dir.X) == 1 && FMath::Abs(Dir.Y) == 1) ? 1.4f : 1.f;
+			float NewIntegCost = CurrIntegCost + Grid[NextPoint].MoveCost * DiagonalWeight;
 
 			 // 이전 값보다 작으면 갱신
 			if (NewIntegCost < Grid[NextPoint].IntegrationCost)
@@ -221,7 +225,7 @@ void AFlowFieldActor::DrawDebugFlowField()
 
 		FVector Dir = FVector(CurrCell.FlowDirection, 0) * 40.f; // 40cm로 그리기
 		FColor ArrowColor = ObstaclePoints.Contains(CurrPoint) ? FColor::Red :
-			TargetPoints.Contains(CurrPoint) ? FColor::Blue : FColor::Green;
+			TargetPoints.Contains(CurrPoint) ? FColor::Green : FColor::Blue;
 
 		DrawDebugDirectionalArrow(GetWorld(), Pos, Pos+Dir, 20.f, ArrowColor, false, GenerationUpdateTime);
 	}
@@ -253,7 +257,7 @@ void AFlowFieldActor::DrawDebugIntegrationField()
 
 		uint32 IntegrationCost = CurrCell.IntegrationCost;
 		FString IntegrationCostString = FString::Printf(TEXT("%u"),IntegrationCost);
-		DrawDebugString(GetWorld(), Pos, IntegrationCostString, nullptr, FColor::Green);
+		DrawDebugString(GetWorld(), Pos, *IntegrationCostString, nullptr, FColor::Purple, GenerationUpdateTime * 0.9f, false, 1.f);
 	}
 	UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugIntegrationField"));
 }

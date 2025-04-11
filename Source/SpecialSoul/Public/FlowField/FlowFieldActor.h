@@ -88,9 +88,10 @@ private:
 	 // unordered_map 해시테이블
 	TMap<FIntPoint, FFlowFieldCell> Grid;
 	 // 12시부터 시계방향
+	 // 동 서 남 북 // 북동 남북 남서 북서 순서
 	const TArray<FIntPoint> Directions = {
-		{1,0}, {1,1}, {0, 1}, {-1, 1},
-		{-1, 0}, {-1, -1}, {0, -1}, {1, -1}
+		{1,0},{0, 1}, {-1, 0},{0, -1},
+		{1,1},{-1, 1},{-1, -1},{1, -1}
 	};
 	
 	FTimerHandle GenTimer;

@@ -19,14 +19,8 @@ class SPECIALSOUL_API UCDataSheetUtility : public UObject
 public:
 	UCDataSheetUtility();
 
-	
-	// UFUNCTION(BlueprintCallable, Category = HTTP)
 	template<typename T>
 	void FetchGoogleSheetData(const FString& SheetName, const FString& startCell, const FString& endCell, TMap<int32, T>& OutDataMap);
-
-	
-	//UPROPERTY()
-	//TMap<FString, float> DataMap;
 
 	FOnDataFetched OnDataFetched;
 

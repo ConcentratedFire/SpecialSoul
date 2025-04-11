@@ -45,4 +45,10 @@ private:
 	float RoationInteropSpeed = 5.f;
 	
 	void RotationToMouseCursor(const float& DeltaTime);
+
+private: // Yasuo Move Distance Check
+	UPROPERTY()
+	class ACYasuo* YasuoCharacer;
+	FVector BeforeLocation = FVector::ZeroVector;
+	
 };

@@ -8,9 +8,12 @@
 #include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Game/CGameState.h"
+#include "Game/SpecialSoulGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/Components/CMovementComponent.h"
+#include "Utility/CDataSheetUtility.h"
 
 class UEnhancedInputLocalPlayerSubsystem;
 // Sets default values
@@ -60,6 +63,35 @@ ACBasePlayer::ACBasePlayer()
 void ACBasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// TODO 서버일때만 하도록 처리
+	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		GS = GM->GetGameState<ACGameState>();
+		if (GS)
+		{
+			// TODO Init Data Settings
+			// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
+			// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
+			DataSheetUtility_ = NewObject<UCDataSheetUtility>(this);
+
+			if (DataSheetUtility_)
+			{
+				DataSheetUtility_->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintAttackDataMap);
+				DataSheetUtility_->OnDataFetched.AddDynamic(GS, &ACGameState::PrintAttackDataMap);
+				
+				DataSheetUtility_->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
+				DataSheetUtility_->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
+				DataSheetUtility_->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", GM->RegenDataMap);
+				DataSheetUtility_->FetchGoogleSheetData<FEXPData>("EXP", "A1", "B22", GS->EXPDataMap);
+				
+				// 리소스 해제
+				// DataSheetUtility->ConditionalBeginDestroy();
+				// DataSheetUtility = nullptr;
+			}			
+		}
+	}
 }
 
 // Called every frame
@@ -84,4 +116,9 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (input)
 		OnInputBindingDel.Broadcast(input);
+}
+
+void ACBasePlayer::PrintAttackDataMap()
+{
+	
 }

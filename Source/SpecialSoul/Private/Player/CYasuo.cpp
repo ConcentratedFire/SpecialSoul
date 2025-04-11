@@ -15,25 +15,9 @@ ACYasuo::ACYasuo()
 void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// TODO Init Data Settings
-	// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
-	// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
-	DataSheetUtility = NewObject<UCDataSheetUtility>(this);
-	if (DataSheetUtility)
-	{
-		DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
-		DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", AttackDataMap);
-		// 리소스 해제
-		// DataSheetUtility->ConditionalBeginDestroy();
-		// DataSheetUtility = nullptr;
-		// 업데이트
-	}
-
+	DataSheetUtility_->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
+	
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
-
-	// FTimerHandle TimerHandle;
-	// GetWorldTimerManager().SetTimer(TimerHandle, [&](){Anim->PlayAttackMontage();}, 3.f, true);
 
 	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::ChargePassiveEnergy, 1.f, true);
 }
@@ -42,10 +26,16 @@ void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// if (MP >= 100)
-	// {
-	// 	MP = 0;
-	// }
+	if (MoveDistance)
+	{
+		
+	}
+
+	if (PassiveEnergy >= 100)
+	{
+		PassiveEnergy -= 100;
+		Anim->PlayAttackMontage();
+	}
 }
 
 void ACYasuo::Attack()
@@ -95,7 +85,7 @@ TArray<FVector> ACYasuo::GetAttackVector()
 
 void ACYasuo::PrintAttackDataMap()
 {
-	for (const auto& Pair : AttackDataMap)
+	for (const auto& Pair : YasuoAttackDataMap)
 	{
 		UE_LOG(LogTemp, Log,
 		       TEXT(
@@ -104,14 +94,26 @@ void ACYasuo::PrintAttackDataMap()
 		       Pair.Key, Pair.Value.ProjectileCount, Pair.Value.ProjectileRange, Pair.Value.Damage, *Pair.Value.UseAOE,
 		       Pair.Value.AOELifeTime, Pair.Value.AOEDamage, Pair.Value.AOEDamageCoolTime);
 	}
+	for (const auto& Pair : YasuoMoveDataMap)
+	{
+		UE_LOG(LogTemp, Log,
+		       TEXT(
+			       "Yasuo's AttackDataMap || ID: %d) ProjectileCount: %d, ProjectileRange: %d, Damage: %f"
+		       ),
+		       Pair.Key, Pair.Value.RangeFrom, Pair.Value.RangeTo, Pair.Value.StackDistance);
+	}
 
 	// 초기 데이터 세팅
-	UpdateYasuoStat(1);
+	if (YasuoAttackDataMap.Num() > 0)
+		UpdateYasuoAttackStat(1);
+
+	if (YasuoMoveDataMap.Num() > 0)
+		UpdateYasuoMoveStat(1);
 }
 
-void ACYasuo::UpdateYasuoStat(const int32 Level)
+void ACYasuo::UpdateYasuoAttackStat(const int32 Level)
 {
-	const auto& StatData = AttackDataMap[Level];
+	const auto& StatData = YasuoAttackDataMap[Level];
 	YasuoStat.ID = StatData.ID;
 	YasuoStat.ProjectileCount = StatData.ProjectileCount;
 	YasuoStat.ProjectileRange = StatData.ProjectileRange;
@@ -122,9 +124,23 @@ void ACYasuo::UpdateYasuoStat(const int32 Level)
 	YasuoStat.AOEDamageCoolTime = StatData.AOEDamageCoolTime;
 }
 
+void ACYasuo::UpdateYasuoMoveStat(const int32 Level)
+{
+	const auto& StatData = YasuoMoveDataMap[Level];
+	YasuoMoveInfo.ID = StatData.ID;
+	YasuoMoveInfo.RangeFrom = StatData.RangeFrom;
+	YasuoMoveInfo.RangeTo = StatData.RangeTo;
+	YasuoMoveInfo.StackDistance = StatData.StackDistance;
+}
+
 void ACYasuo::ChargePassiveEnergy()
 {
 	// 4의 기류를 획득
 	int32 NewEnergy = FMath::Clamp(PassiveEnergy + PassiveEnergyRegen, 0.f, 100.f);
 	PassiveEnergy = NewEnergy;
+}
+
+void ACYasuo::CheckMoveData()
+{
+	
 }

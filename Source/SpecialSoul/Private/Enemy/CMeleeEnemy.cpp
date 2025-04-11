@@ -4,6 +4,7 @@
 #include "Enemy/CMeleeEnemy.h"
 
 #include "Components/CapsuleComponent.h"
+#include "ObjectPool/CObjectPoolManager.h"
 
 class ACBasePlayer;
 
@@ -15,11 +16,13 @@ ACMeleeEnemy::ACMeleeEnemy()
 	GetMesh()->SetRelativeRotation(FRotator(0, 90, 0));
 	GetMesh()->SetRelativeScale3D(FVector(0.008));
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tmpAttackMontage(TEXT("/Script/Engine.AnimMontage'/Game/Asset/MeleeMinion/Anim/AM_MeleeAttack.AM_MeleeAttack'"));
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tmpAttackMontage(
+		TEXT("/Script/Engine.AnimMontage'/Game/Asset/MeleeMinion/Anim/AM_MeleeAttack.AM_MeleeAttack'"));
 	if (tmpAttackMontage.Succeeded())
 		AttackMontage = tmpAttackMontage.Object;
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tmpDieMontage(TEXT("/Script/Engine.AnimMontage'/Game/Asset/MeleeMinion/Anim/AM_MeleeDeath.AM_MeleeDeath'"));
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tmpDieMontage(
+		TEXT("/Script/Engine.AnimMontage'/Game/Asset/MeleeMinion/Anim/AM_MeleeDeath.AM_MeleeDeath'"));
 	if (tmpDieMontage.Succeeded())
 		DieMontage = tmpDieMontage.Object;
 }
@@ -27,4 +30,18 @@ ACMeleeEnemy::ACMeleeEnemy()
 void ACMeleeEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ACMeleeEnemy::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+float ACMeleeEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+                               class AController* EventInstigator, AActor* DamageCauser)
+{
+	HP-=DamageAmount;
+	if (HP<=0)
+		ObjectPoolManager->ReturnEnemy(this);
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

@@ -33,12 +33,14 @@ public:
 	
 	UFUNCTION()
 	virtual void HandleDie();
-	
+
+public:
+	void SetManager(class ACObjectPoolManager* Manager){ObjectPoolManager = Manager;}
+
 protected:
 	virtual void BeginPlay() override;
 
 protected:
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
 	TObjectPtr<AActor> Target;
 
@@ -61,10 +63,25 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Move")
 	float MoveSpeed {600.f};
+	
+	UPROPERTY(EditDefaultsOnly, category = "HP")
+	int32 MaxHP {10};
+
+	int32 HP;
 
 private: // Montage CallBack
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UFUNCTION()
+	void OnMyControllerTickOn();
+	
+	UFUNCTION()
+	void OnMyControllerTickOff();
+	
+protected:
+	UPROPERTY()
+	class ACObjectPoolManager* ObjectPoolManager;
 
 };
 

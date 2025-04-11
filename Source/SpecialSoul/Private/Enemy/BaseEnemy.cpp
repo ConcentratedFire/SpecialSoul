@@ -8,6 +8,7 @@
 #include "Enemy/AI/CEnemyController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CBasePlayer.h"
 
 class ACBasePlayer;
@@ -17,7 +18,6 @@ ABaseEnemy::ABaseEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 
 	ConstructorHelpers::FClassFinder<ACEnemyController> tempController(
 		TEXT("/Script/Engine.Blueprint'/Game/Enemy/AI/BP_AIController.BP_AIController_C'"));
@@ -26,11 +26,20 @@ ABaseEnemy::ABaseEnemy()
 
 	// 레벨 배치시 or 런타임 스폰시에 자동으로 Possess 되도록 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	if (ObjectPoolManager)
+	{
+		ObjectPoolManager->EnemyOutFromPool_Dele.AddUObject(this, &ABaseEnemy::OnMyControllerTickOn);
+		ObjectPoolManager->EnemyGotoPool_Dele.AddUObject(this, &ABaseEnemy::OnMyControllerTickOff);		
+	}
 }
 
 void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+	HP = MaxHP;
 
 	MyController = Cast<ACEnemyController>(GetController());
 
@@ -39,7 +48,7 @@ void ABaseEnemy::BeginPlay()
 		AnimInstance = Cast<UEnemyAnimInstance>(Anim);
 		AnimInstance->OnMontageEnded.AddDynamic(this, &ABaseEnemy::OnMontageEnded);
 	}
-	
+
 	StartFindingTarget();
 }
 
@@ -105,4 +114,20 @@ void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	{
 		MyController->bEndAttack = true;
 	}
+}
+
+void ABaseEnemy::OnMyControllerTickOn()
+{
+	if (IsHidden()) return;	// 보이지 않는것은 아직 풀에 있는것임
+	
+	ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
+	EC->SetActorTickEnabled(true);
+}
+
+void ABaseEnemy::OnMyControllerTickOff()
+{
+	if (!IsHidden()) return; // 보이는 것은 아직 죽지 않은 것
+		
+	ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
+	EC->SetActorTickEnabled(false);
 }

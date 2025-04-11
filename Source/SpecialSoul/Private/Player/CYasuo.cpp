@@ -9,22 +9,26 @@
 #include "Utility/CDataSheetUtility.h"
 
 ACYasuo::ACYasuo()
-{	
+{
 }
 
 void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// TODO Init Data Settings
 	// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
 	// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
 	UCDataSheetUtility* DataSheetUtility = NewObject<UCDataSheetUtility>();
 	if (DataSheetUtility)
-		//DataSheetUtility->FetchGoogleSheetData("Yasuo", "B2", "H7");
-	// 리소스 해제
-	DataSheetUtility->ConditionalBeginDestroy();
-	DataSheetUtility = nullptr;
+	{
+		DataSheetUtility->FetchGoogleSheetData("Yasuo", "B2", "H7", AttackDataMap);
+		// 리소스 해제
+		// DataSheetUtility->ConditionalBeginDestroy();
+		// DataSheetUtility = nullptr;
+		// 업데이트
+		DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
+	}
 
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
@@ -50,7 +54,7 @@ void ACYasuo::Attack()
 	{
 		FTransform Transform;
 		FVector curLocation = GetActorLocation();
-		Transform.SetLocation(FVector(curLocation.X,curLocation.Y, 0));
+		Transform.SetLocation(FVector(curLocation.X, curLocation.Y, 0));
 		Transform.SetRotation(FQuat::Identity);
 		Transform.SetScale3D(FVector(1.f));
 		ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>(TornadoFactory, Transform, GetOwner());
@@ -85,4 +89,13 @@ TArray<FVector> ACYasuo::GetAttackVector()
 	}
 
 	return AttackVectors;
+}
+
+void ACYasuo::PrintAttackDataMap()
+{
+	for (const auto& Pair : AttackDataMap)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Yasuo's AttackDataMap || ID: %d) ProjectileCount: %d, ProjectileRange: %f, Damage: %f, UseAOE: %s, AOELifeTime: %f, AOEDamage: %f, AOEDamageCoolTime: %f"),
+			Pair.Key, Pair.Value.ProjectileCount, Pair.Value.ProjectileRange, Pair.Value.Damage, *Pair.Value.UseAOE, Pair.Value.AOELifeTime, Pair.Value.AOEDamage, Pair.Value.AOEDamageCoolTime);
+	}
 }

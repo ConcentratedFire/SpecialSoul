@@ -61,6 +61,7 @@ void UCMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		FVector CurrentLocation = YasuoCharacer->GetActorLocation();
 		float Distance = FVector::Dist(CurrentLocation, BeforeLocation);
 		YasuoCharacer->MoveDistance += Distance;
+		BeforeLocation = CurrentLocation;
 	}
 }
 

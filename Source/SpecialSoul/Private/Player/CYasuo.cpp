@@ -3,6 +3,7 @@
 
 #include "Player/CYasuo.h"
 
+#include "Game/CGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
@@ -16,7 +17,7 @@ void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
 	DataSheetUtility_->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
-	
+
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
 	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::ChargePassiveEnergy, 1.f, true);
@@ -26,9 +27,16 @@ void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (MoveDistance)
+	// 데이터가 들어왔는지 체크
+	if (YasuoMoveDataMap.Num() > 0)
 	{
-		
+		// 데이터 업데이트 체크
+		CheckMoveData();
+		if (MoveDistance >= YasuoMoveInfo.StackDistance)
+		{
+			ChargePassiveEnergy();
+			MoveDistance -= YasuoMoveInfo.StackDistance;
+		}
 	}
 
 	if (PassiveEnergy >= 100)
@@ -126,6 +134,9 @@ void ACYasuo::UpdateYasuoAttackStat(const int32 Level)
 
 void ACYasuo::UpdateYasuoMoveStat(const int32 Level)
 {
+	if (YasuoMoveDataMap.Num() == 0) return;
+	if (Level == GS->MaxLevel) return;
+
 	const auto& StatData = YasuoMoveDataMap[Level];
 	YasuoMoveInfo.ID = StatData.ID;
 	YasuoMoveInfo.RangeFrom = StatData.RangeFrom;
@@ -142,5 +153,6 @@ void ACYasuo::ChargePassiveEnergy()
 
 void ACYasuo::CheckMoveData()
 {
-	
+	if (GS->GetCurLevel() > YasuoMoveInfo.RangeTo)
+		UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
 }

@@ -92,6 +92,8 @@ void ACBasePlayer::BeginPlay()
 			}			
 		}
 	}
+
+	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
 }
 
 // Called every frame

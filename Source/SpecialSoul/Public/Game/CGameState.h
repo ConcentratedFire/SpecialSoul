@@ -15,7 +15,7 @@ struct FEXPData // 레벨업에 필요한 경험치 테이블
 	int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveData")
 	int32 XP;
-	
+
 	FEXPData()
 		: ID(0), XP(0)
 	{
@@ -36,12 +36,15 @@ class SPECIALSOUL_API ACGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+	const int32 MaxLevel = 21;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FEXPData> EXPDataMap;
 
 	UFUNCTION()
 	void PrintAttackDataMap();
-	
+	int32 GetCurLevel() const { return curLevel; }
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	int32 curLevel = 1;
@@ -50,6 +53,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	FEXPData ExpInfo;
-	
+
 	void UpdateYasuoAttackStat(int32 Level);
 };

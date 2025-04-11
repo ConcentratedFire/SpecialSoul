@@ -55,7 +55,7 @@ struct FYasuoMoveData // 야스오 이동거리 기류 획득 데이터
 	int32 RangeTo;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveData")
 	float StackDistance;
-	
+
 	FYasuoMoveData()
 		: ID(0), RangeFrom(0), RangeTo(0), StackDistance(0)
 	{
@@ -93,7 +93,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 public: // Input
 	FInputBindingDelegate OnInputBindingDel;
 
@@ -122,16 +122,20 @@ private: // Actor Component
 	UPROPERTY(EditDefaultsOnly)
 	class UCMovementComponent* MoveComp;
 
-protected:	// Get Player Data
+protected: // Get Player Data
 	UPROPERTY()
 	class UCDataSheetUtility* DataSheetUtility_;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoMoveData> YasuoMoveDataMap;
-	
+
 	// Base는 virtual로만 만들고, Child에서 구현
 	// Child의 BeginPlay에서 델리게이트 바인딩
 	// Child에서는 override할때 UFUNCTION 붙여줘야 함.
 	virtual void PrintAttackDataMap();
+
+protected: // MoveSpeed
+	UPROPERTY(EditDefaultsOnly, Category = "MoveSpeed")
+	float PlayerMoveSpeed=600;
 };

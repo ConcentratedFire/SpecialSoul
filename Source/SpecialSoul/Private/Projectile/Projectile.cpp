@@ -5,11 +5,8 @@
 
 #include "GameFramework/ProjectileMovementComponent.h"
 
-// Sets default values
 AProjectile::AProjectile()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	SetRootComponent(MeshComp);
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
@@ -20,17 +17,14 @@ AProjectile::AProjectile()
 	SetActorEnableCollision(true);
 }
 
-// Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SetLifeTime();
 }
 
-// Called every frame
-void AProjectile::Tick(float DeltaTime)
+void AProjectile::SetLifeTime()
 {
-	Super::Tick(DeltaTime);
-
+	SetLifeSpan(1);
 }
-

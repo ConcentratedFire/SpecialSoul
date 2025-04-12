@@ -100,13 +100,13 @@ void ABaseEnemy::FindTarget()
 	{
 		Target = ClosestPlayer;
 		MyController->TargetPlayer = Target;
+		
 	}
 }
 
 void ABaseEnemy::HandleAttack()
 {
-	// PlayAnimMontage(AttackMontage);
-	AnimInstance->Montage_Play(AttackMontage);
+	PlayAnimMontage(AttackMontage);
 }
 
 void ABaseEnemy::HandleDie()

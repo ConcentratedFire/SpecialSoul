@@ -14,24 +14,29 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	APawn* OwnerPawn = TryGetPawnOwner();
-	if (!OwnerPawn) return;
+	auto OwnerPawn = TryGetPawnOwner();
+	if (!OwnerPawn)  return;
+	OwnerEnemy = Cast<ABaseEnemy>(OwnerPawn);
+	if (!OwnerEnemy) return;
 
-	Speed = OwnerPawn->GetVelocity().Size();
+	Speed = OwnerEnemy->GetVelocity().Size();
 }
 
 void UEnemyAnimInstance::AnimNotify_EnemyAttack()
 {
-	APawn* OwnerPawn = TryGetPawnOwner();
-	if (!OwnerPawn || !ProjectileActor) return;
+	auto OwnerPawn = TryGetPawnOwner();
+	if (!OwnerPawn)  return;
+	OwnerEnemy = Cast<ABaseEnemy>(OwnerPawn);
+
+	if (!OwnerEnemy || !ProjectileActor) return;
 	
-	FVector SpawnPoint = OwnerPawn->GetActorLocation();
-	SpawnPoint += OwnerPawn->GetActorForwardVector() * 300;
+	FVector SpawnPoint = OwnerEnemy->GetActorLocation();
+	SpawnPoint += OwnerEnemy->GetActorForwardVector() * 300;
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerPawn;
+	SpawnParams.Owner = OwnerEnemy;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	GetWorld()->SpawnActor<AActor>(ProjectileActor, SpawnPoint, OwnerPawn->GetActorRotation(), SpawnParams);
+	GetWorld()->SpawnActor<AActor>(ProjectileActor, SpawnPoint, OwnerEnemy->GetActorRotation(), SpawnParams);
 }
 
 void UEnemyAnimInstance::AnimNotify_DieEnd()

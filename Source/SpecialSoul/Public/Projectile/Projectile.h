@@ -15,7 +15,6 @@ class SPECIALSOUL_API AProjectile : public AActor
 	
 public:	
 	AProjectile();
-	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -29,4 +28,6 @@ public:
 
 	// UPROPERTY(VisibleAnywhere, Category = "Components")
 	// TObjectPtr<Niagara> ;
+
+	void SetLifeTime();
 };

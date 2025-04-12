@@ -23,16 +23,19 @@ public:
 	UPROPERTY()
 	class ACEnemyController* MyController;
 	UPROPERTY(EditDefaultsOnly, Category = "AI|MoveDistance")
-	float MoveDistance{100.f};
-
+	float MoveDistance {100.f};
+	
 	UFUNCTION()
 	virtual void HandleAttack();
 
 	// UFUNCTION()
 	// virtual void HandleDamaged();
-
+	
 	UFUNCTION()
 	virtual void HandleDie();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BaseEnemy")
+	bool bIsAttacking {false};
 
 	virtual void ResetEnemy();
 
@@ -60,7 +63,7 @@ protected:
 	float FindTargetInterval{2.f};
 
 	void StartFindingTarget();
-	void FindTarget();
+	virtual void FindTarget();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim")
 	TObjectPtr<UEnemyAnimInstance> AnimInstance;
@@ -72,7 +75,7 @@ protected:
 	TObjectPtr<UAnimMontage> DieMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Move")
-	float MoveSpeed{600.f};
+	float MoveSpeed{200.f};
 
 	UPROPERTY(EditDefaultsOnly, category = "HP")
 	int32 MaxHP{200};

@@ -6,18 +6,18 @@
 #include "Components/ActorComponent.h"
 #include "EnemyFSMComponent.generated.h"
 
+class IPathFindingStrategy;
 class ABaseEnemy;
 
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
-	Idle,
 	Move,
 	Attack,
 	Die
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateChange, EEnemyState, NewState);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateChange, EEnemyState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttack);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamaged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDie);
@@ -30,6 +30,7 @@ class SPECIALSOUL_API UEnemyFSMComponent : public UActorComponent
 
 public:	
 	UEnemyFSMComponent();
+	void InitPathFindingStrategy(TScriptInterface<IPathFindingStrategy> InPFStrategy);
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
@@ -37,38 +38,44 @@ protected:
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<ABaseEnemy> Enemy;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<ABaseEnemy> OwnerEnemy;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	FVector TargetLocation;
 	
-	FOnStateChange OnStateChange;
-	FOnAttack OnAttack;
-	FOnDamaged OnDamaged;
-	FOnDie OnDie;
+	//FOnStateChange OnStateChange;
+	// FOnAttack OnAttack;
+	// FOnDamaged OnDamaged;
+	// FOnDie OnDie;
 	
 protected:
-	EEnemyState CurrentState { EEnemyState::Idle};
-
-	virtual void IdleTick(float DeltaTime);
 	virtual void MoveTick(float DeltaTime);
 	virtual void AttackTick(float DeltaTime);
 	virtual void DieTick(float DeltaTime);
 
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
 	float ElapsedTime {0.0f}; // 현재 상태에서의 경과시간
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-	float AttackRange {100.f};
+	float AttackRange {600.f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-	float AttackSpeed {2.f};
+	float AttackSpeed {4.f};
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FSM")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	float MaxHP {200.f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	float HP { MaxHP };
 
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM", meta = (AllowPrivateAccess = "true"))
+	TScriptInterface<IPathFindingStrategy> PFStrategy;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM", meta = (AllowPrivateAccess = "true"))
+	EEnemyState CurrentState { EEnemyState::Move};
 
 public: // GET SET
 	virtual void SetState(EEnemyState NewState);

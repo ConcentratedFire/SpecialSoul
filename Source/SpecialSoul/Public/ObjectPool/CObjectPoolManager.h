@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/CMeleeEnemy.h"
-#include "Enemy/RangedEnemy.h"
+#include "Enemy/Ranged/RangedEnemy.h"
 #include "GameFramework/Actor.h"
 #include "Item/CExp.h"
 #include "Kismet/GameplayStatics.h"

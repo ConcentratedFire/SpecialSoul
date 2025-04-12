@@ -1,9 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "FlowField/FlowFieldActor.h"
-
-#include "SpecialSoul.h"
+#include "PathFinding//FlowFieldActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/CBasePlayer.h"
 
@@ -240,7 +238,7 @@ void AFlowFieldActor::DrawDebugFlowField()
 
 		DrawDebugDirectionalArrow(GetWorld(), Pos, Pos+Dir, 20.f, ArrowColor, false, GenerationUpdateTime);
 	}
-	UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugFlowField"));
+	//UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugFlowField"));
 }
 
 void AFlowFieldActor::DrawDebugCostField()
@@ -255,7 +253,7 @@ void AFlowFieldActor::DrawDebugCostField()
 		FString MoveCostString = FString::Printf(TEXT("%u"),MoveCost);
 		DrawDebugString(GetWorld(), Pos, *MoveCostString, nullptr, FColor::Yellow, GenerationUpdateTime * 0.9f, false, 1.f);
 	}
-	UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugCostField"));
+	//UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugCostField"));
 }
 
 void AFlowFieldActor::DrawDebugIntegrationField()
@@ -270,7 +268,7 @@ void AFlowFieldActor::DrawDebugIntegrationField()
 		FString IntegrationCostString = FString::Printf(TEXT("%u"),IntegrationCost);
 		DrawDebugString(GetWorld(), Pos, *IntegrationCostString, nullptr, FColor::Purple, GenerationUpdateTime * 0.9f, false, 1.f);
 	}
-	UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugIntegrationField"));
+	//UE_LOG(LogTemp, Display, TEXT("AFlowFieldActor::DrawDebugIntegrationField"));
 }
 
 bool AFlowFieldActor::IsValidCell(FIntPoint Coord) const

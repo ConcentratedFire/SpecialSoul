@@ -21,27 +21,18 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
 public:
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
+	TObjectPtr<ABaseEnemy> OwnerEnemy;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	float Speed { 0.f };
 
-
-	 // FSM의 값을 BaseEnemy를 통해 받아온다 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FSM")
-	EEnemyState CurrentState;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FSM")
-	bool bCanAttack { false };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
-	bool bIsDead { false };
-
-private:
+protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> ProjectileActor;
 
 	UFUNCTION()
-	void AnimNotify_EnemyAttack();
+	virtual void AnimNotify_EnemyAttack();
 
 	UFUNCTION()
 	void AnimNotify_DieEnd();

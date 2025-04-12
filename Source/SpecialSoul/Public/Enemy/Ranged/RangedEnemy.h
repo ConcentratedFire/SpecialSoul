@@ -6,10 +6,13 @@
 #include "Enemy/BaseEnemy.h"
 #include "RangedEnemy.generated.h"
 
+class AProjectile;
+class IPathFindingStrategy;
 class AFlowFieldActor;
 /**
  * 
  */
+
 UCLASS()
 class SPECIALSOUL_API ARangedEnemy : public ABaseEnemy
 {
@@ -19,20 +22,21 @@ public:
 	ARangedEnemy();
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FlowField)
-	TObjectPtr<AFlowFieldActor> FlowField;
-
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void FindTarget() override;
+	
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	TObjectPtr<UEnemyFSMComponent> FSMComponent;
 
+	// UFUNCTION()
+	// void OnFSMStateChanged(EEnemyState NewState);
 
-	UFUNCTION()
-	void OnFSMStateChanged(EEnemyState NewState);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
+	TSubclassOf<AProjectile> ProjectileActor;
 
-
-	// 애니메이션
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM", meta = (AllowPrivateAccess = "true"))
+	float AttackRange { 100.f};
 };

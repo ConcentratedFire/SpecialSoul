@@ -44,6 +44,7 @@ void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 			SpawnParams.Instigator = Caster;
 
 			auto Bullet = Caster->GetWorld()->SpawnActor<AMinigunBullet>(MinigunBullet, MuzzleLoc, MuzzleRot, SpawnParams);
+			//Bullet->AttackRange = 1500.f;
 			if (Bullet)
 			{
 				FiredBulletNum++;

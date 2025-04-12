@@ -14,7 +14,7 @@ class SPECIALSOUL_API ACEnemyController : public AAIController
 {
 	GENERATED_BODY()
 
-private:
+protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -31,7 +31,9 @@ private:	// Behavior Tree, For Melee Enemy & Middle Boss
 	class UBlackboardComponent* BB_Enemy;
 	bool bUsingBT;
 
-private:
+
+protected:
 	UPROPERTY()
 	class APawn* MyPawn;
+
 };

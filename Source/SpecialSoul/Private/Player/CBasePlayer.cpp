@@ -17,6 +17,7 @@
 #include "Player/Components/CMovementComponent.h"
 #include "Utility/CDataSheetUtility.h"
 
+struct FJinxAttackData;
 class UEnhancedInputLocalPlayerSubsystem;
 // Sets default values
 ACBasePlayer::ACBasePlayer()
@@ -76,17 +77,20 @@ void ACBasePlayer::BeginPlay()
 			// TODO Init Data Settings
 			// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
 			// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
-			DataSheetUtility_ = NewObject<UCDataSheetUtility>(this);
+			DataSheetUtility = NewObject<UCDataSheetUtility>(this);
 
-			if (DataSheetUtility_)
+			if (DataSheetUtility)
 			{
-				DataSheetUtility_->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintAttackDataMap);
-				DataSheetUtility_->OnDataFetched.AddDynamic(GS, &ACGameState::PrintAttackDataMap);
+				DataSheetUtility->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintAttackDataMap);
+				DataSheetUtility->OnDataFetched.AddDynamic(GS, &ACGameState::PrintAttackDataMap);
 				
-				DataSheetUtility_->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
-				DataSheetUtility_->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
-				DataSheetUtility_->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", GM->RegenDataMap);
-				DataSheetUtility_->FetchGoogleSheetData<FEXPData>("EXP", "A1", "B22", GS->EXPDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", GM->RegenDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FEXPData>("EXP", "A1", "B22", GS->EXPDataMap);
+
+				DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", AttackDataMap); // 기본공격 데이터
+
 				
 				// 리소스 해제
 				// DataSheetUtility->ConditionalBeginDestroy();

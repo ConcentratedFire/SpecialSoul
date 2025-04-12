@@ -24,7 +24,9 @@ private:
 public: // Using Charge Enemy
 	UPROPERTY(VisibleAnywhere, Category = "Data|MoveDistance")
 	float MoveDistance = 0.0f;
-	
+
+	int32 GetDamage() const { return YasuoStat.Damage; }
+
 public:
 	virtual void Attack() override;
 	void UpdatePlayerData(const int32 PlayerLevel);

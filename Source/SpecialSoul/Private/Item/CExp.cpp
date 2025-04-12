@@ -4,6 +4,7 @@
 #include "Item/CExp.h"
 
 #include "Game/CGameState.h"
+#include "ObjectPool/CObjectPoolManager.h"
 
 ACExp::ACExp()
 {
@@ -13,5 +14,8 @@ ACExp::ACExp()
 void ACExp::ActiveItem()
 {
 	if (!GS) return;
-	GS->AddExp(ExpCount);	
+	GS->AddExp(ExpCount);
+
+	if (ObjectPoolManager)
+		ObjectPoolManager->ReturnExp(this);
 }

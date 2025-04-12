@@ -6,6 +6,7 @@
 #include "Enemy/CMeleeEnemy.h"
 #include "Enemy/RangedEnemy.h"
 #include "GameFramework/Actor.h"
+#include "Item/CExp.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AttackActors/CTornado.h"
 #include "CObjectPoolManager.generated.h"
@@ -31,12 +32,16 @@ public:
 	FEnemyGotoPool EnemyGotoPool_Dele;
 
 	// Return To ObjectPool
-	void ReturnEnemy(class ACMeleeEnemy* Enemy);
-	void ReturnTornado(class ACTornado* Tornado);
+	void ReturnEnemy(ACMeleeEnemy* Enemy);
+	void ReturnTornado(ACTornado* Tornado);
+	void ReturnExp(ACExp* EXP);
 
 	// Tornado
-	void MakeTornadoPool();
+	void MakeTornadoPool(AActor* NewOwner);
 	void TornadoSpawn(FTransform SpawnTransform);
+
+	// Object Setting
+	void ExpSpawn(FTransform SpawnTransform);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -45,15 +50,19 @@ private:
 	TSubclassOf<ABaseEnemy> RangeEnemy;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACTornado> TornadoActor;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACExp> ExpActor;
 
 private: // Object Pool
 	// 한번에 스폰시킬 Enemy 마리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendMeleePoolSize = 100;
-
 	// 한번에 스폰시킬 회오리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendTornadoPoolSize = 100;
+	// 한번에 스폰시킬 경험치수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendExpPoolSize = 100;
 
 	// 근거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
@@ -64,6 +73,9 @@ private: // Object Pool
 	// 회오리 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACTornado*> TornadoPool;
+	// 경험치 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACExp*> ExpPool;
 
 	/**
 	 * 오브젝트 풀의 크기를 늘리고 UClass를 이용하여 오브젝트 생성
@@ -75,11 +87,13 @@ private: // Object Pool
 	 *
 	 */
 	template <typename T>
-	void InitPool(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class);
+	void InitPool(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
+	              AActor* NewOwner = nullptr);
 
 	// 템플릿 특수화 (Enemy 용도)
 	template <>
-	void InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<ABaseEnemy>& Class);
+	void InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<ABaseEnemy>& Class,
+	              AActor* NewOwner);
 
 private: // Place
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -94,7 +108,8 @@ private: // Place
 };
 
 template <typename T>
-void ACObjectPoolManager::InitPool(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class)
+void ACObjectPoolManager::InitPool(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
+                                   AActor* NewOwner)
 {
 	if (!Class) return;
 	PoolArray.Reserve(PoolArray.Max() + AddPoolSize);
@@ -110,6 +125,8 @@ void ACObjectPoolManager::InitPool(TArray<T*>& PoolArray, const int32& AddPoolSi
 		PoolObj->SetActorHiddenInGame(true);
 		PoolObj->SetActorTickEnabled(false);
 		PoolObj->SetManager(this);
+		if (NewOwner != nullptr)
+			PoolObj->SetOwner(NewOwner);
 
 		UGameplayStatics::FinishSpawningActor(PoolObj, Transform);
 		PoolArray.Push(PoolObj);
@@ -142,7 +159,7 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 	// Pool에 들어가는 시점과 추가되는 시점이 겹치면 Null값이 배열에 들어가는 경우 발생
 	// 만약 Top이 Null이라면 요소를 제거하고 다시 수행하도록 재귀 호출
 	bool bIsNullEnemy = false;
-	while (!PoolArray.Top())
+	while (PoolArray.Num() > 0 && !PoolArray.Top())
 	{
 		bIsNullEnemy = true;
 		PoolArray.Pop();
@@ -152,6 +169,7 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 		PlaceEnemyRandomPlace(PoolArray, AddPoolSize, Class);
 
 	T* PoolObj = PoolArray.Pop();
+	PoolObj->ResetEnemy();
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);
 	PoolObj->SetActorTickEnabled(true);

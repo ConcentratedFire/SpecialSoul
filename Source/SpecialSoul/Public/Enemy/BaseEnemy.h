@@ -23,19 +23,29 @@ public:
 	UPROPERTY()
 	class ACEnemyController* MyController;
 	UPROPERTY(EditDefaultsOnly, Category = "AI|MoveDistance")
-	float MoveDistance {100.f};
-	
+	float MoveDistance{100.f};
+
 	UFUNCTION()
 	virtual void HandleAttack();
 
 	// UFUNCTION()
 	// virtual void HandleDamaged();
-	
+
 	UFUNCTION()
 	virtual void HandleDie();
 
+	virtual void ResetEnemy();
+
 public:
-	void SetManager(class ACObjectPoolManager* Manager){ObjectPoolManager = Manager;}
+	void SetManager(class ACObjectPoolManager* Manager) { ObjectPoolManager = Manager; }
+
+public: // Damage
+	UFUNCTION(BlueprintCallable)
+	void MyDamage(int32 DamageAmount);
+
+	virtual void DieEndAction()
+	{
+	}; // 사망 애니메이션 종료 후, Pool로 돌아가도록 처리
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,7 +57,7 @@ protected:
 	FTimerHandle FindTargetTimerHandle; // 가장 가까운 타겟을 찾는 Timer
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
-	float FindTargetInterval {2.f};
+	float FindTargetInterval{2.f};
 
 	void StartFindingTarget();
 	void FindTarget();
@@ -62,10 +72,10 @@ protected:
 	TObjectPtr<UAnimMontage> DieMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Move")
-	float MoveSpeed {600.f};
-	
+	float MoveSpeed{600.f};
+
 	UPROPERTY(EditDefaultsOnly, category = "HP")
-	int32 MaxHP {10};
+	int32 MaxHP{200};
 
 	int32 HP;
 
@@ -75,13 +85,14 @@ private: // Montage CallBack
 
 	UFUNCTION()
 	void OnMyControllerTickOn();
-	
+
 	UFUNCTION()
 	void OnMyControllerTickOff();
-	
+
 protected:
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Enemy")
+	bool bIsDead{false};
 };
-

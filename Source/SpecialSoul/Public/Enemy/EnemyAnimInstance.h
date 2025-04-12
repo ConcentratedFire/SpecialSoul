@@ -42,4 +42,7 @@ private:
 
 	UFUNCTION()
 	void AnimNotify_EnemyAttack();
+
+	UFUNCTION()
+	void AnimNotify_DieEnd();
 };

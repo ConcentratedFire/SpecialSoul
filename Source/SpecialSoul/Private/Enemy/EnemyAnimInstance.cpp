@@ -33,3 +33,10 @@ void UEnemyAnimInstance::AnimNotify_EnemyAttack()
 	
 	GetWorld()->SpawnActor<AActor>(ProjectileActor, SpawnPoint, OwnerPawn->GetActorRotation(), SpawnParams);
 }
+
+void UEnemyAnimInstance::AnimNotify_DieEnd()
+{
+	ABaseEnemy* OwnerPawn = Cast<ABaseEnemy>(TryGetPawnOwner());
+	if (!OwnerPawn) return;
+	OwnerPawn->DieEndAction();
+}

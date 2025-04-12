@@ -3,6 +3,7 @@
 
 #include "Player/CYasuo.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Game/CGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "ObjectPool/CObjectPoolManager.h"
@@ -25,7 +26,7 @@ void ACYasuo::BeginPlay()
 
 	if (ObjectPoolManager)
 	{
-		ObjectPoolManager->MakeTornadoPool();
+		ObjectPoolManager->MakeTornadoPool(this);
 	}
 }
 
@@ -63,7 +64,8 @@ void ACYasuo::Attack()
 	{
 		FTransform Transform;
 		FVector curLocation = GetActorLocation();
-		Transform.SetLocation(FVector(curLocation.X, curLocation.Y, 0));
+		curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		Transform.SetLocation(curLocation);
 		Transform.SetRotation(Vector.Rotation().Quaternion());
 		Transform.SetScale3D(FVector(1.f));
 		ObjectPoolManager->TornadoSpawn(Transform);

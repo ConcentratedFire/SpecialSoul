@@ -15,6 +15,7 @@ ACBaseItem::ACBaseItem()
 
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	BoxComp->SetCollisionProfileName(FName("Item"));
+	BoxComp->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 	RootComponent = BoxComp;
 	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
@@ -41,3 +42,14 @@ void ACBaseItem::Tick(float DeltaTime)
 
 }
 
+void ACBaseItem::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+
+	if (!bNewHidden)
+	{
+		FVector UpLocation = GetActorLocation();
+		UpLocation.Z += BoxComp->GetScaledBoxExtent().Z;
+		SetActorLocation(UpLocation);	
+	}	
+}

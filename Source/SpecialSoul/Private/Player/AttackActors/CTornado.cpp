@@ -3,8 +3,10 @@
 
 #include "Player/AttackActors/CTornado.h"
 
+#include "SpecialSoul.h"
 #include "Components/BoxComponent.h"
 #include "ObjectPool/CObjectPoolManager.h"
+#include "Player/CYasuo.h"
 
 // Sets default values
 ACTornado::ACTornado()
@@ -29,6 +31,12 @@ ACTornado::ACTornado()
 		TornadoMesh1->SetStaticMesh(tmpTornado.Object);
 		TornadoMesh2->SetStaticMesh(tmpTornado.Object);
 	}
+
+	TornadoBox->SetCollisionProfileName(FName("PlayerAttack"));
+	TornadoMesh1->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TornadoMesh2->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	TornadoBox->OnComponentBeginOverlap.AddDynamic(this, &ACTornado::OnCompBeginOverlap);
 }
 
 // Called when the game starts or when spawned
@@ -36,6 +44,8 @@ void ACTornado::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OwnerYasuo = Cast<ACYasuo>(GetOwner());
+	LOG_S(Warning, TEXT("OwnerYasuo : %s"), OwnerYasuo==nullptr?TEXT("Owner Null"):*OwnerYasuo->GetName());
 	// 이동 경로 방향으로 회전
 	// if (!TornadoDirection.IsZero())
 	// {
@@ -49,7 +59,11 @@ void ACTornado::SetActorHiddenInGame(bool bNewHidden)
 
 	if (!bNewHidden)
 	{
-		TornadoStartLocation = GetActorLocation();
+		FVector UpLocation = GetActorLocation();
+		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
+		SetActorLocation(UpLocation);
+		
+		TornadoStartLocation = GetActorLocation();		
 	}
 }
 
@@ -71,5 +85,14 @@ void ACTornado::Tick(float DeltaTime)
 	if (FVector::Dist(TornadoStartLocation, TornadoCurLocation) >= 700)
 	{
 		ObjectPoolManager->ReturnTornado(this);
+	}
+}
+
+void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
+	{
+		Enemy->MyDamage(OwnerYasuo->GetDamage());
 	}
 }

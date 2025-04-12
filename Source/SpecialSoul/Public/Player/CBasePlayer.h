@@ -78,11 +78,10 @@ class SPECIALSOUL_API ACBasePlayer : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ACBasePlayer();
-
+	
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	virtual void UpdataPlayerData(const int32 PlayerLevel) {};
+	virtual void BeginPlay() override;	
 
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;

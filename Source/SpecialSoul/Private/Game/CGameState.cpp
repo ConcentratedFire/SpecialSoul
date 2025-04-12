@@ -3,7 +3,9 @@
 
 #include "Game/CGameState.h"
 
+#include "EngineUtils.h"
 #include "SpecialSoul.h"
+#include "Player/CYasuo.h"
 
 void ACGameState::PrintAttackDataMap()
 {
@@ -38,7 +40,15 @@ void ACGameState::AddExp(const int32 exp)
 
 void ACGameState::UpdateExpInfo(const int32 Level)
 {
+	if (Level >= MaxLevel) return;
 	const auto& StatData = EXPDataMap[Level];
 	ExpInfo.ID = StatData.ID;
 	ExpInfo.XP = StatData.XP;
+
+	if (Level == 1) return;
+	// 레벨업 후 야스오 정보 갱신
+	for (TActorIterator<ACYasuo> It(GetWorld(), ACYasuo::StaticClass()); It; ++It)
+	{
+		(*It)->UpdatePlayerData(Level);
+	}
 }

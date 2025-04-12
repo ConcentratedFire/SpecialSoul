@@ -37,7 +37,7 @@ void ACYasuo::Tick(float DeltaTime)
 	if (YasuoMoveDataMap.Num() > 0)
 	{
 		// 데이터 업데이트 체크
-		CheckMoveData();
+		//CheckMoveData();
 
 		// 이동 거리가 충분하면 기류를 충전
 		if (MoveDistance >= YasuoMoveInfo.StackDistance)
@@ -167,8 +167,10 @@ void ACYasuo::CheckMoveData()
 		UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
 }
 
-void ACYasuo::UpdataPlayerData(const int32 PlayerLevel)
+void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)
 {
-	// TODO 레벨업 후 정보 갱신 처리
+	// 레벨업 후 정보 갱신 처리
 	// MoveData는 키값 체크 후 넘기기
+	if (YasuoMoveDataMap.Contains(PlayerLevel))
+		UpdateYasuoMoveStat(PlayerLevel);
 }

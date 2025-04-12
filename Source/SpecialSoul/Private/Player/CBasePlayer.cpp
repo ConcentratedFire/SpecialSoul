@@ -59,6 +59,9 @@ ACBasePlayer::ACBasePlayer()
 		TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Input/IMC_Player.IMC_Player'"));
 	if (tempIMC.Succeeded())
 		IMC_Player = tempIMC.Object;
+
+	GetCapsuleComponent()->SetCollisionProfileName(FName("Player"));
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned

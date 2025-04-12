@@ -3,17 +3,15 @@
 
 #include "Item/CExp.h"
 
-#include "Components/BoxComponent.h"
+#include "Game/CGameState.h"
 
 ACExp::ACExp()
 {
 	SetActorScale3D(FVector(0.4f));
-
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACExp::OnExpBeginOverlap);
 }
 
-void ACExp::OnExpBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ACExp::ActiveItem()
 {
-	
+	if (!GS) return;
+	GS->AddExp(ExpCount);	
 }

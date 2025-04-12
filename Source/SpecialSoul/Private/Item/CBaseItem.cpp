@@ -4,6 +4,8 @@
 #include "Item/CBaseItem.h"
 
 #include "Components/BoxComponent.h"
+#include "Game/CGameState.h"
+#include "Game/SpecialSoulGameMode.h"
 
 // Sets default values
 ACBaseItem::ACBaseItem()
@@ -24,7 +26,12 @@ ACBaseItem::ACBaseItem()
 void ACBaseItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		GS = GM->GetGameState<ACGameState>();
+	}
 }
 
 // Called every frame

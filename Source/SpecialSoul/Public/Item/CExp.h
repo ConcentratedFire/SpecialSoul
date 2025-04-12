@@ -16,8 +16,9 @@ class SPECIALSOUL_API ACExp : public ACBaseItem
 
 private:
 	ACExp();
+	virtual void ActiveItem() override;
 
-	UFUNCTION()
-	void OnExpBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	                       int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Exp")
+	int32 ExpCount = 2;
 };

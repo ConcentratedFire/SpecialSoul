@@ -15,6 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	ACBaseItem();
 
+	virtual void ActiveItem(){};
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,4 +30,9 @@ protected:
 	class UBoxComponent* BoxComp;
 	UPROPERTY(EditDefaultsOnly)
 	class UStaticMeshComponent* MeshComp;
+
+	UPROPERTY()
+	class ASpecialSoulGameMode* GM;
+	UPROPERTY()
+	class ACGameState* GS;
 };

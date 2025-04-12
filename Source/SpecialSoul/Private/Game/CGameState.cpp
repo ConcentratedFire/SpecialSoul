@@ -3,6 +3,8 @@
 
 #include "Game/CGameState.h"
 
+#include "SpecialSoul.h"
+
 void ACGameState::PrintAttackDataMap()
 {
 	// for (const auto& Pair : EXPDataMap)
@@ -16,11 +18,25 @@ void ACGameState::PrintAttackDataMap()
 
 	// 초기 데이터 세팅
 	if (EXPDataMap.Num() > 0)
-		UpdateYasuoAttackStat(1);
+		UpdateExpInfo(1);
+}
+
+void ACGameState::AddExp(const int32 exp)
+{
+	curExp += exp;
+	if (EXPDataMap.Num() == 0) return;
+	if (curExp >= ExpInfo.XP)
+	{
+		++curLevel;
+		curExp -= ExpInfo.XP;
+		UpdateExpInfo(ExpInfo.ID + 1);
+	}
+
+	LOG_S(Warning, TEXT("Level: %d, curExp: %d"), curLevel, curExp);
 }
 
 
-void ACGameState::UpdateYasuoAttackStat(const int32 Level)
+void ACGameState::UpdateExpInfo(const int32 Level)
 {
 	const auto& StatData = EXPDataMap[Level];
 	ExpInfo.ID = StatData.ID;

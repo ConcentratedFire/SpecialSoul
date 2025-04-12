@@ -45,14 +45,16 @@ public:
 	void PrintAttackDataMap();
 	int32 GetCurLevel() const { return curLevel; }
 
+	void AddExp(const int32 exp);
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	int32 curLevel = 1;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
-	float curExp = 0;
+	int32 curExp = 0;
 
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	FEXPData ExpInfo;
 
-	void UpdateYasuoAttackStat(int32 Level);
+	void UpdateExpInfo(int32 Level);
 };

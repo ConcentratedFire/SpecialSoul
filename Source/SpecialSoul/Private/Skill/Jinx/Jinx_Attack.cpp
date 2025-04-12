@@ -29,15 +29,15 @@ void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 	// 마우스가 가리키는 방향으로 총을 쏜다
 	Caster->GetWorld()->GetTimerManager().SetTimer(FireTimer, FTimerDelegate::CreateLambda([this, Caster]()
 	{
+		FVector FireDir = Caster->GetActorForwardVector();
+		FRotator MuzzleRot = FRotationMatrix::MakeFromX(FireDir).Rotator();
 		if (FiredBulletNum < BulletNum)
 		{
-			FVector FireDir = Caster->GetActorForwardVector();
 
 			 // 발사위치, 발사방향
 			FVector MuzzleLoc = Caster->GetMesh()->GetSocketLocation("Minigun_FirePos0");
-			FRotator MuzzleRot = FRotationMatrix::MakeFromX(FireDir).Rotator();
 
-			UE_LOG(LogTemp, Log, TEXT("MuzzleRot : %s"), *MuzzleRot.ToString());
+			//UE_LOG(LogTemp, Log, TEXT("MuzzleRot : %s"), *MuzzleRot.ToString());
 			 // 총알 스폰
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = Caster;

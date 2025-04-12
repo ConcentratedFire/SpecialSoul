@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/JinxData.h"
 #include "GameFramework/Character.h"
 #include "CBasePlayer.generated.h"
 
@@ -126,11 +127,14 @@ private: // Actor Component
 
 protected: // Get Player Data
 	UPROPERTY()
-	class UCDataSheetUtility* DataSheetUtility_;
+	class UCDataSheetUtility* DataSheetUtility;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoMoveData> YasuoMoveDataMap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	TMap<int32, FJinxAttackData> AttackDataMap;
 
 	// Base는 virtual로만 만들고, Child에서 구현
 	// Child의 BeginPlay에서 델리게이트 바인딩

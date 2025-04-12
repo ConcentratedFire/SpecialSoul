@@ -17,7 +17,7 @@ ACYasuo::ACYasuo()
 void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
-	DataSheetUtility_->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
+	DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
 
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 

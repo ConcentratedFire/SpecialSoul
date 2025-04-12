@@ -3,6 +3,7 @@
 
 #include "Player/CBasePlayer.h"
 
+#include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -12,6 +13,7 @@
 #include "Game/SpecialSoulGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "ObjectPool/CObjectPoolManager.h"
 #include "Player/Components/CMovementComponent.h"
 #include "Utility/CDataSheetUtility.h"
 
@@ -93,6 +95,12 @@ void ACBasePlayer::BeginPlay()
 		}
 	}
 
+	// 오브젝트 풀 매니저 가져오기
+	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+	{
+		ObjectPoolManager = *It;
+	}
+	
 	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
 }
 

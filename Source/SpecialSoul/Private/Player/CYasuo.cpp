@@ -5,6 +5,7 @@
 
 #include "Game/CGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "ObjectPool/CObjectPoolManager.h"
 #include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
 #include "Utility/CDataSheetUtility.h"
@@ -21,6 +22,11 @@ void ACYasuo::BeginPlay()
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
 	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::ChargePassiveEnergy, 1.f, true);
+
+	if (ObjectPoolManager)
+	{
+		ObjectPoolManager->MakeTornadoPool();
+	}
 }
 
 void ACYasuo::Tick(float DeltaTime)
@@ -32,6 +38,8 @@ void ACYasuo::Tick(float DeltaTime)
 	{
 		// 데이터 업데이트 체크
 		CheckMoveData();
+
+		// 이동 거리가 충분하면 기류를 충전
 		if (MoveDistance >= YasuoMoveInfo.StackDistance)
 		{
 			ChargePassiveEnergy();
@@ -39,6 +47,7 @@ void ACYasuo::Tick(float DeltaTime)
 		}
 	}
 
+	// 기류가 100이 되면 회오리 발사
 	if (PassiveEnergy >= 100)
 	{
 		PassiveEnergy -= 100;
@@ -55,13 +64,14 @@ void ACYasuo::Attack()
 		FTransform Transform;
 		FVector curLocation = GetActorLocation();
 		Transform.SetLocation(FVector(curLocation.X, curLocation.Y, 0));
-		Transform.SetRotation(FQuat::Identity);
+		Transform.SetRotation(Vector.Rotation().Quaternion());
 		Transform.SetScale3D(FVector(1.f));
-		ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>(TornadoFactory, Transform, GetOwner());
-		Tornado->TornadoDirection = Vector;
-		UGameplayStatics::FinishSpawningActor(Tornado, Transform);
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + Vector * 100.f, FColor::Red, false, 0.f, 0,
-		              10.f);
+		ObjectPoolManager->TornadoSpawn(Transform);
+		// ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>(TornadoFactory, Transform, GetOwner());
+		// Tornado->TornadoDirection = Vector;
+		// UGameplayStatics::FinishSpawningActor(Tornado, Transform);
+		// DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + Vector * 100.f, FColor::Red, false, 0.f, 0,
+		//               10.f);
 	}
 }
 

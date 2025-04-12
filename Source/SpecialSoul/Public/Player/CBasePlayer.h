@@ -86,6 +86,8 @@ protected:
 	class ASpecialSoulGameMode* GM;
 	UPROPERTY()
 	class ACGameState* GS;
+	UPROPERTY()
+	class ACObjectPoolManager* ObjectPoolManager;
 
 public:
 	// Called every frame

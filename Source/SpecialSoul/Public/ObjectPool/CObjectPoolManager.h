@@ -32,6 +32,11 @@ public:
 
 	// Return To ObjectPool
 	void ReturnEnemy(class ACMeleeEnemy* Enemy);
+	void ReturnTornado(class ACTornado* Tornado);
+
+	// Tornado
+	void MakeTornadoPool();
+	void TornadoSpawn(FTransform SpawnTransform);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -46,12 +51,19 @@ private: // Object Pool
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendMeleePoolSize = 100;
 
+	// 한번에 스폰시킬 회오리수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendTornadoPoolSize = 100;
+
 	// 근거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ABaseEnemy*> MeleePool;
 	// 원거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ABaseEnemy*> RangePool;
+	// 회오리 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACTornado*> TornadoPool;
 
 	/**
 	 * 오브젝트 풀의 크기를 늘리고 UClass를 이용하여 오브젝트 생성
@@ -75,6 +87,10 @@ private: // Place
 
 	template <typename T>
 	void PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class);
+
+	template <typename T>
+	void PlaceActorSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
+	                        const FTransform SpawnTransform);
 };
 
 template <typename T>
@@ -142,4 +158,30 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 	PoolObj->SetActorLocation(SpawnLocation);
 
 	EnemyOutFromPool_Dele.Broadcast();
+}
+
+template <typename T>
+void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize,
+                                             const TSubclassOf<T>& Class, const FTransform SpawnTransform)
+{
+	if (PoolArray.Num() == 0)
+		InitPool(PoolArray, AddPoolSize, Class);
+
+	// Pool에 들어가는 시점과 추가되는 시점이 겹치면 Null값이 배열에 들어가는 경우 발생
+	// 만약 Top이 Null이라면 요소를 제거하고 다시 수행하도록 재귀 호출
+	bool bIsNullActor = false;
+	while (!PoolArray.Top())
+	{
+		bIsNullActor = true;
+		PoolArray.Pop();
+	}
+
+	if (bIsNullActor)
+		PlaceActorSetPlace(PoolArray, AddPoolSize, Class, SpawnTransform);
+
+	T* PoolObj = PoolArray.Pop();
+	PoolObj->SetActorTransform(SpawnTransform);
+	PoolObj->SetActorEnableCollision(true);
+	PoolObj->SetActorHiddenInGame(false);
+	PoolObj->SetActorTickEnabled(true);
 }

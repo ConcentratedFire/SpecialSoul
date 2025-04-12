@@ -38,6 +38,25 @@ void ACObjectPoolManager::ReturnEnemy(class ACMeleeEnemy* Enemy)
 	MeleePool.Push(Enemy);
 }
 
+void ACObjectPoolManager::ReturnTornado(class ACTornado* Tornado)
+{
+	Tornado->SetActorEnableCollision(false);
+	Tornado->SetActorHiddenInGame(true);
+	Tornado->SetActorTickEnabled(false);
+
+	TornadoPool.Push(Tornado);
+}
+
+void ACObjectPoolManager::MakeTornadoPool()
+{
+	InitPool(TornadoPool, AppendTornadoPoolSize, TornadoActor);
+}
+
+void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform);
+}
+
 template<>
 void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<ABaseEnemy>& Class)
 {

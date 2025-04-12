@@ -18,13 +18,14 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
 public:
-	FVector TornadoDirection;
+	FVector TornadoStartLocation;
 
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
@@ -39,4 +40,9 @@ private:
 	class UStaticMeshComponent* TornadoMesh1;
 	UPROPERTY(EditDefaultsOnly)
 	class UStaticMeshComponent* TornadoMesh2;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Speed = 1000;
+
+	FVector StartLocation;	
 };

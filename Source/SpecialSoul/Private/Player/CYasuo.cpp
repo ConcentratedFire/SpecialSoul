@@ -166,3 +166,9 @@ void ACYasuo::CheckMoveData()
 	if (GS->GetCurLevel() > YasuoMoveInfo.RangeTo)
 		UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
 }
+
+void ACYasuo::UpdataPlayerData(const int32 PlayerLevel)
+{
+	// TODO 레벨업 후 정보 갱신 처리
+	// MoveData는 키값 체크 후 넘기기
+}

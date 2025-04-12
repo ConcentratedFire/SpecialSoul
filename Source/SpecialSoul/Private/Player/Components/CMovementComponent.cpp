@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Player/CBasePlayer.h"
 #include "Player/CPlayerController.h"
+#include "Player/CYasuo.h"
 
 // Sets default values for this component's properties
 UCMovementComponent::UCMovementComponent()
@@ -39,6 +40,10 @@ void UCMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	PC = Cast<ACPlayerController>(BaseOwnerCharacter->GetController());
+
+	YasuoCharacer = Cast<ACYasuo>(PC->GetPawn());
+	if (YasuoCharacer)
+		BeforeLocation = YasuoCharacer->GetActorLocation();
 }
 
 
@@ -49,6 +54,15 @@ void UCMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	RotationToMouseCursor(DeltaTime);
+
+	// 플레이중인 캐릭터가 야스오 일때, 이동거리를 체크하고 기력을 충전시킴
+	if (YasuoCharacer)
+	{
+		FVector CurrentLocation = YasuoCharacer->GetActorLocation();
+		float Distance = FVector::Dist(CurrentLocation, BeforeLocation);
+		YasuoCharacer->MoveDistance += Distance;
+		BeforeLocation = CurrentLocation;
+	}
 }
 
 void UCMovementComponent::SetInputBinding(class UEnhancedInputComponent* Input)
@@ -68,7 +82,7 @@ void UCMovementComponent::Move(const FInputActionValue& Value)
 void UCMovementComponent::RotationToMouseCursor(const float& DeltaTime)
 {
 	if (!PC) return;
-	
+
 	FHitResult HitResult;
 	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	if (bHit)
@@ -79,7 +93,7 @@ void UCMovementComponent::RotationToMouseCursor(const float& DeltaTime)
 
 		// 목표 회전값
 		FRotator targetRot = FRotationMatrix::MakeFromX(directionToMouseCursor).Rotator();
-		
+
 		// 현재 회전값에서 목표 회전값으로 보간
 		FRotator CurrentRotation = BaseOwnerCharacter->GetActorRotation();
 		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, targetRot, DeltaTime, RoationInteropSpeed);

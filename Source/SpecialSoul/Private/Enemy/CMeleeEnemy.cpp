@@ -3,6 +3,7 @@
 
 #include "Enemy/CMeleeEnemy.h"
 
+#include "SpecialSoul.h"
 #include "Components/CapsuleComponent.h"
 #include "ObjectPool/CObjectPoolManager.h"
 
@@ -37,11 +38,8 @@ void ACMeleeEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-float ACMeleeEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
-                               class AController* EventInstigator, AActor* DamageCauser)
+void ACMeleeEnemy::DieEndAction()
 {
-	HP-=DamageAmount;
-	if (HP<=0)
-		ObjectPoolManager->ReturnEnemy(this);
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (!ObjectPoolManager) return;
+	ObjectPoolManager->ReturnEnemy(this);
 }

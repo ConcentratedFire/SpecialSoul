@@ -4,6 +4,7 @@
 #include "Player/Jinx.h"
 
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Player/Anim/JinxAnim.h"
 #include "Skill/Jinx/Jinx_Attack.h"
 #include "Skill/Jinx/Jinx_ESkill.h"
@@ -25,16 +26,13 @@ AJinx::AJinx()
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(68.f);
 	GetCapsuleComponent()->SetCapsuleRadius(28.f);
+	
+	// GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 void AJinx::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-void AJinx::Attack()
-{
-	CastSkill(ESkillKey::Attack); // 기본공격
 }
 
 void AJinx::BeginPlay()
@@ -48,10 +46,6 @@ void AJinx::BeginPlay()
 	BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
 	
-	// 데이터
-	DataSheetUtility = NewObject<UCDataSheetUtility>(this); // Outer인 this를 기준으로 객체 생명주기를 관리 (Outer가 죽을 때 자동으로 GC 됨)
-	DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", AttackDataMap); // 기본공격 데이터
-	
 	DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::SetAttackData);
 }
 
@@ -59,6 +53,12 @@ void AJinx::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Ski
 {
 	SkillMap.Add(Key, Skill);
 }
+
+void AJinx::Attack()
+{
+	CastSkill(ESkillKey::Attack); // 기본공격
+}
+
 
 // 플레이어의 키 입력에 따른 스킬 캐스팅
 void AJinx::CastSkill(ESkillKey Key)
@@ -77,7 +77,7 @@ void AJinx::SetAttackData()
 	StartAttack();
 }
 
-void AJinx::PrintAttackDataMap()
+void AJinx::PrintAttackDataMap() // CBasePlayer.cpp에서 바인딩됨
 {
 	for (const auto& Pair : AttackDataMap)
 	{
@@ -91,6 +91,5 @@ void AJinx::StartAttack()
 	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
 	{
 		PlayAnimMontage(AttackMontage); // AttackMontage의 AnimNotify에서 애니메이션의 특정 프레임에 Attack 호출
-		UE_LOG(LogTemp, Log, TEXT("Attack"));
 	}), AttackData.Cooltime, true, AttackData.Cooltime);
 }

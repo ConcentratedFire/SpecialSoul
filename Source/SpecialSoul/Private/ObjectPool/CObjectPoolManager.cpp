@@ -16,18 +16,20 @@ ACObjectPoolManager::ACObjectPoolManager()
 void ACObjectPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
-	// InitPool(MeleePool, AppendMeleePoolSize, MeleeEnemy);
+	InitPool(ExpPool, AppendExpPoolSize, ExpActor);
+	
+	InitPool(MeleePool, AppendMeleePoolSize, MeleeEnemy);
 
 	// 오브젝트 풀링 테스트
-	// FTimerHandle TimerHandle;
-	// GetWorldTimerManager().SetTimer(TimerHandle, [&]()
-	// {
-	// 	for (int i = 0; i < 4; ++i)
-	// 		PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
-	// }, 1.5f, true);	
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [&]()
+	{
+		for (int i = 0; i < 3; ++i)
+			PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
+	}, 1.5f, true);
 }
 
-void ACObjectPoolManager::ReturnEnemy(class ACMeleeEnemy* Enemy)
+void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
 {
 	Enemy->SetActorEnableCollision(false);
 	Enemy->SetActorHiddenInGame(true);
@@ -38,8 +40,41 @@ void ACObjectPoolManager::ReturnEnemy(class ACMeleeEnemy* Enemy)
 	MeleePool.Push(Enemy);
 }
 
+void ACObjectPoolManager::ReturnTornado(ACTornado* Tornado)
+{
+	Tornado->SetActorEnableCollision(false);
+	Tornado->SetActorHiddenInGame(true);
+	Tornado->SetActorTickEnabled(false);
+
+	TornadoPool.Push(Tornado);
+}
+
+void ACObjectPoolManager::ReturnExp(ACExp* EXP)
+{
+	EXP->SetActorEnableCollision(false);
+	EXP->SetActorHiddenInGame(true);
+	EXP->SetActorTickEnabled(false);
+
+	ExpPool.Push(EXP);
+}
+
+void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
+{
+	InitPool(TornadoPool, AppendTornadoPoolSize, TornadoActor, NewOwner);
+}
+
+void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform);
+}
+
+void ACObjectPoolManager::ExpSpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(ExpPool, AppendExpPoolSize, ExpActor, SpawnTransform);
+}
+
 template<>
-void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<ABaseEnemy>& Class)
+void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<ABaseEnemy>& Class, AActor* NewOwner)
 {
 	if (!Class) return;
 	PoolArray.Reserve(PoolArray.Max() + AddPoolSize);

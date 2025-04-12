@@ -3,15 +3,22 @@
 
 #include "Player/CBasePlayer.h"
 
+#include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Game/CGameState.h"
+#include "Game/SpecialSoulGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Item/CBaseItem.h"
+#include "ObjectPool/CObjectPoolManager.h"
 #include "Player/Components/CMovementComponent.h"
+#include "Utility/CDataSheetUtility.h"
 
+struct FJinxAttackData;
 class UEnhancedInputLocalPlayerSubsystem;
 // Sets default values
 ACBasePlayer::ACBasePlayer()
@@ -54,12 +61,57 @@ ACBasePlayer::ACBasePlayer()
 		TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Input/IMC_Player.IMC_Player'"));
 	if (tempIMC.Succeeded())
 		IMC_Player = tempIMC.Object;
+
+	GetCapsuleComponent()->SetCollisionProfileName(FName("Player"));
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACBasePlayer::OnCharacterBeginOverlap);
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned
 void ACBasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// TODO 서버일때만 하도록 처리
+	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		GS = GM->GetGameState<ACGameState>();
+		if (GS)
+		{
+			// TODO Init Data Settings
+			// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
+			// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
+			DataSheetUtility = NewObject<UCDataSheetUtility>(this);
+
+			if (DataSheetUtility)
+			{
+				DataSheetUtility->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintAttackDataMap);
+				DataSheetUtility->OnDataFetched.AddDynamic(GS, &ACGameState::PrintAttackDataMap);
+				
+				DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", GM->RegenDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FEXPData>("EXP", "A1", "B22", GS->EXPDataMap);
+
+				DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", AttackDataMap); // 기본공격 데이터
+
+				
+				// 리소스 해제
+				// DataSheetUtility->ConditionalBeginDestroy();
+				// DataSheetUtility = nullptr;
+			}
+		}
+	}
+
+	// 오브젝트 풀 매니저 가져오기
+	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+	{
+		ObjectPoolManager = *It;
+	}
+	
+	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
 }
 
 // Called every frame
@@ -84,4 +136,18 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (input)
 		OnInputBindingDel.Broadcast(input);
+}
+
+void ACBasePlayer::PrintAttackDataMap()
+{
+}
+
+void ACBasePlayer::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                           const FHitResult& SweepResult)
+{
+	if (auto Item = Cast<ACBaseItem>(OtherActor))
+	{
+		Item->ActiveItem();
+	}
 }

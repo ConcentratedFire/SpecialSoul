@@ -28,7 +28,7 @@ public:
 	int32 BulletNum = 5;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	float FireDelay = 0.1;
+	float FireDelay = 0.05;
 	
 private:
 	FTimerHandle FireTimer;

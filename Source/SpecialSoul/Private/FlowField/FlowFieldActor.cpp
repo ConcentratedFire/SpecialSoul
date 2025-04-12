@@ -7,7 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/CBasePlayer.h"
 
-#define ECC_FF_Obstacle ECC_GameTraceChannel5
+#define ECC_FF_Obstacle ECC_GameTraceChannel6
 
 AFlowFieldActor::AFlowFieldActor()
 {

@@ -4,6 +4,8 @@
 #include "Enemy/BaseEnemy.h"
 
 #include "EngineUtils.h"
+#include "SpecialSoul.h"
+#include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyAnimInstance.h"
 #include "Enemy/AI/CEnemyController.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -30,8 +32,13 @@ ABaseEnemy::ABaseEnemy()
 	if (ObjectPoolManager)
 	{
 		ObjectPoolManager->EnemyOutFromPool_Dele.AddUObject(this, &ABaseEnemy::OnMyControllerTickOn);
-		ObjectPoolManager->EnemyGotoPool_Dele.AddUObject(this, &ABaseEnemy::OnMyControllerTickOff);		
+		ObjectPoolManager->EnemyGotoPool_Dele.AddUObject(this, &ABaseEnemy::OnMyControllerTickOff);
 	}
+
+	GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
+	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// GetMesh()->SetCollisionProfileName(FName("Enemy"));
 }
 
 void ABaseEnemy::BeginPlay()
@@ -104,7 +111,13 @@ void ABaseEnemy::HandleAttack()
 
 void ABaseEnemy::HandleDie()
 {
-	PlayAnimMontage(DieMontage);
+	if (DieMontage) PlayAnimMontage(DieMontage);
+}
+
+void ABaseEnemy::ResetEnemy()
+{
+	bIsDead = false;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
 }
 
 void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -118,8 +131,8 @@ void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void ABaseEnemy::OnMyControllerTickOn()
 {
-	if (IsHidden()) return;	// 보이지 않는것은 아직 풀에 있는것임
-	
+	if (IsHidden()) return; // 보이지 않는것은 아직 풀에 있는것임
+
 	ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
 	EC->SetActorTickEnabled(true);
 }
@@ -127,7 +140,37 @@ void ABaseEnemy::OnMyControllerTickOn()
 void ABaseEnemy::OnMyControllerTickOff()
 {
 	if (!IsHidden()) return; // 보이는 것은 아직 죽지 않은 것
-		
+
 	ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
 	EC->SetActorTickEnabled(false);
+}
+
+void ABaseEnemy::MyDamage(int32 DamageAmount)
+{
+	HP -= DamageAmount;
+	// LOG_S(Warning, TEXT("Name:%s, HP : %d"), *GetName(), HP);
+	if (HP <= 0)
+	{
+		bIsDead = true;
+		ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
+		if (EC)
+			EC->StopMovement();
+
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+
+		HandleDie();
+
+		// 80% 확률 계산
+		if (FMath::RandRange(1, 100) >= 20)
+		{
+			// 경험치 스폰
+			FTransform SpawnTransform;
+			FVector SpawnLocation = GetActorLocation();
+			SpawnLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+			SpawnTransform.SetLocation(SpawnLocation);
+			SpawnTransform.SetRotation(GetActorRotation().Quaternion());
+			SpawnTransform.SetScale3D(FVector(.4));
+			ObjectPoolManager->ExpSpawn(SpawnTransform);
+		}
+	}
 }

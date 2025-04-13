@@ -13,5 +13,8 @@ UCLASS()
 class SPECIALSOUL_API ACItemBox : public ACBaseItem
 {
 	GENERATED_BODY()
-	
+
+private:
+	ACItemBox();
+	virtual void ActiveItem() override;
 };

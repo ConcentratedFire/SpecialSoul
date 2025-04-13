@@ -36,6 +36,7 @@ public:
 	void ReturnEnemy(ACMeleeEnemy* Enemy);
 	void ReturnTornado(ACTornado* Tornado);
 	void ReturnExp(ACExp* EXP);
+	void ReturnItemBox(ACItemBox* ItemBox);
 
 	// Tornado
 	void MakeTornadoPool(AActor* NewOwner);
@@ -57,6 +58,9 @@ private:
 	TSubclassOf<ACItemBox> ItemBoxActor;
 
 private: // Object Pool
+	UPROPERTY(EditDefaultsOnly, Category="ObjectPool")
+	FVector PoolLocation = FVector(-1000, 2000, 500);
+
 	// 한번에 스폰시킬 Enemy 마리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendMeleePoolSize = 100;
@@ -134,7 +138,7 @@ void ACObjectPoolManager::InitPool(TArray<T*>& PoolArray, const int32& AddPoolSi
 
 	for (int i = 0; i < AddPoolSize; ++i)
 	{
-		FTransform Transform(FRotator::ZeroRotator, FVector(-1000, 2000, 500), FVector(1));
+		FTransform Transform(FRotator::ZeroRotator, PoolLocation, FVector(1));
 		FActorSpawnParameters SpawnParam;
 		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		T* PoolObj = GetWorld()->SpawnActorDeferred<T>(Class, Transform, nullptr, nullptr,

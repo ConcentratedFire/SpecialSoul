@@ -95,4 +95,9 @@ void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		Enemy->MyDamage(OwnerYasuo->GetDamage());
 	}
+	else if (auto Item = Cast<ACBaseItem>(OtherActor))
+	{
+		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
+			Item->ActiveItem();
+	}
 }

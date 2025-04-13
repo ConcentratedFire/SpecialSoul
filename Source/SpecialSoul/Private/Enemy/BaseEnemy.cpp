@@ -99,7 +99,7 @@ void ABaseEnemy::FindTarget()
 	if (ClosestPlayer)
 	{
 		Target = ClosestPlayer;
-		//MyController->TargetPlayer = Target; // 클라 추가하면 크래시 발생
+		MyController->TargetPlayer = Target; // 클라 추가하면 크래시 발생
 	}
 }
 

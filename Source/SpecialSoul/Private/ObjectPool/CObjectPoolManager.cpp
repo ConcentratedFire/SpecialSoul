@@ -70,6 +70,16 @@ void ACObjectPoolManager::ReturnExp(ACExp* EXP)
 	ExpPool.Push(EXP);
 }
 
+void ACObjectPoolManager::ReturnItemBox(ACItemBox* ItemBox)
+{
+	ItemBox->SetActorEnableCollision(false);
+	ItemBox->SetActorHiddenInGame(true);
+	ItemBox->SetActorTickEnabled(false);
+	ItemBox->SetActorLocation(PoolLocation);
+
+	ItemBoxPool.Push(ItemBox);
+}
+
 void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 {
 	InitPool(TornadoPool, AppendTornadoPoolSize, TornadoActor, NewOwner);

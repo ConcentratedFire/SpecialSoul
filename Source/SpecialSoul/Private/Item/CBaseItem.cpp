@@ -16,6 +16,7 @@ ACBaseItem::ACBaseItem()
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	BoxComp->SetCollisionProfileName(FName("Item"));
 	BoxComp->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+	BoxComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 	RootComponent = BoxComp;
 	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));

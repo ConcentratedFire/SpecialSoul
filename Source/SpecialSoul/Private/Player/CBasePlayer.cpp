@@ -9,6 +9,7 @@
 #include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Game/CGameState.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -55,6 +56,15 @@ ACBasePlayer::ACBasePlayer()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	ArrowWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("ArrowWidgetComp"));
+	ArrowWidgetComp->SetupAttachment(RootComponent);
+	ArrowWidgetComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), ArrowRotation);
+	ArrowWidgetComp->SetRelativeScale3D(FVector(.2, .35, .35));
+	
+	ConstructorHelpers::FClassFinder<UUserWidget> tempArrowWidget(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Arrow.WBP_Arrow_C'"));
+	if (tempArrowWidget.Succeeded())
+		ArrowWidgetComp->SetWidgetClass(tempArrowWidget.Class);
+
 	MoveComp = CreateDefaultSubobject<UCMovementComponent>(TEXT("MoveComp"));
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> tempIMC(
@@ -90,15 +100,16 @@ void ACBasePlayer::BeginPlay()
 				{
 					DataSheetUtility->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintRegenDataMap);
 					DataSheetUtility->OnDataFetched.AddDynamic(GS, &ACGameState::PrintExpDataMap);
-				
+
 					DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
 					DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
 					DataSheetUtility->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", GM->RegenDataMap);
 					DataSheetUtility->FetchGoogleSheetData<FEXPData>("EXP", "A1", "B22", GS->EXPDataMap);
 
-					DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", JinxAttackDataMap); // 기본공격 데이터
+					DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", JinxAttackDataMap);
+					// 기본공격 데이터
 
-				
+
 					// 리소스 해제
 					// DataSheetUtility->ConditionalBeginDestroy();
 					// DataSheetUtility = nullptr;
@@ -112,7 +123,7 @@ void ACBasePlayer::BeginPlay()
 	{
 		ObjectPoolManager = *It;
 	}
-	
+
 	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
 }
 

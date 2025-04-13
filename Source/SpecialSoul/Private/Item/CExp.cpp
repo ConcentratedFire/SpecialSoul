@@ -75,6 +75,6 @@ void ACExp::OnItemOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 {
 	if (DropPlayer) return;
 
-	// DropPlayer = Cast<ACBasePlayer>(OtherActor);
-	// bCanDrop = true;
+	DropPlayer = Cast<ACBasePlayer>(OtherActor);
+	bCanDrop = true;
 }

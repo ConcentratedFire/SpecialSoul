@@ -45,6 +45,11 @@ private: // Attack
 	UPROPERTY(VisibleAnywhere, Category=Attack)
 	int32 AttackCnt = 5;
 
+public:
+	UPROPERTY(BlueprintReadOnly, Category=Attck)
+	FVector AttackFrontVector;
+	
+	void SetAttackFrontVector();
 	TArray<FVector> GetAttackVector();
 
 private: // Anim
@@ -68,4 +73,7 @@ private: // Passive Energy
 
 private: // Passive Movement
 	void CheckMoveData();
+
+private:
+	virtual void RotateArrow() override;
 };

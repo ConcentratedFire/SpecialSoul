@@ -46,7 +46,9 @@ void UCMovementComponent::BeginPlay()
 
 	YasuoCharacer = Cast<ACYasuo>(PC->GetPawn());
 	if (YasuoCharacer)
+	{
 		BeforeLocation = YasuoCharacer->GetActorLocation();
+	}
 }
 
 

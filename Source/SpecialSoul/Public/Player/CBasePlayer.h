@@ -78,10 +78,10 @@ class SPECIALSOUL_API ACBasePlayer : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ACBasePlayer();
-	
+
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;	
+	virtual void BeginPlay() override;
 
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;
@@ -107,7 +107,7 @@ public: // Return Component
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	virtual void Attack() PURE_VIRTUAL(); // Attack 기본 함수
-
+	
 private: // Input
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* IMC_Player;
@@ -144,4 +144,13 @@ protected: // Get Player Data
 protected: // MoveSpeed
 	UPROPERTY(EditDefaultsOnly, Category = "MoveSpeed")
 	float PlayerMoveSpeed = 600;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UWidgetComponent* ArrowWidgetComp;
+
+protected: // Arrow UI
+	FRotator ArrowRotation{90, 0, -45};
+
+	virtual void RotateArrow(){};
 };

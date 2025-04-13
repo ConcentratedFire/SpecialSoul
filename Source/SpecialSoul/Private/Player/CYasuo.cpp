@@ -3,9 +3,12 @@
 
 #include "Player/CYasuo.h"
 
+#include "SpecialSoul.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Game/CGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
@@ -37,6 +40,9 @@ void ACYasuo::BeginPlay()
 void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	SetAttackFrontVector();
+	RotateArrow();
 
 	// 데이터가 들어왔는지 체크
 	if (YasuoMoveDataMap.Num() > 0)
@@ -81,7 +87,7 @@ void ACYasuo::Attack()
 	}
 }
 
-TArray<FVector> ACYasuo::GetAttackVector()
+void ACYasuo::SetAttackFrontVector()
 {
 	FVector forwardVec = GetActorForwardVector();
 	FVector Velocity = GetVelocity().GetSafeNormal();
@@ -93,6 +99,11 @@ TArray<FVector> ACYasuo::GetAttackVector()
 	}
 	Dir.Normalize();
 
+	AttackFrontVector = Dir;
+}
+
+TArray<FVector> ACYasuo::GetAttackVector()
+{
 	float AngleStep = 360.f / static_cast<float>(AttackCnt);
 	TArray<FVector> AttackVectors;
 
@@ -100,7 +111,7 @@ TArray<FVector> ACYasuo::GetAttackVector()
 	{
 		float AngleOffset = -AngleStep * (AttackCnt - 1) / 2 + AngleStep * i;
 		FRotator RotationOffset(0.0f, AngleOffset, 0.0f);
-		FVector RotatedVector = RotationOffset.RotateVector(Dir);
+		FVector RotatedVector = RotationOffset.RotateVector(AttackFrontVector);
 		AttackVectors.Add(RotatedVector);
 	}
 
@@ -171,6 +182,14 @@ void ACYasuo::CheckMoveData()
 {
 	if (GS->GetCurLevel() > YasuoMoveInfo.RangeTo)
 		UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
+}
+
+void ACYasuo::RotateArrow()
+{
+	float rotateValue = UKismetMathLibrary::MakeRotFromX(AttackFrontVector).Yaw * -1;
+	FRotator newRot = ArrowRotation;
+	newRot.Roll += rotateValue;
+	ArrowWidgetComp->SetWorldRotation(newRot);
 }
 
 void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)

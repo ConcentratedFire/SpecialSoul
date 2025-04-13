@@ -28,7 +28,7 @@ ASpecialSoulGameMode::ASpecialSoulGameMode()
 	}
 }
 
-void ASpecialSoulGameMode::PrintAttackDataMap()
+void ASpecialSoulGameMode::PrintRegenDataMap()
 {
 	// for (const auto& Pair : RegenDataMap)
 	// {
@@ -42,11 +42,11 @@ void ASpecialSoulGameMode::PrintAttackDataMap()
 
 	// 초기 데이터 세팅
 	if (RegenDataMap.Num() > 0)
-		UpdateYasuoAttackStat(1);
+		UpdateRegenInfo(1);
 }
 
 
-void ASpecialSoulGameMode::UpdateYasuoAttackStat(const int32 Level)
+void ASpecialSoulGameMode::UpdateRegenInfo(const int32 Level)
 {
 	const auto& StatData = RegenDataMap[Level];
 	RegenInfo.ID = StatData.ID;

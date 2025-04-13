@@ -89,8 +89,8 @@ void ACBasePlayer::BeginPlay()
 
 				if (DataSheetUtility)
 				{
-					DataSheetUtility->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintAttackDataMap);
-					DataSheetUtility->OnDataFetched.AddDynamic(GS, &ACGameState::PrintAttackDataMap);
+					DataSheetUtility->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintRegenDataMap);
+					DataSheetUtility->OnDataFetched.AddDynamic(GS, &ACGameState::PrintExpDataMap);
 				
 					DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
 					DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
@@ -107,7 +107,6 @@ void ACBasePlayer::BeginPlay()
 			}
 		}
 	}
-	
 
 	// 오브젝트 풀 매니저 가져오기
 	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)

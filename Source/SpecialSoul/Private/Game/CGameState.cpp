@@ -5,10 +5,36 @@
 
 #include "EngineUtils.h"
 #include "SpecialSoul.h"
+#include "Game/SpecialSoulGameMode.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
 
-void ACGameState::PrintAttackDataMap()
+ACGameState::ACGameState()
+{
+	PrimaryActorTick.bCanEverTick = true;	
+}
+
+void ACGameState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+}
+
+void ACGameState::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	CurStageTime += DeltaSeconds;
+	LOG_SCREEN_IDX(0, FColor::Blue, "Stage Time: %.2f", CurStageTime);
+	if (CurStageTime >= StageTime)
+	{
+		NextStage();
+		CurStageTime = 0;
+	}
+}
+
+void ACGameState::PrintExpDataMap()
 {
 	// for (const auto& Pair : EXPDataMap)
 	// {
@@ -36,6 +62,13 @@ void ACGameState::AddExp(const int32 exp)
 	}
 
 	LOG_S(Warning, TEXT("Level: %d, curExp: %d"), curLevel, curExp);
+}
+
+void ACGameState::NextStage()
+{
+	++curStage;
+	if (OnNextStage.IsBound()) OnNextStage.Broadcast(); // 아이템 박스 생성, 추후 추가 바인딩 가능
+	GM->UpdateRegenInfo(curStage); // 리젠 테이블 갱신
 }
 
 

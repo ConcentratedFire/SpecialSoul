@@ -41,17 +41,15 @@ class ASpecialSoulGameMode : public AGameModeBase
 
 public:
 	ASpecialSoulGameMode();
-
+	void UpdateRegenInfo(int32 Level);
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FRegenData> RegenDataMap;
 
 	UFUNCTION()
-	void PrintAttackDataMap();
+	void PrintRegenDataMap();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	FRegenData RegenInfo;
-	
-	void UpdateYasuoAttackStat(int32 Level);
 };

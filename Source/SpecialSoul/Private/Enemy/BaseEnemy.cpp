@@ -59,6 +59,18 @@ void ABaseEnemy::BeginPlay()
 	StartFindingTarget();
 }
 
+void ABaseEnemy::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+
+	if (!bNewHidden)
+	{
+		HP = MaxHP;
+		MyController = Cast<ACEnemyController>(GetController());
+		StartFindingTarget();
+	}
+}
+
 
 void ABaseEnemy::Tick(float DeltaTime)
 {

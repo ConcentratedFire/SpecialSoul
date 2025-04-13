@@ -7,6 +7,7 @@
 #include "Enemy/Ranged/RangedEnemy.h"
 #include "GameFramework/Actor.h"
 #include "Item/CExp.h"
+#include "Item/CExpMagnet.h"
 #include "Item/CItemBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AttackActors/CTornado.h"
@@ -37,6 +38,7 @@ public:
 	void ReturnTornado(ACTornado* Tornado);
 	void ReturnExp(ACExp* EXP);
 	void ReturnItemBox(ACItemBox* ItemBox);
+	void ReturnExpMagnet(ACExpMagnet* ExpMagnet);
 
 	// Tornado
 	void MakeTornadoPool(AActor* NewOwner);
@@ -44,6 +46,7 @@ public:
 
 	// Object Setting
 	void ExpSpawn(FTransform SpawnTransform);
+	void MagnetSpawn(FTransform SpawnTransform);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -56,6 +59,8 @@ private:
 	TSubclassOf<ACExp> ExpActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACItemBox> ItemBoxActor;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACExpMagnet> ItemMagnetActor;
 
 private: // Object Pool
 	UPROPERTY(EditDefaultsOnly, Category="ObjectPool")
@@ -73,6 +78,9 @@ private: // Object Pool
 	// 한번에 스폰시킬 아이템박스 개수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendItemBoxSize = 10;
+	// 한번에 스폰시킬 자석 아이템 개수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendItemMagnetSize = 10;
 
 	// 근거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
@@ -89,6 +97,9 @@ private: // Object Pool
 	// 아이템박스 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACItemBox*> ItemBoxPool;
+	// 자석 아이템 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACExpMagnet*> ItemMagnetPool;
 
 private: // ItemBox	
 	UPROPERTY(EditAnywhere, Category = "ObjectPool|ItemBox")

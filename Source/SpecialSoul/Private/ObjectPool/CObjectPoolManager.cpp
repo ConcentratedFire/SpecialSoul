@@ -20,6 +20,7 @@ void ACObjectPoolManager::BeginPlay()
 	Super::BeginPlay();
 	InitPool(ItemBoxPool, AppendItemBoxSize, ItemBoxActor);
 	InitPool(ExpPool, AppendExpPoolSize, ExpActor);
+	InitPool(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor);
 
 	InitPool(MeleePool, AppendMeleePoolSize, MeleeEnemy);
 
@@ -80,6 +81,16 @@ void ACObjectPoolManager::ReturnItemBox(ACItemBox* ItemBox)
 	ItemBoxPool.Push(ItemBox);
 }
 
+void ACObjectPoolManager::ReturnExpMagnet(ACExpMagnet* ExpMagnet)
+{
+	ExpMagnet->SetActorEnableCollision(false);
+	ExpMagnet->SetActorHiddenInGame(true);
+	ExpMagnet->SetActorTickEnabled(false);
+	ExpMagnet->SetActorLocation(PoolLocation);
+	
+	ItemMagnetPool.Push(ExpMagnet);
+}
+
 void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 {
 	InitPool(TornadoPool, AppendTornadoPoolSize, TornadoActor, NewOwner);
@@ -93,6 +104,11 @@ void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform)
 void ACObjectPoolManager::ExpSpawn(FTransform SpawnTransform)
 {
 	PlaceActorSetPlace(ExpPool, AppendExpPoolSize, ExpActor, SpawnTransform);
+}
+
+void ACObjectPoolManager::MagnetSpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor, SpawnTransform);
 }
 
 void ACObjectPoolManager::PlaceItemBox()

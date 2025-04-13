@@ -22,13 +22,26 @@ ACExp::ACExp()
 	DropRangeComp->OnComponentBeginOverlap.AddDynamic(this, &ACExp::OnItemOverlapBegin);
 }
 
+void ACExp::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+
+	if (!bNewHidden)
+	{
+		bCanDrop = false;
+		DropPlayer = nullptr;
+	}
+}
+
 void ACExp::ActiveItem()
 {
 	if (!GS) return;
 	GS->AddExp(ExpCount);
 
 	if (ObjectPoolManager)
+	{
 		ObjectPoolManager->ReturnExp(this);
+	}
 }
 
 void ACExp::Tick(float DeltaSeconds)
@@ -50,12 +63,18 @@ void ACExp::Tick(float DeltaSeconds)
 	}
 }
 
+void ACExp::MagnetDrop(ACBasePlayer* Player)
+{
+	DropPlayer = Player;
+	bCanDrop = true;
+}
+
 void ACExp::OnItemOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                const FHitResult& SweepResult)
 {
 	if (DropPlayer) return;
 
-	DropPlayer = Cast<ACBasePlayer>(OtherActor);
-	bCanDrop = true;
+	// DropPlayer = Cast<ACBasePlayer>(OtherActor);
+	// bCanDrop = true;
 }

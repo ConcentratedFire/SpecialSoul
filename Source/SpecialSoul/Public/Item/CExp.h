@@ -19,6 +19,10 @@ private:
 	virtual void ActiveItem() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+public:
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	void MagnetDrop(class ACBasePlayer* Player);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category=Comp)
 	class UBoxComponent* DropRangeComp;

@@ -17,4 +17,5 @@ class SPECIALSOUL_API ACItemBox : public ACBaseItem
 private:
 	ACItemBox();
 	virtual void ActiveItem() override;
+	void SelectItem();
 };

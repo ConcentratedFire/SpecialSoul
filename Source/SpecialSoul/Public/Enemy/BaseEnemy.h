@@ -18,7 +18,8 @@ class SPECIALSOUL_API ABaseEnemy : public ACharacter
 public:
 	ABaseEnemy();
 	virtual void Tick(float DeltaTime) override;
-
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	
 public:
 	UPROPERTY()
 	class ACEnemyController* MyController;

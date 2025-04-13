@@ -17,8 +17,26 @@ class SPECIALSOUL_API ACExp : public ACBaseItem
 private:
 	ACExp();
 	virtual void ActiveItem() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category=Comp)
+	class UBoxComponent* DropRangeComp;
+
+	UFUNCTION()
+	void OnItemOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	                        const FHitResult& SweepResult);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Exp")
 	int32 ExpCount = 2;
+
+private:
+	float RunningTime = 0.0f;
+
+	UPROPERTY()
+	class ACBasePlayer* DropPlayer = nullptr;
+
+	bool bCanDrop = false;
 };

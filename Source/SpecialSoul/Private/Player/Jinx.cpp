@@ -4,7 +4,6 @@
 #include "Player/Jinx.h"
 
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Player/Anim/JinxAnim.h"
 #include "Skill/Jinx/Jinx_Attack.h"
 #include "Skill/Jinx/Jinx_ESkill.h"
@@ -30,24 +29,42 @@ AJinx::AJinx()
 	// GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
-void AJinx::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AJinx::BeginPlay()
 {
 	Super::BeginPlay();
-
 	Anim = Cast<UJinxAnim>(GetMesh()->GetAnimInstance());
 
 	BindSkill(ESkillKey::Attack, NewObject<UJinx_Attack>());
 	BindSkill(ESkillKey::Passive, NewObject<UJinx_Passive>());
 	BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
-	
-	DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::SetAttackData);
+
+	if (HasAuthority() && DataSheetUtility)
+	{
+		DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::InitAllData);
+	}
+
 }
+
+void AJinx::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+}
+
+// void AJinx::PossessedBy(AController* NewController)
+// {
+// 	Super::PossessedBy(NewController);
+//
+// 	
+// 	
+// }
+
+// void AJinx::BeginPlay()
+// {
+// 	Super::BeginPlay();
+//
+// }
 
 void AJinx::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill)
 {
@@ -59,6 +76,27 @@ void AJinx::Attack()
 	CastSkill(ESkillKey::Attack); // 기본공격
 }
 
+void AJinx::InitAllData()
+{
+	UpdatePlayerData(1);
+}
+
+void AJinx::UpdatePlayerData(const int32 PlayerLevel)
+{
+	if (JinxAttackDataMap.Contains(PlayerLevel))
+	{
+		UpdateJinxAttackStat(PlayerLevel);
+	}
+}
+
+void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
+{
+	AttackData = JinxAttackDataMap.FindRef(PlayerLevel);
+
+	 // 업데이트된 데이터로 공격 시작
+	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+	StartAttack();
+}
 
 // 플레이어의 키 입력에 따른 스킬 캐스팅
 void AJinx::CastSkill(ESkillKey Key)
@@ -71,15 +109,9 @@ void AJinx::CastSkill(ESkillKey Key)
 	SkillMap[Key]->UseSkill(this); // 캐릭터(this)를 넣어줌으로써, 스킬에서 캐릭터의 데이터를 사용할 수 있다
 }
 
-void AJinx::SetAttackData()
-{
-	AttackData = AttackDataMap.FindRef(1);
-	StartAttack();
-}
-
 void AJinx::PrintAttackDataMap() // CBasePlayer.cpp에서 바인딩됨
 {
-	for (const auto& Pair : AttackDataMap)
+	for (const auto& Pair : JinxAttackDataMap)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Jinx's AttackDataMap || ID: %d) ProjectileCount: %d, ProjectileRange: %f, Damage: %f, Cooltime: %f, UseAP: %s, APDamage: %f"),
 			Pair.Key, Pair.Value.ProjectileCount, Pair.Value.ProjectileRange, Pair.Value.Damage, Pair.Value.Cooltime, *Pair.Value.UseAP, Pair.Value.APDamage);

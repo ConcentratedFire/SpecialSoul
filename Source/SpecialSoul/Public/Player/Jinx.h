@@ -31,10 +31,14 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	//virtual void PossessedBy(AController* NewController) override;
 
 	virtual void Attack() override;
+	UFUNCTION()
+	void InitAllData();
+	void UpdatePlayerData(const int32 PlayerLevel);
+	
 public:
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	TObjectPtr<UJinxAnim> Anim;
 
@@ -51,13 +55,11 @@ public:
 	void CastSkill(ESkillKey Key);
 
 	UFUNCTION()
-	void SetAttackData(); // 임시
-	
-	UFUNCTION()
 	virtual void PrintAttackDataMap() override;
 	
 private:
-	
+	void UpdateJinxAttackStat(int32 PlayerLevel);
+
 	void BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill);
 
 	FTimerHandle AttackTimer;

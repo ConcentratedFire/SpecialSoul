@@ -39,6 +39,9 @@ void UCMovementComponent::InitializeComponent()
 void UCMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (!BaseOwnerCharacter || !BaseOwnerCharacter->IsLocallyControlled()) return;
+	
 	PC = Cast<ACPlayerController>(BaseOwnerCharacter->GetController());
 
 	YasuoCharacer = Cast<ACYasuo>(PC->GetPawn());

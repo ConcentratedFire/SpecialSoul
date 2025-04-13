@@ -6,6 +6,7 @@
 #include "EngineUtils.h"
 #include "SpecialSoul.h"
 #include "Player/CYasuo.h"
+#include "Player/Jinx.h"
 
 void ACGameState::PrintAttackDataMap()
 {
@@ -48,6 +49,11 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 	if (Level == 1) return;
 	// 레벨업 후 야스오 정보 갱신
 	for (TActorIterator<ACYasuo> It(GetWorld(), ACYasuo::StaticClass()); It; ++It)
+	{
+		(*It)->UpdatePlayerData(Level);
+	}
+
+	for (TActorIterator<AJinx> It(GetWorld(), AJinx::StaticClass()); It; ++It)
 	{
 		(*It)->UpdatePlayerData(Level);
 	}

@@ -134,7 +134,7 @@ protected: // Get Player Data
 	TMap<int32, FYasuoMoveData> YasuoMoveDataMap;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TMap<int32, FJinxAttackData> AttackDataMap;
+	TMap<int32, FJinxAttackData> JinxAttackDataMap;
 
 	// Base는 virtual로만 만들고, Child에서 구현
 	// Child의 BeginPlay에서 델리게이트 바인딩

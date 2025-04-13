@@ -7,6 +7,7 @@
 #include "Enemy/Ranged/RangedEnemy.h"
 #include "GameFramework/Actor.h"
 #include "Item/CExp.h"
+#include "Item/CItemBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AttackActors/CTornado.h"
 #include "CObjectPoolManager.generated.h"
@@ -52,6 +53,8 @@ private:
 	TSubclassOf<ACTornado> TornadoActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACExp> ExpActor;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACItemBox> ItemBoxActor;
 
 private: // Object Pool
 	// 한번에 스폰시킬 Enemy 마리수
@@ -63,6 +66,9 @@ private: // Object Pool
 	// 한번에 스폰시킬 경험치수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendExpPoolSize = 100;
+	// 한번에 스폰시킬 아이템박스 개수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendItemBoxSize = 10;
 
 	// 근거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
@@ -76,7 +82,17 @@ private: // Object Pool
 	// 경험치 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACExp*> ExpPool;
+	// 아이템박스 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACItemBox*> ItemBoxPool;
 
+private: // ItemBox	
+	UPROPERTY(EditAnywhere, Category = "ObjectPool|ItemBox")
+	TArray<FVector> ItemBoxLocation;
+
+	void PlaceItemBox();
+
+private: // Function
 	/**
 	 * 오브젝트 풀의 크기를 늘리고 UClass를 이용하여 오브젝트 생성
 	 *
@@ -98,6 +114,8 @@ private: // Object Pool
 private: // Place
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	float Radius = 700.f;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	float TraceRadius = 100.f;
 
 	template <typename T>
 	void PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class);

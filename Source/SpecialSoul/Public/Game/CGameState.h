@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "CGameState.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FNextStage);
+
 USTRUCT(BlueprintType)
 struct FEXPData // 레벨업에 필요한 경험치 테이블
 {
@@ -35,19 +37,36 @@ class SPECIALSOUL_API ACGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 
+private:
+	ACGameState();
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	UPROPERTY()
+	class ASpecialSoulGameMode* GM;
+
+	UPROPERTY(EditDefaultsOnly, Category="Game")
+	float StageTime = 20.f;
+	float CurStageTime = 0.f;
+
 public:
 	const int32 MaxLevel = 21;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FEXPData> EXPDataMap;
 
+	FNextStage OnNextStage;
+
 	UFUNCTION()
-	void PrintAttackDataMap();
+	void PrintExpDataMap();
 	int32 GetCurLevel() const { return curLevel; }
 
 	void AddExp(const int32 exp);
+	void NextStage();
 
 private:
+	UPROPERTY(VisibleAnywhere, Category = "Game")
+	int32 curStage = 1;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	int32 curLevel = 1;
 	UPROPERTY(VisibleAnywhere, Category = "Game")

@@ -19,25 +19,25 @@ class SPECIALSOUL_API UCDataSheetUtility : public UObject
 public:
 	UCDataSheetUtility();
 
-	template<typename T>
-	void FetchGoogleSheetData(const FString& SheetName, const FString& startCell, const FString& endCell, TMap<int32, T>& OutDataMap);
+	template<typename T, typename Y>
+	void FetchGoogleSheetData(const FString& SheetName, const FString& startCell, const FString& endCell, TMap<Y, T>& OutDataMap);
 
 	FOnDataFetched OnDataFetched;
 
 protected:
-	template<typename T>
-	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful, TMap<int32, T>& OutDataMap);
+	template<typename T, typename Y>
+	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful, TMap<Y, T>& OutDataMap);
 
-	template<typename T>
-	void PaserSheetRowsToStructArray(const TArray<TSharedPtr<FJsonValue>>*& Rows, TMap<int32, T>& OutDataMap);
+	template<typename T, typename Y>
+	void PaserSheetRowsToStructArray(const TArray<TSharedPtr<FJsonValue>>*& Rows, TMap<Y, T>& OutDataMap);
 
 private:
 	const FString GoogleSheetID = TEXT("1jDDDp-0KEwhWuXAKkKeoljX5N8G2za3HqO0F8c1oQRY");
 	const FString ApiKey = TEXT("AIzaSyB6rO5H4OxqWTOGvHVr04Xtt1YL-da3EdQ");
 };
 
-template<typename T>
-void UCDataSheetUtility::FetchGoogleSheetData(const FString& SheetName, const FString& startCell, const FString& endCell, TMap<int32, T>& OutDataMap)
+template<typename T, typename Y>
+void UCDataSheetUtility::FetchGoogleSheetData(const FString& SheetName, const FString& startCell, const FString& endCell, TMap<Y, T>& OutDataMap)
 {
 	// HTTP Module 가져오기
 	FHttpModule* Http = &FHttpModule::Get();
@@ -67,8 +67,8 @@ void UCDataSheetUtility::FetchGoogleSheetData(const FString& SheetName, const FS
 	UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager Fetching Google Sheet Data"));
 }
 
-template<typename T>
-void UCDataSheetUtility::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful, TMap<int32, T>& OutDataMap)
+template<typename T, typename Y>
+void UCDataSheetUtility::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful, TMap<Y, T>& OutDataMap)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived start"));
 	if (bWasSuccessful && Response.IsValid())
@@ -137,8 +137,8 @@ void UCDataSheetUtility::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 }
 
 
-template <typename T>
-void UCDataSheetUtility::PaserSheetRowsToStructArray(const TArray<TSharedPtr<FJsonValue>>*& Rows, TMap<int32, T>& OutDataMap)
+template <typename T, typename Y>
+void UCDataSheetUtility::PaserSheetRowsToStructArray(const TArray<TSharedPtr<FJsonValue>>*& Rows, TMap<Y, T>& OutDataMap)
 {
 	if (!Rows || Rows->Num() < 3)
 	{
@@ -202,7 +202,12 @@ void UCDataSheetUtility::PaserSheetRowsToStructArray(const TArray<TSharedPtr<FJs
 			}
 		}
 
-		int32 ID = FCString::Atoi(*DataRow[0]->AsString());
+		Y ID;
+		if constexpr (std::is_same<Y, int32>::value)
+			ID = FCString::Atoi(*DataRow[0]->AsString());
+		else if constexpr (std::is_same<Y, FString>::value)
+			ID = *DataRow[0]->AsString();
+		
 		OutDataMap.Add(ID, StructInstance);
 
 	}

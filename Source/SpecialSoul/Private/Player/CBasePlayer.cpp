@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Game/CGameState.h"
+#include "Game/CPlayerState.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -114,6 +115,18 @@ void ACBasePlayer::BeginPlay()
 					// DataSheetUtility->ConditionalBeginDestroy();
 					// DataSheetUtility = nullptr;
 				}
+			}
+		}
+
+		PS = Cast<ACPlayerState>(GetPlayerState());
+		if (PS)
+		{
+			if (!DataSheetUtility)
+				DataSheetUtility = NewObject<UCDataSheetUtility>(this);
+
+			if (DataSheetUtility)
+			{
+				PS->InitPlayerState(DataSheetUtility);
 			}
 		}
 	}

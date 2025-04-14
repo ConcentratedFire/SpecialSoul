@@ -88,6 +88,8 @@ protected:
 	UPROPERTY()
 	class ACGameState* GS;
 	UPROPERTY()
+	class ACPlayerState* PS;
+	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
 public:

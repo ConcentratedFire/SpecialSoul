@@ -6,12 +6,13 @@
 #include "EngineUtils.h"
 #include "SpecialSoul.h"
 #include "Game/SpecialSoulGameMode.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
 
 ACGameState::ACGameState()
 {
-	PrimaryActorTick.bCanEverTick = true;	
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ACGameState::BeginPlay()
@@ -90,4 +91,6 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 	{
 		(*It)->UpdatePlayerData(Level);
 	}
+
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }

@@ -59,7 +59,7 @@ public:
 
 public: 
 	UPROPERTY(VisibleAnywhere, Category = "Projectile")
-	float Damage; // 데미지
+	float Damage {30.f}; // 데미지
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float AttackRange {1500.f}; // 사거리

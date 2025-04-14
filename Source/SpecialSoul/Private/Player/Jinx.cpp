@@ -4,7 +4,12 @@
 #include "Player/Jinx.h"
 
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "Player/CPlayerController.h"
 #include "Player/Anim/JinxAnim.h"
+#include "Player/Components/CMovementComponent.h"
+#include "Player/Components/SkillComponent.h"
 #include "Skill/Jinx/Jinx_Attack.h"
 #include "Skill/Jinx/Jinx_ESkill.h"
 #include "Skill/Jinx/Jinx_Passive.h"
@@ -22,11 +27,19 @@ AJinx::AJinx()
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -68.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetCollisionProfileName(TEXT("Player"));
+	//bUseControllerRotationYaw = true;
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(68.f);
 	GetCapsuleComponent()->SetCapsuleRadius(28.f);
 	
 	// GetCharacterMovement()->bOrientRotationToMovement = false;
+	
+	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
+	//GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	UseOrientationToMovement(true);
+	UseMoveCompRotation(false);
+	
 }
 
 void AJinx::BeginPlay()
@@ -34,46 +47,24 @@ void AJinx::BeginPlay()
 	Super::BeginPlay();
 	Anim = Cast<UJinxAnim>(GetMesh()->GetAnimInstance());
 
-	BindSkill(ESkillKey::Attack, NewObject<UJinx_Attack>());
-	BindSkill(ESkillKey::Passive, NewObject<UJinx_Passive>());
-	BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
-	BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
+	SkillComponent->BindSkill(ESkillKey::Attack, NewObject<UJinx_Attack>());
+	SkillComponent->BindSkill(ESkillKey::Passive, NewObject<UJinx_Passive>());
+	SkillComponent->BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
+	SkillComponent->BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
 
 	if (HasAuthority() && DataSheetUtility)
 	{
 		DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::InitAllData);
 	}
 
+	PC = Cast<ACPlayerController>(GetController());
+
 }
 
-void AJinx::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-}
-
-// void AJinx::PossessedBy(AController* NewController)
-// {
-// 	Super::PossessedBy(NewController);
-//
-// 	
-// 	
-// }
-
-// void AJinx::BeginPlay()
-// {
-// 	Super::BeginPlay();
-//
-// }
-
-void AJinx::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill)
-{
-	SkillMap.Add(Key, Skill);
-}
 
 void AJinx::Attack()
 {
-	CastSkill(ESkillKey::Attack); // 기본공격
+	SkillComponent->Attack(); // 기본공격
 }
 
 void AJinx::InitAllData()
@@ -98,17 +89,6 @@ void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
 	StartAttack();
 }
 
-// 플레이어의 키 입력에 따른 스킬 캐스팅
-void AJinx::CastSkill(ESkillKey Key)
-{
-	if (!SkillMap.Contains(Key))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CastSkill) Skill does not exist"));
-		return;
-	}
-	SkillMap[Key]->UseSkill(this); // 캐릭터(this)를 넣어줌으로써, 스킬에서 캐릭터의 데이터를 사용할 수 있다
-}
-
 void AJinx::PrintAttackDataMap() // CBasePlayer.cpp에서 바인딩됨
 {
 	for (const auto& Pair : JinxAttackDataMap)
@@ -118,6 +98,16 @@ void AJinx::PrintAttackDataMap() // CBasePlayer.cpp에서 바인딩됨
 	}
 }
 
+void AJinx::UseOrientationToMovement(bool bUse)
+{
+	GetCharacterMovement()->bOrientRotationToMovement = bUse;
+}
+
+void AJinx::UseMoveCompRotation(bool bUse)
+{
+	MoveComp->SetActive(bUse);
+}
+
 void AJinx::StartAttack()
 {
 	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
@@ -125,3 +115,22 @@ void AJinx::StartAttack()
 		PlayAnimMontage(AttackMontage); // AttackMontage의 AnimNotify에서 애니메이션의 특정 프레임에 Attack 호출
 	}), AttackData.Cooltime, true, AttackData.Cooltime);
 }
+
+void AJinx::RotateToMouseCursor()
+{
+	FHitResult HitResult;
+	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
+	if (bHit)
+	{
+		FVector directionToMouseCursor = HitResult.Location -GetActorLocation();
+		directionToMouseCursor.Z = 0;
+		directionToMouseCursor.Normalize();
+
+		// 목표 회전값
+		FRotator targetRot = FRotationMatrix::MakeFromX(directionToMouseCursor).Rotator();
+
+		// 회전 적용
+		SetActorRotation(targetRot);
+	}
+}
+

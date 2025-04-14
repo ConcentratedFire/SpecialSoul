@@ -26,7 +26,10 @@ public:
 	int32 BulletNum = 5;
 	
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	float FireDelay = 0.05;
+	float FireDelay = 0.1f;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	float MaxAngle = 30.f; // [-MaxAngle, +MaxAngle] 범위로 랜덤 발사
 	
 private:
 	FTimerHandle FireTimer;

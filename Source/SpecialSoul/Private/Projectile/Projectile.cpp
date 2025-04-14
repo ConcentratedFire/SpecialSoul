@@ -6,6 +6,7 @@
 #include "NiagaraComponent.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Player/Jinx.h"
 
 AProjectile::AProjectile()
 {
@@ -64,4 +65,6 @@ void AProjectile::ApplyCasterStat(ACBasePlayer* Caster)
 {
 	// TODO: BasePlayer의 공통 스탯을 this에게 적용하기!!
 	// Caster에서 호출된다.
+	if ( Cast<AJinx>(Caster))
+		Damage = Cast<AJinx>(Caster)->AttackData.Damage;
 }

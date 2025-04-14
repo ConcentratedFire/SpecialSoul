@@ -8,6 +8,8 @@
 #include "Player/CBasePlayer.h"
 #include "Jinx.generated.h"
 
+class ACPlayerController;
+class USkillComponent;
 class UCDataSheetUtility;
 class UJinxAnim;
 class ISkillStrategy;
@@ -30,38 +32,42 @@ public:
 	AJinx();
 
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
-	//virtual void PossessedBy(AController* NewController) override;
 
 	virtual void Attack() override;
+	
 	UFUNCTION()
 	void InitAllData();
+	
 	void UpdatePlayerData(const int32 PlayerLevel);
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	TObjectPtr<UJinxAnim> Anim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
+	TObjectPtr<ACPlayerController> PC;
 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
+	TObjectPtr<USkillComponent> SkillComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FJinxAttackData AttackData; // 기본공격 데이터
 
 	TSharedPtr<TMap<int32, FJinxAttackData>> SafeMap = MakeShared<TMap<int32, FJinxAttackData>>();
 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
-	TMap<ESkillKey, TScriptInterface<ISkillStrategy>> SkillMap;
-
-	void CastSkill(ESkillKey Key);
-
 	UFUNCTION()
 	virtual void PrintAttackDataMap() override;
+
+	void UseOrientationToMovement(bool bUse);
+	void UseMoveCompRotation(bool bUse);
+
+	void RotateToMouseCursor();
+	
 	
 private:
 	void UpdateJinxAttackStat(int32 PlayerLevel);
-
-	void BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill);
-
+	
 	FTimerHandle AttackTimer;
 	void StartAttack();
 
@@ -69,4 +75,3 @@ private:
 	TObjectPtr<UAnimMontage> AttackMontage;
 	
 };
-

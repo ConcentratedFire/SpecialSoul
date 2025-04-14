@@ -121,7 +121,7 @@ private: // Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-private: // Actor Component
+protected: // Actor Component
 	UPROPERTY(EditDefaultsOnly)
 	class UCMovementComponent* MoveComp;
 

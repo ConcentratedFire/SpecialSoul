@@ -12,13 +12,13 @@ UJinx_Attack::UJinx_Attack()
 	ConstructorHelpers::FClassFinder<AMinigunBullet> BulletClassFinder(TEXT("/Game/Player/Jinx/BP_MinigunBullet.BP_MinigunBullet_C"));
 	if (BulletClassFinder.Succeeded())
 	{
-		MinigunBullet = BulletClassFinder.Class;
+		BulletClass = BulletClassFinder.Class;
 	}
 }
 
 void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 {
-	if (!Caster || !MinigunBullet)
+	if (!Caster || !BulletClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Caster or MinigunBullet is nullptr..."));
 		return;
@@ -33,7 +33,6 @@ void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 		FRotator MuzzleRot = FRotationMatrix::MakeFromX(FireDir).Rotator();
 		if (FiredBulletNum < BulletNum)
 		{
-
 			 // 발사위치, 발사방향
 			FVector MuzzleLoc = Caster->GetMesh()->GetSocketLocation("Minigun_FirePos0");
 
@@ -43,10 +42,11 @@ void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 			SpawnParams.Owner = Caster;
 			SpawnParams.Instigator = Caster;
 
-			auto Bullet = Caster->GetWorld()->SpawnActor<AMinigunBullet>(MinigunBullet, MuzzleLoc, MuzzleRot, SpawnParams);
+			auto Bullet = Caster->GetWorld()->SpawnActor<AMinigunBullet>(BulletClass, MuzzleLoc, MuzzleRot, SpawnParams);
 			//Bullet->AttackRange = 1500.f;
 			if (Bullet)
 			{
+				Bullet->ApplyCasterStat(Caster); // 공격 데이터 세팅
 				FiredBulletNum++;
 			}
 		}

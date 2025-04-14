@@ -3,17 +3,36 @@
 
 #include "Projectile/Jinx/MinigunBullet.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AMinigunBullet::AMinigunBullet()
 {
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Game/LevelPrototyping/Meshes/SM_Cube.SM_Cube"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/Asset/Jinx/Projectiles/Attack/7_62_x_51_NATO_7_62_x_51_NATO_0.7_62_x_51_NATO_7_62_x_51_NATO_0'"));
 	if (TempMesh.Succeeded())
 	{
 		MeshComp->SetStaticMesh(TempMesh.Object);
+		MeshComp->SetCollisionProfileName("PlayerAttack");
+		MeshComp->SetRelativeLocation(FVector(0.f, 60.f, 0.f));
+		MeshComp->SetRelativeRotation(FRotator(-90, 0, 0));
 	}
 
-	MeshComp->SetCollisionProfileName("PlayerAttack");
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempTailVfx(TEXT("/Script/Niagara.NiagaraSystem'/Game/Asset/Jinx/VFX/Particles/Projectiles/NS_Jinx_Attack_Tail.NS_Jinx_Attack_Tail'"));
+	if (TempTailVfx.Succeeded())
+	{
+		TailVfxAsset = TempTailVfx.Object;
+		TailVfx->SetAsset(TailVfxAsset);
+		TailVfx->bAutoActivate = true;
+	}
+
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempHitVfx(TEXT("/Script/Niagara.NiagaraSystem'/Game/Asset/Jinx/VFX/Particles/Projectiles/Hits/NS_Jinx_Attack_Hit.NS_Jinx_Attack_Hit'"));
+	if (TempHitVfx.Succeeded())
+	{
+		HitVfxAsset = TempHitVfx.Object;
+		//HitVfx->SetAsset(HitVfxAsset);
+		//HitVfx->bAutoActivate = false;
+	}
 }
 
 void AMinigunBullet::BeginPlay()

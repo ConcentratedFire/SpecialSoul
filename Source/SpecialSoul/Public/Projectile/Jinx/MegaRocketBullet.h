@@ -6,6 +6,7 @@
 #include "Projectile/Projectile.h"
 #include "MegaRocketBullet.generated.h"
 
+class UNiagaraComponent;
 /**
  * 
  */
@@ -16,5 +17,12 @@ class SPECIALSOUL_API AMegaRocketBullet : public AProjectile
 
 
 public:
-	
+	AMegaRocketBullet();
+	virtual void Tick(float DeltaSeconds) override;
+
+protected:
+	virtual void BeginPlay() override;
+
+	// UPROPERTY(VisibleAnywhere, Category = "Stat")
+	// FInterpCurveFloat InterpCurve; ?? 커브를 이용해서 속도 세팅..?
 };

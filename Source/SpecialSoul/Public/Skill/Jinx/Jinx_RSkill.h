@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -16,9 +14,19 @@ class SPECIALSOUL_API UJinx_RSkill : public UObject, public ISkillStrategy
 	GENERATED_BODY()
 
 public:
+	UJinx_RSkill();
 	virtual void UseSkill(ACBasePlayer* Caster) override;
 
-	UPROPERTY(EditAnywhere, Category = "Jinx")
-	TSubclassOf<AMegaRocketBullet> MegaRocketBullet;
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AMegaRocketBullet> BulletClass;
 	
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	int32 BulletNum = 5;
+	
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	float FireDelay = 0.05;
+	
+private:
+	FTimerHandle FireTimer;
+	int32 FiredBulletNum {0};
 };

@@ -22,7 +22,7 @@ public:
 	virtual void UseSkill(ACBasePlayer* Caster) override;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AMinigunBullet> MinigunBullet;
+	TSubclassOf<AMinigunBullet> BulletClass;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	int32 BulletNum = 5;

@@ -4,6 +4,16 @@
 #include "Skill/Jinx/Jinx_ESkill.h"
 
 #include "Player/CBasePlayer.h"
+#include "Projectile/Jinx/RocketLauncherBullet.h"
+
+UJinx_ESkill::UJinx_ESkill()
+{
+	ConstructorHelpers::FClassFinder<ARocketLauncherBullet> BulletClassFinder(TEXT("/Game/Player/Jinx/BP_MinigunBullet.BP_MinigunBullet_C"));
+	if (BulletClassFinder.Succeeded())
+	{
+		BulletClass = BulletClassFinder.Class;
+	}
+}
 
 void UJinx_ESkill::UseSkill(ACBasePlayer* Caster)
 {
@@ -13,6 +23,4 @@ void UJinx_ESkill::UseSkill(ACBasePlayer* Caster)
 
 	// Caster Transform에 맞춰서 스킬을 발사한다
 	FVector SpawnLoc = Caster->GetActorLocation() + Caster->GetActorForwardVector() * 50.f;
-	
-	
 }

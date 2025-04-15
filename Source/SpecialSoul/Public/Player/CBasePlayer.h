@@ -127,9 +127,13 @@ public:
 			PS->GetWeaponDamage_Jinx(level, CurDamage, NextDamage);
 	}
 
-	FORCEINLINE void GetCurProjectileNextProjectile(int32 level, int32& CurProjectile, int32& NextProjectile)
+	FORCEINLINE void GetCurProjectileNextProjectile(int32 level, int32& CurProjectile, int32& NextProjectile,
+	                                                bool bYasuoType)
 	{
-		PS->GetWeaponProjectile_Jinx(level, CurProjectile, NextProjectile);
+		if (bYasuoType)
+			PS->GetWeaponProjectile_Yasuo(level, CurProjectile, NextProjectile);
+		else
+			PS->GetWeaponProjectile_Jinx(level, CurProjectile, NextProjectile);
 	}
 
 	FORCEINLINE FString GetUpgradeData(FString UpgradeType, FString& OutDesc, FString& OutTitle)
@@ -138,5 +142,7 @@ public:
 	}
 
 public:
-	virtual void UpgradeWeapon(const int32 Level){};
+	virtual void UpgradeWeapon(const int32 Level)
+	{
+	};
 };

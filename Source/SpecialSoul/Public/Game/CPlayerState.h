@@ -60,6 +60,11 @@ public: // 캐릭터 데이터
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FJinxAttackData> JinxAttackDataMap;
 
+public: // 스텟 계산 및 반환
+	float CalcDamage(float CurDamage, bool& OutbIsCri);
+	float CalcAbilityHaste(float CurHaste);
+	int32 CalcProjectile(int32 CurProjectile);
+
 public:
 	void InitPlayerState(class UCDataSheetUtility* Utility); // 데이터 테이블 로드
 
@@ -109,6 +114,15 @@ public:
 			outNextDamage = JinxAttackDataMap[level + 1].Damage;
 	}
 
+	FORCEINLINE void GetWeaponProjectile_Yasuo(int32 level, int32& outCurProjectile, int32& outNexProjectile)
+	{
+		outCurProjectile = 0, outNexProjectile = 0;
+		if (YasuoAttackDataMap.Contains(level))
+			outCurProjectile = YasuoAttackDataMap[level].ProjectileCount;
+		if (YasuoAttackDataMap.Contains(level + 1))
+			outNexProjectile = YasuoAttackDataMap[level + 1].ProjectileCount;
+	}
+	
 	FORCEINLINE void GetWeaponProjectile_Jinx(int32 level, int32& outCurProjectile, int32& outNexProjectile)
 	{
 		outCurProjectile = 0, outNexProjectile = 0;

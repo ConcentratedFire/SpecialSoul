@@ -7,11 +7,63 @@
 #include "Player/CYasuo.h"
 #include "Utility/CDataSheetUtility.h"
 
+float ACPlayerState::CalcDamage(float CurDamage, bool& OutbIsCri)
+{
+	OutbIsCri = false;
+	if (UpgradeDataMap.Num() == 0) return CurDamage;
+	
+	// 추가해야되는 퍼센트
+	int32 CalcDamagePercent = UpgradeDataMap["Damage"].DefaultValue + UpgradeDataMap["Damage"].AppendValue *
+		CurDamageGrade;
+	// ex) 220%
+	// 180 + 180 * 220/100 + 180 * 220%100 / 100
+	float quotient = CalcDamagePercent / 100;
+	float remainder = CalcDamagePercent % 100;
+	float ResultDamage = CurDamage + (CurDamage * quotient) + (CurDamage * remainder / 100);
+
+	// 치명타 퍼센트
+	int32 CriPercent = UpgradeDataMap["CritChance"].DefaultValue + UpgradeDataMap["CritChance"].AppendValue *
+		CurCritChanceGrade;
+	if (FMath::RandRange(1, 100) <= CriPercent)
+	{
+		OutbIsCri = true;
+		return ResultDamage * 1.75; // 치명타 적용
+	}
+	else
+	{
+		return ResultDamage; // 치명타 미적용
+	}
+}
+
+float ACPlayerState::CalcAbilityHaste(float CurHaste)
+{
+	if (UpgradeDataMap.Num() == 0) return CurHaste;
+
+	// 추가해야되는 퍼센트
+	// 0 + 5 * 3
+	float CalcValue = UpgradeDataMap["AbilityHaste"].DefaultValue + UpgradeDataMap["AbilityHaste"].AppendValue *
+		CurAbilityHasteGrade;
+	// 퍼센트로 변환
+	// 100 * 15 / 115
+	int32 CalcPercent = FMath::RoundToInt(100 * CalcValue / (100 + CalcValue));
+	float quotient = CalcPercent / 100;
+	float remainder = CalcPercent % 100;
+	return CurHaste + (CurHaste * quotient) + (CurHaste * remainder / 100);
+}
+
+int32 ACPlayerState::CalcProjectile(int32 CurProjectile)
+{
+	if (UpgradeDataMap.Num() == 0) return CurProjectile;
+	
+	int32 CalcValue = UpgradeDataMap["Projectiles"].AppendValue * CurProjectilesGrade;
+	return CurProjectile + CalcValue;
+}
+
 void ACPlayerState::InitPlayerState(class UCDataSheetUtility* Utility)
 {
 	// Utility->OnDataFetched.AddDynamic(this, &ACPlayerState::UpdateGradeInfo);
 	Utility->FetchGoogleSheetData<FUpgradeData>("Upgrade", "A1", "G6", UpgradeDataMap);
-	
+
 	Player = Cast<ACBasePlayer>(GetPawn());
 }
 
@@ -30,7 +82,7 @@ TArray<FString> ACPlayerState::ChooseUpgradeCardList()
 
 	TArray<FString> CardList;
 	int32 CardCount = 0;
-	for (int i = 0; i < UpgradeData.Num() - 1; i++)
+	for (int i = 0; i < UpgradeData.Num(); ++i)
 	{
 		CardList.Push(UpgradeData[i]);
 		if (++CardCount == 3)
@@ -45,7 +97,7 @@ void ACPlayerState::UpgradeStat(const FString statName)
 	if (statName == "Weapon")
 	{
 		++CurWeaponGrade;
-		Player->UpgradeWeapon(CurWeaponGrade);	// 플레이어 공통 함수를 통해서 업그레이드 처리
+		Player->UpgradeWeapon(CurWeaponGrade); // 플레이어 공통 함수를 통해서 업그레이드 처리
 		if (IsMaxUpgrade_Weapon())
 		{
 			RemoveArrayElement(statName);

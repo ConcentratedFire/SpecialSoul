@@ -22,13 +22,16 @@ void UCSelectUpgradeWidget::SetCardData(TArray<FString> Data)
 		if (data == "Weapon")
 		{
 			int32 curDamage, nextDamage;
+			int32 curProjectile, nextProjectile;
 			FString strLevel, strTitle, strDesc, strStat;
+			FString strDesc2, strStat2;
 
 			cardWidget->SetBg(UIDataArray[0].TypeBG["Skill"]);
 
 			if (Player->IsA(ACYasuo::StaticClass()))
 			{
 				Player->GetCurDamageNextDamage(WeaponGrade, curDamage, nextDamage, true);
+				Player->GetCurProjectileNextProjectile(WeaponGrade, curProjectile, nextProjectile, true);
 				// 다음 업글 단계가 Final인지 확인
 				if (Player->IsNextWeaponFinal(true))
 				{
@@ -45,15 +48,16 @@ void UCSelectUpgradeWidget::SetCardData(TArray<FString> Data)
 					strTitle = FString::Printf(TEXT("강철 폭풍"));
 					strDesc = FString::Printf(TEXT("피해량"));
 					strStat = FString::Printf(TEXT("%d > %d"), curDamage, nextDamage);
+					strDesc2 = FString::Printf(TEXT("투사체"));
+					strStat2 = FString::Printf(TEXT("%d > %d"), curProjectile, nextProjectile);
 					cardWidget->SetTarget(strLevel, UIDataArray[0].UpgradeTextures["YasuoNormal"], strTitle,
-					                      strDesc, strStat);
+					                      strDesc, strStat, strDesc2, strStat2);
 				}
 			}
 			else
 			{
-				int32 curProjectile, nextProjectile;
 				Player->GetCurDamageNextDamage(WeaponGrade, curDamage, nextDamage, false);
-				Player->GetCurProjectileNextProjectile(WeaponGrade, curProjectile, nextProjectile);
+				Player->GetCurProjectileNextProjectile(WeaponGrade, curProjectile, nextProjectile, false);
 				// 다음 업글 단계가 Final인지 확인
 				if (Player->IsNextWeaponFinal(false))
 				{
@@ -70,8 +74,8 @@ void UCSelectUpgradeWidget::SetCardData(TArray<FString> Data)
 					strTitle = FString::Printf(TEXT("야옹 야옹"));
 					strDesc = FString::Printf(TEXT("피해량"));
 					strStat = FString::Printf(TEXT("%d > %d"), curDamage, nextDamage);
-					FString strDesc2 = FString::Printf(TEXT("투사체"));
-					FString strStat2 = FString::Printf(TEXT("%d > %d"), curProjectile, nextProjectile);
+					strDesc2 = FString::Printf(TEXT("투사체"));
+					strStat2 = FString::Printf(TEXT("%d > %d"), curProjectile, nextProjectile);
 					cardWidget->SetTarget(strLevel, UIDataArray[0].UpgradeTextures["JinxNormal"], strTitle,
 					                      strDesc, strStat, strDesc2, strStat2);
 				}

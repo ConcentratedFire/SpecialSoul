@@ -25,7 +25,7 @@ public: // Using Charge Enemy
 	UPROPERTY(VisibleAnywhere, Category = "Data|MoveDistance")
 	float MoveDistance = 0.0f;
 
-	int32 GetDamage() const { return YasuoStat.Damage; }
+	float GetDamage(bool& OutbIsCri) const;
 	int32 GetRange() const { return YasuoStat.ProjectileRange; }
 
 public:

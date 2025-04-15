@@ -65,7 +65,7 @@ void ACTornado::SetActorHiddenInGame(bool bNewHidden)
 		SetActorLocation(UpLocation);
 
 		Range = OwnerYasuo->GetRange();
-		Damage = OwnerYasuo->GetDamage();
+		Damage = OwnerYasuo->GetDamage(IsCri);
 		TornadoStartLocation = GetActorLocation();
 	}
 }

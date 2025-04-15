@@ -46,16 +46,17 @@ void ACYasuo::Tick(float DeltaTime)
 	RotateArrow();
 
 	// 데이터가 들어왔는지 체크
-	if (PS->YasuoMoveDataMap.Num() > 0)
+	if (PS && PS->YasuoMoveDataMap.Num() > 0)
 	{
 		// 데이터 업데이트 체크
 		//CheckMoveData();
 
 		// 이동 거리가 충분하면 기류를 충전
-		if (MoveDistance >= YasuoMoveInfo.StackDistance)
+		float calcDistance = PS->CalcAbilityHaste(YasuoMoveInfo.StackDistance);
+		if (MoveDistance >= calcDistance)
 		{
 			ChargePassiveEnergy();
-			MoveDistance -= YasuoMoveInfo.StackDistance;
+			MoveDistance -= calcDistance;
 		}
 	}
 
@@ -65,6 +66,12 @@ void ACYasuo::Tick(float DeltaTime)
 		PassiveEnergy -= 100;
 		Anim->PlayAttackMontage();
 	}
+}
+
+float ACYasuo::GetDamage(bool& OutbIsCri) const
+{
+	float CalcDamage = PS->CalcDamage(YasuoStat.Damage, OutbIsCri);
+	return CalcDamage;
 }
 
 void ACYasuo::Attack()
@@ -106,6 +113,7 @@ void ACYasuo::SetAttackFrontVector()
 TArray<FVector> ACYasuo::GetAttackVector()
 {
 	int AttackCnt = YasuoStat.ProjectileCount;
+	AttackCnt = PS->CalcProjectile(AttackCnt);
 	float AngleStep = 360.f / static_cast<float>(AttackCnt);
 	TArray<FVector> AttackVectors;
 
@@ -184,7 +192,7 @@ void ACYasuo::RotateArrow()
 void ACYasuo::UpgradeWeapon(const int32 Level)
 {
 	if (!PS->YasuoAttackDataMap.Contains(Level)) return;
-	
+
 	const auto& StatData = PS->YasuoAttackDataMap[Level];
 	YasuoStat.ID = StatData.ID;
 	YasuoStat.ProjectileCount = StatData.ProjectileCount;

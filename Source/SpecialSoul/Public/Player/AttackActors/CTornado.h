@@ -49,6 +49,7 @@ private:
 	float Speed = 800;
 
 	FVector StartLocation;
+	bool IsCri;
 
 private:
 	UPROPERTY()

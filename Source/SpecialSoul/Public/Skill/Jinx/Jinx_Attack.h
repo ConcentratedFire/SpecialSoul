@@ -7,6 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "Jinx_Attack.generated.h"
 
+class AJinx;
 class AMinigunBullet;
 /**
  * 
@@ -22,16 +23,27 @@ public:
 	virtual void UseSkill(ACBasePlayer* Caster) override;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AMinigunBullet> MinigunBullet;
+	TSubclassOf<AMinigunBullet> BulletClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	int32 TotalShot = 3;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	int32 OneShotBullet = 3; // 한번에 3개씩 쏘기
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float ShotDelay = 0.1f;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	int32 BulletNum = 5;
-	
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	float FireDelay = 0.05;
+	float OneShotDelay = 0.02f;
 	
 private:
-	FTimerHandle FireTimer;
-	int32 FiredBulletNum {0};
-
+	void HandleShot(ACBasePlayer* Caster, AJinx* Jinx);
+	void HandleOneShot(ACBasePlayer* Caster, FRotator MuzzleRot);
+	
+	int32 ShotCount {0};		// 전체 발사 수
+	int32 ShotBulletCount {0};	// 한 발사당 쏘는 총알 수 
+	
+	FTimerHandle ShotTimer; 
+	FTimerHandle OneShotTimer; 
 };

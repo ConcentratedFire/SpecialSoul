@@ -2,57 +2,99 @@
 
 
 #include "Skill/Jinx/Jinx_Attack.h"
-
-#include "Kismet/GameplayStatics.h"
 #include "Player/Jinx.h"
 #include "Projectile/Jinx/MinigunBullet.h"
 
 UJinx_Attack::UJinx_Attack()
 {
-	ConstructorHelpers::FClassFinder<AMinigunBullet> BulletClassFinder(TEXT("/Game/Player/Jinx/BP_MinigunBullet.BP_MinigunBullet_C"));
+	ConstructorHelpers::FClassFinder<AMinigunBullet> BulletClassFinder(TEXT("/Script/Engine.Blueprint'/Game/Player/Jinx/BP_MinigunBullet.BP_MinigunBullet_C'"));
 	if (BulletClassFinder.Succeeded())
 	{
-		MinigunBullet = BulletClassFinder.Class;
+		BulletClass = BulletClassFinder.Class;
 	}
 }
 
+
 void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 {
-	if (!Caster || !MinigunBullet)
+	UE_LOG(LogTemp, Warning, TEXT("UJinx_Attack::UseSkill"));
+
+	
+	if (!Caster || !BulletClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Caster or MinigunBullet is nullptr..."));
 		return;
 	}
 	
-	FiredBulletNum = 0;
-	
-	// 마우스가 가리키는 방향으로 총을 쏜다
-	Caster->GetWorld()->GetTimerManager().SetTimer(FireTimer, FTimerDelegate::CreateLambda([this, Caster]()
+	AJinx* Jinx = Cast<AJinx>(Caster);
+	if (Jinx)
 	{
-		FVector FireDir = Caster->GetActorForwardVector();
-		FRotator MuzzleRot = FRotationMatrix::MakeFromX(FireDir).Rotator();
-		if (FiredBulletNum < BulletNum)
+		Jinx->UseOrientationToMovement(false);
+		Jinx->UseMoveCompRotation(true);
+		Jinx->RotateToMouseCursor();
+	}
+	
+	ShotCount = 0;
+	ShotBulletCount = 0;
+	UWorld* World = Caster->GetWorld();
+	World->GetTimerManager().ClearTimer(ShotTimer);
+	World->GetTimerManager().ClearTimer(OneShotTimer);
+	
+	World->GetTimerManager().SetTimer(ShotTimer,
+		FTimerDelegate::CreateUObject(this, &UJinx_Attack::HandleShot, Caster, Jinx),
+		ShotDelay, true, 0.f);
+}
+
+void UJinx_Attack::HandleShot(ACBasePlayer* Caster, AJinx* Jinx)
+{
+	if (ShotCount >= TotalShot)
+	{
+		UWorld* World = Caster->GetWorld();
+		World->GetTimerManager().ClearTimer(ShotTimer);
+		World->GetTimerManager().ClearTimer(OneShotTimer);
+	
+		if (Jinx)
 		{
-
-			 // 발사위치, 발사방향
-			FVector MuzzleLoc = Caster->GetMesh()->GetSocketLocation("Minigun_FirePos0");
-
-			//UE_LOG(LogTemp, Log, TEXT("MuzzleRot : %s"), *MuzzleRot.ToString());
-			 // 총알 스폰
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = Caster;
-			SpawnParams.Instigator = Caster;
-
-			auto Bullet = Caster->GetWorld()->SpawnActor<AMinigunBullet>(MinigunBullet, MuzzleLoc, MuzzleRot, SpawnParams);
-			//Bullet->AttackRange = 1500.f;
-			if (Bullet)
-			{
-				FiredBulletNum++;
-			}
+			Jinx->UseOrientationToMovement(true);
+			Jinx->UseMoveCompRotation(false);
 		}
-		else
-		{
-			Caster->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
-		}
-	}), FireDelay, true, 0.f);
+		return;
+	}
+
+	FVector FireDir = Caster->GetActorForwardVector();
+	FRotator MuzzleRot = FRotationMatrix::MakeFromX(FireDir).Rotator();
+
+	// OneShot 타이머 시작
+	Caster->GetWorld()->GetTimerManager().SetTimer(OneShotTimer,
+		FTimerDelegate::CreateUObject(this, &UJinx_Attack::HandleOneShot, Caster, MuzzleRot),
+		OneShotDelay, true, 0.f);
+}
+
+// 한번에 3개씩 쏘기
+void UJinx_Attack::HandleOneShot(ACBasePlayer* Caster, FRotator MuzzleRot)
+{
+	if (ShotBulletCount >= OneShotBullet)
+	{
+		Caster->GetWorld()->GetTimerManager().ClearTimer(OneShotTimer);
+		ShotCount++;
+		ShotBulletCount = 0;
+		return;
+	}
+	
+   FActorSpawnParameters SpawnParams;
+   SpawnParams.Owner = Caster;
+   SpawnParams.Instigator = Caster;
+
+	FString SocketName = FString::Printf(TEXT("Minigun_FirePos%d"), ShotBulletCount);
+	FVector SpawnPos = Caster->GetMesh()->GetSocketLocation(FName(*SocketName));
+		
+	auto Bullet = Caster->GetWorld()->SpawnActor<AMinigunBullet>(BulletClass,
+		SpawnPos, MuzzleRot, SpawnParams);
+		
+	if (Bullet)
+	{
+		Bullet->ApplyCasterStat(Caster); // 공격 데이터 세팅
+	}
+	
+	ShotBulletCount++;
 }

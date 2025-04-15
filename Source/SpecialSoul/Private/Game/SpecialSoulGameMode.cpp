@@ -44,7 +44,7 @@ void ASpecialSoulGameMode::ReadExcelData()
 	DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", JinxAttackDataMap);
 	DataSheetUtility->FetchGoogleSheetData<FUpgradeData>("Upgrade", "A1", "G6", UpgradeDataMap);
 	DataSheetUtility->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", RegenDataMap);
-	
+
 	DataSheetUtility->OnDataFetched.AddDynamic(this, &ASpecialSoulGameMode::SetData);
 }
 
@@ -71,7 +71,12 @@ void ASpecialSoulGameMode::UpdateRegenInfo(const int32 Level)
 	RegenInfo.MidleBossCount = StatData.MidleBossCount;
 	RegenInfo.FinalBossCount = StatData.FinalBossCount;
 
-	bIsStartRegen = true;
+	auto GS = GetGameState<ACGameState>();
+	GS->CalcEnemyRegenTime(RegenInfo);
 
-	GetGameState<ACGameState>()->CalcEnemyRegenTime(RegenInfo);
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+	{
+		bIsStartRegen = true;
+	}, 3.0f, false);
 }

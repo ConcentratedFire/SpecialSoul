@@ -51,9 +51,9 @@ class SPECIALSOUL_API ACPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
-	private:
+private:
 	virtual void BeginPlay() override;
-	
+
 public: // 캐릭터 데이터
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
@@ -70,7 +70,7 @@ public: // 스텟 계산 및 반환
 
 public:
 	void SetInitialData();
-	
+
 	UFUNCTION()
 	void UpdateGradeInfo(); // 초기 데이터 세팅용
 
@@ -125,7 +125,7 @@ public:
 		if (YasuoAttackDataMap.Contains(level + 1))
 			outNexProjectile = YasuoAttackDataMap[level + 1].ProjectileCount;
 	}
-	
+
 	FORCEINLINE void GetWeaponProjectile_Jinx(int32 level, int32& outCurProjectile, int32& outNexProjectile)
 	{
 		outCurProjectile = 0, outNexProjectile = 0;
@@ -138,9 +138,21 @@ public:
 	// ==========최대 업글 단계인지 확인============
 	bool IsMaxUpgrade_Weapon();
 	FORCEINLINE bool IsMaxUpgrade_Damage() { return CurDamageGrade == UpgradeDataMap[FString("Damage")].MaxGrade; }
-	FORCEINLINE bool IsMaxUpgrade_AbilityHaste(){	return CurAbilityHasteGrade == UpgradeDataMap[FString("AbilityHaste")].MaxGrade;}
-	FORCEINLINE bool IsMaxUpgrade_Projectile(){	return CurProjectilesGrade == UpgradeDataMap[FString("Projectiles")].MaxGrade;}
-	FORCEINLINE bool IsMaxUpgrade_CritChance(){	return CurCritChanceGrade == UpgradeDataMap[FString("CritChance")].MaxGrade;}
+	FORCEINLINE bool IsMaxUpgrade_AbilityHaste()
+	{
+		return CurAbilityHasteGrade == UpgradeDataMap[FString("AbilityHaste")].MaxGrade;
+	}
+
+	FORCEINLINE bool IsMaxUpgrade_Projectile()
+	{
+		return CurProjectilesGrade == UpgradeDataMap[FString("Projectiles")].MaxGrade;
+	}
+
+	FORCEINLINE bool IsMaxUpgrade_CritChance()
+	{
+		return CurCritChanceGrade == UpgradeDataMap[FString("CritChance")].MaxGrade;
+	}
+
 	// ==========================================
 
 	FORCEINLINE FString GetUpgradeData(FString UpgradeType, FString& OutDesc, FString& OutTitle)
@@ -169,8 +181,9 @@ public:
 		else if (UpgradeType == "CritChance")
 			curUpgradeLevel = CurCritChanceGrade;
 
-		int32 nextValue = defaultValue + increaseGrade * curUpgradeLevel;
-		strUpgradeData = FString::Printf(TEXT("%d > %d"), defaultValue, nextValue);
+		int32 curValue = defaultValue + increaseGrade * (curUpgradeLevel);
+		int32 nextValue = defaultValue + increaseGrade * (curUpgradeLevel + 1);
+		strUpgradeData = FString::Printf(TEXT("%d > %d"), curValue, nextValue);
 		return strUpgradeData;
 	}
 
@@ -179,7 +192,7 @@ private:
 	class ASpecialSoulGameMode* GM;
 	UPROPERTY()
 	class ACBasePlayer* Player;
-	
+
 	UPROPERTY(VisibleAnywhere, Category = "Data")
 	TMap<FString, FUpgradeData> UpgradeDataMap;
 

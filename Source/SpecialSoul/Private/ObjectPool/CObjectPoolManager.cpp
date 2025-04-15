@@ -18,12 +18,7 @@ ACObjectPoolManager::ACObjectPoolManager()
 void ACObjectPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
-	InitPool(ItemBoxPool, AppendItemBoxSize, ItemBoxActor);
-	InitPool(ExpPool, AppendExpPoolSize, ExpActor);
-	InitPool(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor);
-
-	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	InitPool(RangePool, AppendEnemyPoolSize, RangeEnemy);
+	
 
 	// 오브젝트 풀링 테스트
 	// FTimerHandle TimerHandle;
@@ -41,6 +36,16 @@ void ACObjectPoolManager::BeginPlay()
 			GS->OnNextStage.Broadcast();
 		}
 	}
+}
+
+void ACObjectPoolManager::InitSettings()
+{
+	InitPool(ItemBoxPool, AppendItemBoxSize, ItemBoxActor);
+	InitPool(ExpPool, AppendExpPoolSize, ExpActor);
+	InitPool(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor);
+
+	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	InitPool(RangePool, AppendEnemyPoolSize, RangeEnemy);
 }
 
 void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
@@ -190,8 +195,10 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 
 void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
 {
-	if (bIsMelee)
-		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	else
-		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
+	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	
+	// if (bIsMelee)
+	// 	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	// else
+	// 	PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
 }

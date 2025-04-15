@@ -45,6 +45,7 @@ void ACPlayerState::UpgradeStat(const FString statName)
 	if (statName == "Weapon")
 	{
 		++CurWeaponGrade;
+		Player->UpgradeWeapon(CurWeaponGrade);	// 플레이어 공통 함수를 통해서 업그레이드 처리
 		if (IsMaxUpgrade_Weapon())
 		{
 			RemoveArrayElement(statName);

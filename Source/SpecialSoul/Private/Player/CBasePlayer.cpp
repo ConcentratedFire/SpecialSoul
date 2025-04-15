@@ -175,7 +175,11 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 	if (!SelectUpgradeWidget) return;
 	// 업그레이드 할 항목 지정 후 화면에 출력
 	// 랜덤으로 카드 3개를 선택 (남은 카드가 3장보다 적으면 1~2장까지만 뽑음)
-	SelectUpgradeWidget->SetCardData(PS->ChooseUpgradeCardList());
+	// 업그레이드 가능 항목이 없으면 진행하지 않음
+	TArray<FString> cardList = PS->ChooseUpgradeCardList();
+	if (cardList.Num() == 0) return;
+	
+	SelectUpgradeWidget->SetCardData(cardList);
 	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
@@ -204,5 +208,4 @@ void ACBasePlayer::EndUpgrade()
 		SelectUpgradeWidget->ClearCardData();
 	}
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
-	GS->bCanStatUp=true;
 }

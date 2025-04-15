@@ -165,7 +165,7 @@ private:
 	TMap<FString, FUpgradeData> UpgradeDataMap;
 
 	UPROPERTY(visibleAnywhere, Category = "Data")
-	int32 CurWeaponGrade = 0;
+	int32 CurWeaponGrade = 1;
 	UPROPERTY(visibleAnywhere, Category = "Data")
 	int32 CurDamageGrade = 0;
 	UPROPERTY(visibleAnywhere, Category = "Data")

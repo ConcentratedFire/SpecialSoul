@@ -105,6 +105,7 @@ void ACYasuo::SetAttackFrontVector()
 
 TArray<FVector> ACYasuo::GetAttackVector()
 {
+	int AttackCnt = YasuoStat.ProjectileCount;
 	float AngleStep = 360.f / static_cast<float>(AttackCnt);
 	TArray<FVector> AttackVectors;
 
@@ -141,23 +142,10 @@ void ACYasuo::PrintAttackDataMap()
 
 	// 초기 데이터 세팅
 	if (PS->YasuoAttackDataMap.Num() > 0)
-		UpdateYasuoAttackStat(1);
+		UpgradeWeapon(1);
 
 	if (PS->YasuoMoveDataMap.Num() > 0)
 		UpdateYasuoMoveStat(1);
-}
-
-void ACYasuo::UpdateYasuoAttackStat(const int32 Level)
-{
-	const auto& StatData = PS->YasuoAttackDataMap[Level];
-	YasuoStat.ID = StatData.ID;
-	YasuoStat.ProjectileCount = StatData.ProjectileCount;
-	YasuoStat.ProjectileRange = StatData.ProjectileRange;
-	YasuoStat.Damage = StatData.Damage;
-	YasuoStat.UseAOE = StatData.UseAOE;
-	YasuoStat.AOELifeTime = StatData.AOELifeTime;
-	YasuoStat.AOEDamage = StatData.AOEDamage;
-	YasuoStat.AOEDamageCoolTime = StatData.AOEDamageCoolTime;
 }
 
 void ACYasuo::UpdateYasuoMoveStat(const int32 Level)
@@ -191,6 +179,21 @@ void ACYasuo::RotateArrow()
 	FRotator newRot = ArrowRotation;
 	newRot.Roll += rotateValue;
 	ArrowWidgetComp->SetWorldRotation(newRot);
+}
+
+void ACYasuo::UpgradeWeapon(const int32 Level)
+{
+	if (!PS->YasuoAttackDataMap.Contains(Level)) return;
+	
+	const auto& StatData = PS->YasuoAttackDataMap[Level];
+	YasuoStat.ID = StatData.ID;
+	YasuoStat.ProjectileCount = StatData.ProjectileCount;
+	YasuoStat.ProjectileRange = StatData.ProjectileRange;
+	YasuoStat.Damage = StatData.Damage;
+	YasuoStat.UseAOE = StatData.UseAOE;
+	YasuoStat.AOELifeTime = StatData.AOELifeTime;
+	YasuoStat.AOEDamage = StatData.AOEDamage;
+	YasuoStat.AOEDamageCoolTime = StatData.AOEDamageCoolTime;
 }
 
 void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)

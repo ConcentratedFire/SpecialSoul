@@ -29,11 +29,18 @@ void ACGameState::Tick(float DeltaSeconds)
 	CurStageTime += DeltaSeconds;
 	LOG_SCREEN_IDX(0, FColor::Blue, "Stage Time: %.2f", CurStageTime);
 	LOG_SCREEN_IDX(2, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
-	if (CurStageTime >= StageTime && bCanStatUp)
+	if (CurStageTime >= StageTime)
 	{
-		bCanStatUp = false;
 		NextStage();
 		CurStageTime = 0;
+	}
+	
+	if (EXPDataMap.Num() == 0) return;
+	if (curExp >= ExpInfo.XP)
+	{
+		++curLevel;
+		curExp -= ExpInfo.XP;
+		UpdateExpInfo(ExpInfo.ID + 1);
 	}
 }
 
@@ -56,17 +63,6 @@ void ACGameState::PrintExpDataMap()
 void ACGameState::AddExp(const int32 exp)
 {
 	curExp += exp;
-	if (EXPDataMap.Num() == 0) return;
-
-
-	if (curExp >= ExpInfo.XP)
-	{
-		++curLevel;
-		curExp -= ExpInfo.XP;
-		UpdateExpInfo(ExpInfo.ID + 1);
-	}
-
-	LOG_S(Warning, TEXT("Level: %d, curExp: %d"), curLevel, curExp);
 }
 
 void ACGameState::NextStage()

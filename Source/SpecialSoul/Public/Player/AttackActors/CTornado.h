@@ -32,7 +32,7 @@ public:
 
 public:
 	void SetManager(class ACObjectPoolManager* Manager) { ObjectPoolManager = Manager; }
-
+	
 private:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* TornadoBox;
@@ -41,7 +41,11 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	class UStaticMeshComponent* TornadoMesh2;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, category = Attack)
+	float Range = 850;
+	UPROPERTY(EditDefaultsOnly, category = Attack)
+	float Damage = 100;
+	UPROPERTY(EditDefaultsOnly, category = Attack)
 	float Speed = 800;
 
 	FVector StartLocation;

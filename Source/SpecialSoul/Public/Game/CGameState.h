@@ -50,7 +50,6 @@ private:
 	float CurStageTime = 0.f;
 
 public:
-	bool bCanStatUp = true;
 	const int32 MaxLevel = 21;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")

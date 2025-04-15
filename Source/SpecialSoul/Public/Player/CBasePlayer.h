@@ -136,4 +136,7 @@ public:
 	{
 		return PS->GetUpgradeData(UpgradeType, OutDesc, OutTitle);
 	}
+
+public:
+	virtual void UpgradeWeapon(const int32 Level){};
 };

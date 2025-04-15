@@ -26,6 +26,7 @@ public: // Using Charge Enemy
 	float MoveDistance = 0.0f;
 
 	int32 GetDamage() const { return YasuoStat.Damage; }
+	int32 GetRange() const { return YasuoStat.ProjectileRange; }
 
 public:
 	virtual void Attack() override;
@@ -42,8 +43,6 @@ private:
 private: // Attack
 	UPROPERTY(EditDefaultsOnly, category=Attack)
 	TSubclassOf<class ACTornado> TornadoFactory;
-	UPROPERTY(VisibleAnywhere, Category=Attack)
-	int32 AttackCnt = 5;
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category=Attck)
@@ -60,7 +59,7 @@ private: // Spec
 	UFUNCTION()
 	virtual void PrintAttackDataMap() override; // 임시
 
-	void UpdateYasuoAttackStat(const int32 Level);
+	virtual void UpgradeWeapon(const int32 Level) override;
 	void UpdateYasuoMoveStat(const int32 Level);
 
 private: // Passive Energy
@@ -76,4 +75,5 @@ private: // Passive Movement
 
 private:
 	virtual void RotateArrow() override;
+	
 };

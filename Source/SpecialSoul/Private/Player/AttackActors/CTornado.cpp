@@ -45,6 +45,7 @@ void ACTornado::BeginPlay()
 	Super::BeginPlay();
 
 	OwnerYasuo = Cast<ACYasuo>(GetOwner());
+
 	LOG_S(Warning, TEXT("OwnerYasuo : %s"), OwnerYasuo==nullptr?TEXT("Owner Null"):*OwnerYasuo->GetName());
 	// 이동 경로 방향으로 회전
 	// if (!TornadoDirection.IsZero())
@@ -62,8 +63,10 @@ void ACTornado::SetActorHiddenInGame(bool bNewHidden)
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
 		SetActorLocation(UpLocation);
-		
-		TornadoStartLocation = GetActorLocation();		
+
+		Range = OwnerYasuo->GetRange();
+		Damage = OwnerYasuo->GetDamage();
+		TornadoStartLocation = GetActorLocation();
 	}
 }
 
@@ -82,18 +85,19 @@ void ACTornado::Tick(float DeltaTime)
 	TornadoMesh2->SetRelativeRotation(meshRot2);
 
 	FVector TornadoCurLocation = GetActorLocation();
-	if (FVector::Dist(TornadoStartLocation, TornadoCurLocation) >= 700)
+	if (FVector::Dist(TornadoStartLocation, TornadoCurLocation) >= Range)
 	{
 		ObjectPoolManager->ReturnTornado(this);
 	}
 }
 
 void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                   const FHitResult& SweepResult)
 {
 	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
 	{
-		Enemy->MyDamage(OwnerYasuo->GetDamage());
+		Enemy->MyDamage(Damage);
 	}
 	else if (auto Item = Cast<ACBaseItem>(OtherActor))
 	{

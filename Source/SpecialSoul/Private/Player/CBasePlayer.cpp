@@ -17,8 +17,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Item/CBaseItem.h"
 #include "ObjectPool/CObjectPoolManager.h"
+#include "Player/CPlayerController.h"
 #include "Player/Components/CMovementComponent.h"
+#include "UI/CSelectUpgradeWidget.h"
 #include "Utility/CDataSheetUtility.h"
+#include "Data/JinxData.h"
+#include "Data/CYasuoData.h"
 
 struct FJinxAttackData;
 class UEnhancedInputLocalPlayerSubsystem;
@@ -61,8 +65,9 @@ ACBasePlayer::ACBasePlayer()
 	ArrowWidgetComp->SetupAttachment(RootComponent);
 	ArrowWidgetComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), ArrowRotation);
 	ArrowWidgetComp->SetRelativeScale3D(FVector(.2, .35, .35));
-	
-	ConstructorHelpers::FClassFinder<UUserWidget> tempArrowWidget(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Arrow.WBP_Arrow_C'"));
+
+	ConstructorHelpers::FClassFinder<UUserWidget> tempArrowWidget(
+		TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Arrow.WBP_Arrow_C'"));
 	if (tempArrowWidget.Succeeded())
 		ArrowWidgetComp->SetWidgetClass(tempArrowWidget.Class);
 
@@ -102,14 +107,10 @@ void ACBasePlayer::BeginPlay()
 					DataSheetUtility->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintRegenDataMap);
 					DataSheetUtility->OnDataFetched.AddDynamic(GS, &ACGameState::PrintExpDataMap);
 
-					DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
-					DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
 					DataSheetUtility->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", GM->RegenDataMap);
 					DataSheetUtility->FetchGoogleSheetData<FEXPData>("EXP", "A1", "B22", GS->EXPDataMap);
 
-					DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", JinxAttackDataMap);
 					// 기본공격 데이터
-
 
 					// 리소스 해제
 					// DataSheetUtility->ConditionalBeginDestroy();
@@ -126,6 +127,9 @@ void ACBasePlayer::BeginPlay()
 
 			if (DataSheetUtility)
 			{
+				DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", PS->YasuoAttackDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", PS->YasuoMoveDataMap);
+				DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", PS->JinxAttackDataMap);
 				PS->InitPlayerState(DataSheetUtility);
 			}
 		}
@@ -138,6 +142,8 @@ void ACBasePlayer::BeginPlay()
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
+
+	InitUpgradeUI(); // 업그레이드 UI 생성 (추가는 안함)
 }
 
 // Called every frame
@@ -164,6 +170,39 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		OnInputBindingDel.Broadcast(input);
 }
 
-void ACBasePlayer::PrintAttackDataMap()
+void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 {
+	if (!SelectUpgradeWidget) return;
+	// 업그레이드 할 항목 지정 후 화면에 출력
+	// 랜덤으로 카드 3개를 선택 (남은 카드가 3장보다 적으면 1~2장까지만 뽑음)
+	SelectUpgradeWidget->SetCardData(PS->ChooseUpgradeCardList());
+	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+}
+
+void ACBasePlayer::InitUpgradeUI()
+{
+	auto pc = Cast<ACPlayerController>(Controller);
+	if (!pc) return;
+
+	if (pc->SelectUpgradeUIWidgetFactory)
+	{
+		if (!pc->SelectUpgradeWidget)
+			pc->SelectUpgradeWidget = Cast<UCSelectUpgradeWidget>(
+				CreateWidget(GetWorld(), pc->SelectUpgradeUIWidgetFactory));
+
+		SelectUpgradeWidget = pc->SelectUpgradeWidget;
+		SelectUpgradeWidget->AddToViewport();
+	}
+}
+
+void ACBasePlayer::EndUpgrade()
+{
+	if (SelectUpgradeWidget)
+	{
+		SelectUpgradeWidget->ClearCardData();
+	}
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	GS->bCanStatUp=true;
 }

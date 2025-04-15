@@ -28,8 +28,10 @@ void ACGameState::Tick(float DeltaSeconds)
 
 	CurStageTime += DeltaSeconds;
 	LOG_SCREEN_IDX(0, FColor::Blue, "Stage Time: %.2f", CurStageTime);
-	if (CurStageTime >= StageTime)
+	LOG_SCREEN_IDX(2, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
+	if (CurStageTime >= StageTime && bCanStatUp)
 	{
+		bCanStatUp = false;
 		NextStage();
 		CurStageTime = 0;
 	}
@@ -55,6 +57,8 @@ void ACGameState::AddExp(const int32 exp)
 {
 	curExp += exp;
 	if (EXPDataMap.Num() == 0) return;
+
+
 	if (curExp >= ExpInfo.XP)
 	{
 		++curLevel;
@@ -81,16 +85,9 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 	ExpInfo.XP = StatData.XP;
 
 	if (Level == 1) return;
-	// 레벨업 후 야스오 정보 갱신
-	for (TActorIterator<ACYasuo> It(GetWorld(), ACYasuo::StaticClass()); It; ++It)
+
+	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
 	{
 		(*It)->UpdatePlayerData(Level);
 	}
-
-	for (TActorIterator<AJinx> It(GetWorld(), AJinx::StaticClass()); It; ++It)
-	{
-		(*It)->UpdatePlayerData(Level);
-	}
-
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }

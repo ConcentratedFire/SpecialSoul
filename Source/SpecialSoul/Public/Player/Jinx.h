@@ -36,7 +36,7 @@ public:
 	virtual void Attack() override;
 	UFUNCTION()
 	void InitAllData();
-	void UpdatePlayerData(const int32 PlayerLevel);
+	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")

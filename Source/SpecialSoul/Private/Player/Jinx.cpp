@@ -4,6 +4,7 @@
 #include "Player/Jinx.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Game/CPlayerState.h"
 #include "Player/Anim/JinxAnim.h"
 #include "Skill/Jinx/Jinx_Attack.h"
 #include "Skill/Jinx/Jinx_ESkill.h"
@@ -83,15 +84,17 @@ void AJinx::InitAllData()
 
 void AJinx::UpdatePlayerData(const int32 PlayerLevel)
 {
-	if (JinxAttackDataMap.Contains(PlayerLevel))
+	if (PS->JinxAttackDataMap.Contains(PlayerLevel))
 	{
 		UpdateJinxAttackStat(PlayerLevel);
 	}
+
+	Super::UpdatePlayerData(PlayerLevel);
 }
 
 void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
 {
-	AttackData = JinxAttackDataMap.FindRef(PlayerLevel);
+	AttackData = PS->JinxAttackDataMap.FindRef(PlayerLevel);
 
 	 // 업데이트된 데이터로 공격 시작
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
@@ -111,7 +114,7 @@ void AJinx::CastSkill(ESkillKey Key)
 
 void AJinx::PrintAttackDataMap() // CBasePlayer.cpp에서 바인딩됨
 {
-	for (const auto& Pair : JinxAttackDataMap)
+	for (const auto& Pair : PS->JinxAttackDataMap)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Jinx's AttackDataMap || ID: %d) ProjectileCount: %d, ProjectileRange: %f, Damage: %f, Cooltime: %f, UseAP: %s, APDamage: %f"),
 			Pair.Key, Pair.Value.ProjectileCount, Pair.Value.ProjectileRange, Pair.Value.Damage, Pair.Value.Cooltime, *Pair.Value.UseAP, Pair.Value.APDamage);

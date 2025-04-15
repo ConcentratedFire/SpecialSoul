@@ -29,7 +29,7 @@ public: // Using Charge Enemy
 
 public:
 	virtual void Attack() override;
-	void UpdatePlayerData(const int32 PlayerLevel);
+	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")

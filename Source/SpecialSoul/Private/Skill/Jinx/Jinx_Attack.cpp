@@ -29,9 +29,7 @@ void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 	AJinx* Jinx = Cast<AJinx>(Caster);
 	if (Jinx)
 	{
-		Jinx->UseOrientationToMovement(false);
-		Jinx->UseMoveCompRotation(true);
-		Jinx->RotateToMouseCursor();
+		Jinx->ActivateSkillMovement(true);
 	}
 	
 	ShotCount = 0;
@@ -55,23 +53,22 @@ void UJinx_Attack::HandleShot(ACBasePlayer* Caster, AJinx* Jinx)
 	
 		if (Jinx)
 		{
-			Jinx->UseOrientationToMovement(true);
-			Jinx->UseMoveCompRotation(false);
+			Jinx->ActivateSkillMovement(false);
 		}
 		return;
 	}
 
 	FVector FireDir = Caster->GetActorForwardVector();
-	FRotator MuzzleRot = FRotationMatrix::MakeFromX(FireDir).Rotator();
+	FRotator SpawnRot = FRotationMatrix::MakeFromX(FireDir).Rotator();
 
 	// OneShot 타이머 시작
 	Caster->GetWorld()->GetTimerManager().SetTimer(OneShotTimer,
-		FTimerDelegate::CreateUObject(this, &UJinx_Attack::HandleOneShot, Caster, MuzzleRot),
+		FTimerDelegate::CreateUObject(this, &UJinx_Attack::HandleOneShot, Caster, SpawnRot),
 		OneShotDelay, true, 0.f);
 }
 
 // 한번에 3개씩 쏘기
-void UJinx_Attack::HandleOneShot(ACBasePlayer* Caster, FRotator MuzzleRot)
+void UJinx_Attack::HandleOneShot(ACBasePlayer* Caster, FRotator SpawnRot)
 {
 	if (ShotBulletCount >= OneShotBullet)
 	{
@@ -89,7 +86,7 @@ void UJinx_Attack::HandleOneShot(ACBasePlayer* Caster, FRotator MuzzleRot)
 	FVector SpawnPos = Caster->GetMesh()->GetSocketLocation(FName(*SocketName));
 		
 	auto Bullet = Caster->GetWorld()->SpawnActor<AMinigunBullet>(BulletClass,
-		SpawnPos, MuzzleRot, SpawnParams);
+		SpawnPos, SpawnRot, SpawnParams);
 		
 	if (Bullet)
 	{

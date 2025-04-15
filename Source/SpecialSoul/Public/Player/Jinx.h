@@ -59,8 +59,7 @@ public:
 	UFUNCTION()
 	virtual void PrintAttackDataMap() override;
 
-	void UseOrientationToMovement(bool bUse);
-	void UseMoveCompRotation(bool bUse);
+	void ActivateSkillMovement(bool bActive); // 스킬 사용 중 캐릭터 회전 관련
 
 	void RotateToMouseCursor();
 	

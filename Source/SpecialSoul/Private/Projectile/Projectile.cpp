@@ -46,6 +46,7 @@ void AProjectile::InitMoveComp()
 	ProjectileMovementComp->ProjectileGravityScale = 0.f; // 직선운동
 	ProjectileMovementComp->bRotationFollowsVelocity = true; // 추가 확인
 	ProjectileMovementComp->Velocity = GetActorForwardVector() * ProjectileMovementComp->InitialSpeed;
+	ProjectileMovementComp->bSimulationEnabled = true;
 	ProjectileMovementComp->Activate(true);
 }
 
@@ -58,6 +59,11 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 	if (HitVfxAsset)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitVfxAsset, GetActorLocation());
+	}
+	Penetration--;
+	if (Penetration <= 0)
+	{
+		Destroy();
 	}
 }
 

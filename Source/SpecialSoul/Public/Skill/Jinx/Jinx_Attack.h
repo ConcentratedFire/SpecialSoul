@@ -39,7 +39,7 @@ public:
 	
 private:
 	void HandleShot(ACBasePlayer* Caster, AJinx* Jinx);
-	void HandleOneShot(ACBasePlayer* Caster, FRotator MuzzleRot);
+	void HandleOneShot(ACBasePlayer* Caster, FRotator SpawnRot);
 	
 	int32 ShotCount {0};		// 전체 발사 수
 	int32 ShotBulletCount {0};	// 한 발사당 쏘는 총알 수 

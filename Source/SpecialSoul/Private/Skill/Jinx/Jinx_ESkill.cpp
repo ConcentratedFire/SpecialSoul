@@ -18,6 +18,8 @@ UJinx_ESkill::UJinx_ESkill()
 
 void UJinx_ESkill::UseSkill(ACBasePlayer* Caster)
 {
+	// TODO : 서버에 의한 쿨타임 확인 적용해야함
+	
 	UE_LOG(LogTemp, Warning, TEXT("Jinx_ESkill"));
 
 	if (!Caster || !BulletClass)
@@ -29,22 +31,78 @@ void UJinx_ESkill::UseSkill(ACBasePlayer* Caster)
 	AJinx* Jinx = Cast<AJinx>(Caster);
 	if (Jinx)
 	{
-		Jinx->UseOrientationToMovement(false);
-		Jinx->UseMoveCompRotation(true);
+		Jinx->ActivateSkillMovement(true);
+		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
+		Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 	}
 	
-	// 시전시간 동안 Progressbar UI를 띄우고
+	// 스킬 캐스팅
+	
+	// 1.  TODO : CastingTime 시간 동안 Progressbar UI를 띄우고
+	
+	// 2. CastingTime후에 스킬을 시작한다.
+	TWeakObjectPtr<UJinx_ESkill> WeakThis(this); // GC에 의해 댕글링 포인터될 때를 위해 WeakPtr 사용
+	TWeakObjectPtr<AJinx> WeakJinx(Jinx);
+	
+	Jinx->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
+		[WeakThis, WeakJinx]()
+		{
+			if (WeakThis.IsValid() && WeakJinx.IsValid())
+			{
+				WeakThis->StartUseSkill(WeakJinx.Get());
+			}
+		}),
+		CastingTime, false, CastingTime);
+}
 
-	// 시전가능해지면 
-
+void UJinx_ESkill::StartUseSkill(AJinx* Jinx)
+{
+	if (!Jinx) return;
+	
+	TWeakObjectPtr<UJinx_ESkill> WeakThis(this); // GC에 의해 댕글링 포인터될 때를 위해 WeakPtr 사용
+	TWeakObjectPtr<AJinx> WeakJinx(Jinx);
+	
 	// Caster Transform에 맞춰서 스킬을 발사한다
-	FVector SpawnLoc = Caster->GetActorLocation() + Caster->GetActorForwardVector() * 50.f;
+	Jinx->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
+		[WeakThis, WeakJinx]()
+		{
+			// 발사 끝
+			if (!WeakThis.IsValid() || !WeakJinx.IsValid() ||
+				WeakThis->FiredBulletNum >= WeakThis->BulletNum)
+			{
+				WeakThis->EndUseSkill(WeakJinx.Get());  
+				return;
+			}
+			
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = WeakJinx.Get();
+			SpawnParams.Instigator = WeakJinx.Get();
 
-	//FRotator SpawnRot =
+			FVector SpawnPos = WeakJinx->GetMesh()->GetSocketLocation(FName(TEXT("Minigun_FirePos0")));
+			FRotator SpawnRot = WeakJinx->GetActorRotation();
+			
+			float RandomYaw = FMath::FRandRange(-WeakThis->MaxAngle, WeakThis->MaxAngle);
+			SpawnRot.Yaw += RandomYaw;
+			
+			auto Bullet = WeakJinx->GetWorld()->SpawnActor<ARocketLauncherBullet>(WeakThis->BulletClass,
+					SpawnPos, SpawnRot, SpawnParams);
 
-	if (Jinx)
-	{
-		Jinx->UseOrientationToMovement(true);
-		Jinx->UseMoveCompRotation(false);
-	}
+			if (Bullet)
+			{
+				Bullet->ApplyCasterStat(WeakJinx.Get()); // 공격 데이터 세팅
+			}
+
+			WeakThis->FiredBulletNum++;
+		}),
+		FireDelay, true, FireDelay
+	);
+}
+
+void UJinx_ESkill::EndUseSkill(AJinx* Jinx)
+{
+	FiredBulletNum = 0;
+	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
+	Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
+	
+	Jinx->ActivateSkillMovement(false);
 }

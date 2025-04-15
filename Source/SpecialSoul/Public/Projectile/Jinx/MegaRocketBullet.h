@@ -22,6 +22,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
 
 	// UPROPERTY(VisibleAnywhere, Category = "Stat")
 	// FInterpCurveFloat InterpCurve; ?? 커브를 이용해서 속도 세팅..?

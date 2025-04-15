@@ -57,7 +57,10 @@ public:
 	//UPROPERTY(VisibleAnywhere, Category = "Projectile")
 	//TObjectPtr<UNiagaraComponent> HitVfx;
 
-public: 
+public:
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	int32 Penetration {1}; // 사거리
+
 	UPROPERTY(VisibleAnywhere, Category = "Projectile")
 	float Damage {30.f}; // 데미지
 

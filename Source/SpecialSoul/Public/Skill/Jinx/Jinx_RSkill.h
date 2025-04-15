@@ -4,6 +4,7 @@
 #include "Interface/SkillStrategy.h"
 #include "Jinx_RSkill.generated.h"
 
+class AJinx;
 class AMegaRocketBullet;
 /**
  * 
@@ -20,13 +21,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	TSubclassOf<AMegaRocketBullet> BulletClass;
 	
-	UPROPERTY(EditAnywhere, Category = "Skill")
-	int32 BulletNum = 5;
+	//UPROPERTY(EditAnywhere, Category = "Skill")
+	//int32 BulletNum = 1;
 	
-	UPROPERTY(EditAnywhere, Category = "Skill")
-	float FireDelay = 0.05;
+	//UPROPERTY(EditAnywhere, Category = "Skill")
+	//float FireDelay = 0.1;
 	
 private:
-	FTimerHandle FireTimer;
-	int32 FiredBulletNum {0};
+	void StartUseSkill(AJinx* Jinx);
+	void EndUseSkill(AJinx* Jinx);
+	
+	//FTimerHandle FireTimer;
+	//int32 FiredBulletNum {0};
+
+	FTimerHandle CastingTimer;
+	float CastingTime {0.5f};
 };

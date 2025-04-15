@@ -5,7 +5,6 @@
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "Player/CPlayerController.h"
 #include "Player/Anim/JinxAnim.h"
 #include "Player/Components/CMovementComponent.h"
@@ -37,9 +36,8 @@ AJinx::AJinx()
 	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 	//GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	UseOrientationToMovement(true);
-	UseMoveCompRotation(false);
-	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	MoveComp->SetActive(false);
 }
 
 void AJinx::BeginPlay()
@@ -98,14 +96,21 @@ void AJinx::PrintAttackDataMap() // CBasePlayer.cpp에서 바인딩됨
 	}
 }
 
-void AJinx::UseOrientationToMovement(bool bUse)
+void AJinx::ActivateSkillMovement(bool bActive)
 {
-	GetCharacterMovement()->bOrientRotationToMovement = bUse;
-}
+	if (bActive)
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = false; 
+		MoveComp->SetActive(true);
+		RotateToMouseCursor();
+		return;
+	}
 
-void AJinx::UseMoveCompRotation(bool bUse)
-{
-	MoveComp->SetActive(bUse);
+	if (SkillComponent->UseSkillCount == 0)
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = true; 
+		MoveComp->SetActive(false);
+	}
 }
 
 void AJinx::StartAttack()

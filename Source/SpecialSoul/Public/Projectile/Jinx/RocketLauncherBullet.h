@@ -24,10 +24,10 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
-	float MoveAmplitude = 5.f; // 5cm
+	float MoveAmplitude = 20.f; // 5cm
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
-	float MoveAmplitudeSpeed = 5.f; // 5cm
+	float MoveAmplitudeSpeed = 20.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	bool bMoveRight = true;

@@ -15,7 +15,7 @@ ARocketLauncherBullet::ARocketLauncherBullet()
 		MeshComp->SetStaticMesh(TempMesh.Object);
 		MeshComp->SetRelativeLocation(FVector(20.f, 0.f, 0.f));
 		MeshComp->SetRelativeRotation(FRotator(-90.f, 0, 0));
-		MeshComp->SetRelativeScale3D(FVector(0.3f));
+		MeshComp->SetRelativeScale3D(FVector(0.2f));
 	}
 	MeshComp->SetCollisionProfileName("PlayerAttack");
 
@@ -31,8 +31,6 @@ ARocketLauncherBullet::ARocketLauncherBullet()
 	if (TempHitVfx.Succeeded())
 	{
 		HitVfxAsset = TempHitVfx.Object;
-		// HitVfx->SetAsset(HitVfxAsset);
-		// HitVfx->bAutoActivate = false;
 	}
 }
 

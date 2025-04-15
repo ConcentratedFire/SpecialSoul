@@ -59,8 +59,8 @@ void USkillComponent::CastSkill(ESkillKey Key)
 		return;
 	}
 	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
+	// UseSkillCount++;
 }
-
 
 void USkillComponent::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill)
 {

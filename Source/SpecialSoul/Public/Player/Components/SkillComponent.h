@@ -32,6 +32,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	TMap<ESkillKey, TScriptInterface<ISkillStrategy>> SkillMap;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	int32 UseSkillCount {0};
+	
 	void Attack(); // 기본공격
 
 	void Passive();

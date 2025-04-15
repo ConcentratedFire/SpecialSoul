@@ -5,6 +5,7 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // 360 돌면서 나간다
 AMegaRocketBullet::AMegaRocketBullet()
@@ -34,14 +35,15 @@ AMegaRocketBullet::AMegaRocketBullet()
 	if (TempHitVfx.Succeeded())
 	{
 		HitVfxAsset = TempHitVfx.Object;
-		// HitVfx->SetAsset(HitVfxAsset);
-		// HitVfx->bAutoActivate = false;
 	}
 }
 
 void AMegaRocketBullet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
+	SetLifeSpan(LifeSpan); // 수명 설정
 }
 
 void AMegaRocketBullet::Tick(float DeltaSeconds)
@@ -50,5 +52,5 @@ void AMegaRocketBullet::Tick(float DeltaSeconds)
 
 	// 매우 작게 시작해서, 점차 커짐
 	
-	//
+	// 360도 돌면서 날아감
 }

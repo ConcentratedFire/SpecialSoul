@@ -6,6 +6,7 @@
 #include "Interface/SkillStrategy.h"
 #include "Jinx_ESkill.generated.h"
 
+class AJinx;
 class ARocketLauncherBullet;
 /**
  * 
@@ -32,9 +33,12 @@ public:
 	float MaxAngle = 30.f; // [-MaxAngle, +MaxAngle] 범위로 랜덤 발사
 	
 private:
-	FTimerHandle FireTimer;
+	void StartUseSkill(AJinx* Jinx);
+	void EndUseSkill(AJinx* Jinx);
 	
+	FTimerHandle FireTimer;
 	int32 FiredBulletNum {0};
 
+	FTimerHandle CastingTimer;
 	float CastingTime {0.5f};
 };

@@ -48,6 +48,7 @@ void ASpecialSoulGameMode::PrintRegenDataMap()
 
 void ASpecialSoulGameMode::UpdateRegenInfo(const int32 Level)
 {
+	if (!RegenDataMap.Contains(Level)) return;
 	const auto& StatData = RegenDataMap[Level];
 	RegenInfo.ID = StatData.ID;
 	RegenInfo.MeleeEnemyCount = StatData.MeleeEnemyCount;

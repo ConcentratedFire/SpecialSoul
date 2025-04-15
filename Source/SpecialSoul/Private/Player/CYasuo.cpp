@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Game/CGameState.h"
+#include "Game/CPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ObjectPool/CObjectPoolManager.h"
@@ -45,7 +46,7 @@ void ACYasuo::Tick(float DeltaTime)
 	RotateArrow();
 
 	// 데이터가 들어왔는지 체크
-	if (YasuoMoveDataMap.Num() > 0)
+	if (PS->YasuoMoveDataMap.Num() > 0)
 	{
 		// 데이터 업데이트 체크
 		//CheckMoveData();
@@ -120,7 +121,7 @@ TArray<FVector> ACYasuo::GetAttackVector()
 
 void ACYasuo::PrintAttackDataMap()
 {
-	for (const auto& Pair : YasuoAttackDataMap)
+	for (const auto& Pair : PS->YasuoAttackDataMap)
 	{
 		UE_LOG(LogTemp, Log,
 		       TEXT(
@@ -129,7 +130,7 @@ void ACYasuo::PrintAttackDataMap()
 		       Pair.Key, Pair.Value.ProjectileCount, Pair.Value.ProjectileRange, Pair.Value.Damage, *Pair.Value.UseAOE,
 		       Pair.Value.AOELifeTime, Pair.Value.AOEDamage, Pair.Value.AOEDamageCoolTime);
 	}
-	for (const auto& Pair : YasuoMoveDataMap)
+	for (const auto& Pair : PS->YasuoMoveDataMap)
 	{
 		UE_LOG(LogTemp, Log,
 		       TEXT(
@@ -139,16 +140,16 @@ void ACYasuo::PrintAttackDataMap()
 	}
 
 	// 초기 데이터 세팅
-	if (YasuoAttackDataMap.Num() > 0)
+	if (PS->YasuoAttackDataMap.Num() > 0)
 		UpdateYasuoAttackStat(1);
 
-	if (YasuoMoveDataMap.Num() > 0)
+	if (PS->YasuoMoveDataMap.Num() > 0)
 		UpdateYasuoMoveStat(1);
 }
 
 void ACYasuo::UpdateYasuoAttackStat(const int32 Level)
 {
-	const auto& StatData = YasuoAttackDataMap[Level];
+	const auto& StatData = PS->YasuoAttackDataMap[Level];
 	YasuoStat.ID = StatData.ID;
 	YasuoStat.ProjectileCount = StatData.ProjectileCount;
 	YasuoStat.ProjectileRange = StatData.ProjectileRange;
@@ -161,10 +162,10 @@ void ACYasuo::UpdateYasuoAttackStat(const int32 Level)
 
 void ACYasuo::UpdateYasuoMoveStat(const int32 Level)
 {
-	if (YasuoMoveDataMap.Num() == 0) return;
+	if (PS->YasuoMoveDataMap.Num() == 0) return;
 	if (Level == GS->MaxLevel) return;
 
-	const auto& StatData = YasuoMoveDataMap[Level];
+	const auto& StatData = PS->YasuoMoveDataMap[Level];
 	YasuoMoveInfo.ID = StatData.ID;
 	YasuoMoveInfo.RangeFrom = StatData.RangeFrom;
 	YasuoMoveInfo.RangeTo = StatData.RangeTo;
@@ -196,6 +197,8 @@ void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)
 {
 	// 레벨업 후 정보 갱신 처리
 	// MoveData는 키값 체크 후 넘기기
-	if (YasuoMoveDataMap.Contains(PlayerLevel))
+	if (PS->YasuoMoveDataMap.Contains(PlayerLevel))
 		UpdateYasuoMoveStat(PlayerLevel);
+
+	Super::UpdatePlayerData(PlayerLevel);
 }

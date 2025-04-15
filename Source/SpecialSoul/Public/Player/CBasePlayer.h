@@ -3,70 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Data/JinxData.h"
+#include "Game/CPlayerState.h"
 #include "GameFramework/Character.h"
 #include "CBasePlayer.generated.h"
-
-USTRUCT(BlueprintType)
-struct FYasuoAttackData // 야스오 기본공격 데이터
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	int32 ID;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	int32 ProjectileCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	float ProjectileRange;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	float Damage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	FString UseAOE;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	float AOELifeTime;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	float AOEDamage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackData")
-	float AOEDamageCoolTime;
-
-	FYasuoAttackData()
-		: ID(0), ProjectileCount(0), ProjectileRange(0), Damage(0), UseAOE("N"), AOELifeTime(0.f), AOEDamage(0.f),
-		  AOEDamageCoolTime(0.f)
-	{
-	}
-
-	FYasuoAttackData(int32 id, int32 projectileCount, float projectileRange, float damage, FString useAOE,
-	                 float aoeLifeTime, float aoeDamage, float AOEDamageCoolTime)
-		: ID(id), ProjectileCount(projectileCount), ProjectileRange(projectileRange), Damage(damage),
-		  UseAOE(useAOE), AOELifeTime(aoeLifeTime), AOEDamage(aoeDamage), AOEDamageCoolTime(AOEDamageCoolTime)
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
-struct FYasuoMoveData // 야스오 이동거리 기류 획득 데이터
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveData")
-	int32 ID;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveData")
-	int32 RangeFrom;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveData")
-	int32 RangeTo;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MoveData")
-	float StackDistance;
-
-	FYasuoMoveData()
-		: ID(0), RangeFrom(0), RangeTo(0), StackDistance(0)
-	{
-	}
-
-	FYasuoMoveData(int32 id, int32 rangeFrom, float rangeTo, float stackDistance)
-		: ID(id), RangeFrom(rangeFrom), RangeTo(rangeTo), StackDistance(stackDistance)
-	{
-	}
-};
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FInputBindingDelegate, class UEnhancedInputComponent*)
 
@@ -88,6 +27,8 @@ protected:
 	UPROPERTY()
 	class ACGameState* GS;
 	UPROPERTY()
+	class ACPlayerState* PS;
+	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
 public:
@@ -107,7 +48,7 @@ public: // Return Component
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	virtual void Attack() PURE_VIRTUAL(); // Attack 기본 함수
-	
+
 private: // Input
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* IMC_Player;
@@ -128,22 +69,21 @@ protected: // Actor Component
 protected: // Get Player Data
 	UPROPERTY()
 	class UCDataSheetUtility* DataSheetUtility;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TMap<int32, FYasuoMoveData> YasuoMoveDataMap;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TMap<int32, FJinxAttackData> JinxAttackDataMap;
 
 	// Base는 virtual로만 만들고, Child에서 구현
 	// Child의 BeginPlay에서 델리게이트 바인딩
 	// Child에서는 override할때 UFUNCTION 붙여줘야 함.
-	virtual void PrintAttackDataMap();
+	virtual void PrintAttackDataMap()
+	{
+	};
 
 protected: // MoveSpeed
 	UPROPERTY(EditDefaultsOnly, Category = "MoveSpeed")
 	float PlayerMoveSpeed = 600;
+
+public: // Update Info
+	virtual void UpdatePlayerData(const int32 PlayerLevel);
+	void EndUpgrade();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -152,5 +92,48 @@ public:
 protected: // Arrow UI
 	FRotator ArrowRotation{90, 0, -45};
 
-	virtual void RotateArrow(){};
+	virtual void RotateArrow()
+	{
+	};
+
+private: // 업그레이드 UI
+	void InitUpgradeUI();
+
+protected:
+	UPROPERTY()
+	class UCSelectUpgradeWidget* SelectUpgradeWidget;
+
+public:
+	FORCEINLINE bool IsNextWeaponFinal(bool bYasuoType)
+	{
+		if (bYasuoType)
+			return PS->NextWeaponUpgradeIsFinal_Yasuo();
+		else
+			return PS->NextWeaponUpgradeIsFinal_Jinx();
+	}
+
+	FORCEINLINE void GetCurGrade(int32& WeaponGrade, int32& DamageGrade, int32& AbilityHasteGrade,
+	                             int32& ProjectilesGrade,
+	                             int32& CritChanceGrade)
+	{
+		PS->GetCurrentUpgradeGrade(WeaponGrade, DamageGrade, AbilityHasteGrade, ProjectilesGrade, CritChanceGrade);
+	}
+
+	FORCEINLINE void GetCurDamageNextDamage(int32 level, int32& CurDamage, int32& NextDamage, bool bYasuoType)
+	{
+		if (bYasuoType)
+			PS->GetWeaponDamage_Yasuo(level, CurDamage, NextDamage);
+		else
+			PS->GetWeaponDamage_Jinx(level, CurDamage, NextDamage);
+	}
+
+	FORCEINLINE void GetCurProjectileNextProjectile(int32 level, int32& CurProjectile, int32& NextProjectile)
+	{
+		PS->GetWeaponProjectile_Jinx(level, CurProjectile, NextProjectile);
+	}
+
+	FORCEINLINE FString GetUpgradeData(FString UpgradeType, FString& OutDesc, FString& OutTitle)
+	{
+		return PS->GetUpgradeData(UpgradeType, OutDesc, OutTitle);
+	}
 };

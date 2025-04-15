@@ -37,8 +37,7 @@ public:
 	
 	UFUNCTION()
 	void InitAllData();
-	
-	void UpdatePlayerData(const int32 PlayerLevel);
+	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
@@ -46,7 +45,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	TObjectPtr<ACPlayerController> PC;
-
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	TObjectPtr<USkillComponent> SkillComponent;
@@ -74,3 +72,4 @@ private:
 	TObjectPtr<UAnimMontage> AttackMontage;
 	
 };
+

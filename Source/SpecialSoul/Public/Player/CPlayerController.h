@@ -14,8 +14,16 @@ class SPECIALSOUL_API ACPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<class UCSelectUpgradeWidget> SelectUpgradeUIWidgetFactory;
+
+	UPROPERTY()
+	class UCSelectUpgradeWidget* SelectUpgradeWidget;
 private:
 	ACPlayerController();
 
 	virtual void BeginPlay() override;
+
+	
 };

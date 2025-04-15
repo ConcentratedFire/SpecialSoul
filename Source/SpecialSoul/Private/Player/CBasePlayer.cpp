@@ -88,51 +88,16 @@ void ACBasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// TODO 서버일때만 하도록 처리
+	// TODO Init Data Settings
+	// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
+	// PlayerState의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
 	if (HasAuthority())
 	{
 		GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
-		if (GM)
-		{
-			GS = GM->GetGameState<ACGameState>();
-			if (GS)
-			{
-				// TODO Init Data Settings
-				// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
-				// Player의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
-				DataSheetUtility = NewObject<UCDataSheetUtility>(this);
-
-				if (DataSheetUtility)
-				{
-					DataSheetUtility->OnDataFetched.AddDynamic(GM, &ASpecialSoulGameMode::PrintRegenDataMap);
-					DataSheetUtility->OnDataFetched.AddDynamic(GS, &ACGameState::PrintExpDataMap);
-
-					DataSheetUtility->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", GM->RegenDataMap);
-					DataSheetUtility->FetchGoogleSheetData<FEXPData>("EXP", "A1", "B22", GS->EXPDataMap);
-
-					// 기본공격 데이터
-
-					// 리소스 해제
-					// DataSheetUtility->ConditionalBeginDestroy();
-					// DataSheetUtility = nullptr;
-				}
-			}
-		}
-
+		GS = GM->GetGameState<ACGameState>();
 		PS = Cast<ACPlayerState>(GetPlayerState());
-		if (PS)
-		{
-			if (!DataSheetUtility)
-				DataSheetUtility = NewObject<UCDataSheetUtility>(this);
 
-			if (DataSheetUtility)
-			{
-				DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", PS->YasuoAttackDataMap);
-				DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", PS->YasuoMoveDataMap);
-				DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", PS->JinxAttackDataMap);
-				PS->InitPlayerState(DataSheetUtility);
-			}
-		}
+		DataSheetUtility = GM->DataSheetUtility;
 	}
 
 	// 오브젝트 풀 매니저 가져오기

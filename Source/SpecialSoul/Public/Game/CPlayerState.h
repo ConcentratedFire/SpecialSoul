@@ -51,6 +51,9 @@ class SPECIALSOUL_API ACPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
+	private:
+	virtual void BeginPlay() override;
+	
 public: // 캐릭터 데이터
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
@@ -66,8 +69,8 @@ public: // 스텟 계산 및 반환
 	int32 CalcProjectile(int32 CurProjectile);
 
 public:
-	void InitPlayerState(class UCDataSheetUtility* Utility); // 데이터 테이블 로드
-
+	void SetInitialData();
+	
 	UFUNCTION()
 	void UpdateGradeInfo(); // 초기 데이터 세팅용
 
@@ -172,6 +175,8 @@ public:
 	}
 
 private:
+	UPROPERTY()
+	class ASpecialSoulGameMode* GM;
 	UPROPERTY()
 	class ACBasePlayer* Player;
 	

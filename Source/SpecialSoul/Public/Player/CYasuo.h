@@ -47,7 +47,7 @@ private: // Attack
 public:
 	UPROPERTY(BlueprintReadOnly, Category=Attck)
 	FVector AttackFrontVector;
-	
+
 	void SetAttackFrontVector();
 	TArray<FVector> GetAttackVector();
 
@@ -55,10 +55,11 @@ private: // Anim
 	UPROPERTY()
 	class UCYasuoAnim* Anim;
 
-private: // Spec
+public: // Spec
 	UFUNCTION()
 	virtual void PrintAttackDataMap() override; // 임시
 
+private:
 	virtual void UpgradeWeapon(const int32 Level) override;
 	void UpdateYasuoMoveStat(const int32 Level);
 
@@ -75,5 +76,4 @@ private: // Passive Movement
 
 private:
 	virtual void RotateArrow() override;
-	
 };

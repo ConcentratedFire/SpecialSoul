@@ -23,10 +23,10 @@ void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (DataSheetUtility)
-	{
-		DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
-	}
+	// if (DataSheetUtility)
+	// {
+	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
+	// }
 
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 

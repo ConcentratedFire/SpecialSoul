@@ -4,8 +4,34 @@
 #include "Game/CPlayerState.h"
 
 #include "SpecialSoul.h"
+#include "Game/SpecialSoulGameMode.h"
 #include "Player/CYasuo.h"
 #include "Utility/CDataSheetUtility.h"
+
+void ACPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	Player = Cast<ACBasePlayer>(GetPawn());
+	
+}
+
+void ACPlayerState::SetInitialData()
+{
+	if (Player->IsA(ACYasuo::StaticClass()))
+	{
+		YasuoAttackDataMap = GM->YasuoAttackDataMap;
+		YasuoMoveDataMap = GM->YasuoMoveDataMap;
+	}
+	else
+	{
+		JinxAttackDataMap = GM->JinxAttackDataMap;
+	}
+	Player->PrintAttackDataMap();
+	
+	UpgradeDataMap=GM->UpgradeDataMap;
+}
 
 float ACPlayerState::CalcDamage(float CurDamage, bool& OutbIsCri)
 {
@@ -57,14 +83,6 @@ int32 ACPlayerState::CalcProjectile(int32 CurProjectile)
 	
 	int32 CalcValue = UpgradeDataMap["Projectiles"].AppendValue * CurProjectilesGrade;
 	return CurProjectile + CalcValue;
-}
-
-void ACPlayerState::InitPlayerState(class UCDataSheetUtility* Utility)
-{
-	// Utility->OnDataFetched.AddDynamic(this, &ACPlayerState::UpdateGradeInfo);
-	Utility->FetchGoogleSheetData<FUpgradeData>("Upgrade", "A1", "G6", UpgradeDataMap);
-
-	Player = Cast<ACBasePlayer>(GetPawn());
 }
 
 void ACPlayerState::UpdateGradeInfo()

@@ -48,6 +48,9 @@ public:
 	void ExpSpawn(FTransform SpawnTransform);
 	void MagnetSpawn(FTransform SpawnTransform);
 
+	// Enemy Setting
+	void EnemySpawn(bool bIsMelee);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ABaseEnemy> MeleeEnemy;
@@ -68,7 +71,7 @@ private: // Object Pool
 
 	// 한번에 스폰시킬 Enemy 마리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
-	int32 AppendMeleePoolSize = 100;
+	int32 AppendEnemyPoolSize = 100;
 	// 한번에 스폰시킬 회오리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendTornadoPoolSize = 100;

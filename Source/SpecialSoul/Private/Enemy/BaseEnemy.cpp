@@ -65,6 +65,7 @@ void ABaseEnemy::SetActorHiddenInGame(bool bNewHidden)
 
 	if (!bNewHidden)
 	{
+		GetCharacterMovement()->GravityScale = 1;
 		HP = MaxHP;
 		MyController = Cast<ACEnemyController>(GetController());
 
@@ -72,9 +73,11 @@ void ABaseEnemy::SetActorHiddenInGame(bool bNewHidden)
 		// float halfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 		// UpLocation.Z += halfHeight;
 		// SetActorLocation(UpLocation);
-		
+
 		StartFindingTarget();
 	}
+	else
+		GetCharacterMovement()->GravityScale = 0;
 }
 
 

@@ -31,7 +31,7 @@ void ACGameState::BeginPlay()
 	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
 	{
 		ObjectPoolManager = *It;
-		// ObjectPoolManager->InitSettings();
+		//ObjectPoolManager->InitSettings();
 	}
 }
 
@@ -53,8 +53,7 @@ void ACGameState::Tick(float DeltaSeconds)
 				if (RegenCount > CurRegenCount)
 				{
 					++CurRegenCount;
-					// LOG_S(Warning, TEXT("CurRegenCount : %d, bIsMelee : %d"), CurRegenCount, CurRegenCount & 1);
-					//ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
+					ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
 				}
 
 				// if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)

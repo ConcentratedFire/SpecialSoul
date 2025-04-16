@@ -185,12 +185,13 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 
 	// 지면 높이 조정 (옵션)
 	FHitResult Hit;
-	FVector TraceStart = SpawnLocation + FVector(0, 0, 1000);
-	FVector TraceEnd = SpawnLocation - FVector(0, 0, 1000);
+	FVector TraceStart = SpawnLocation + FVector(0, 0, 300);
+	FVector TraceEnd = SpawnLocation - FVector(0, 0, 300);
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility);
 	if (Hit.bBlockingHit)
 	{
-		SpawnLocation.Z = Hit.Location.Z;
+		// SpawnLocation.Z = Hit.Location.Z;
+		SpawnLocation.Z = GetActorLocation().Z;
 	}
 
 	if (PoolArray.Num() == 0)
@@ -213,6 +214,7 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);
 	PoolObj->SetActorTickEnabled(true);
+	// PoolObj->SetActorLocation(GetActorLocation());
 	PoolObj->SetActorLocation(SpawnLocation);
 
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation()+(SpawnLocation-GetActorLocation()), FColor::Red, false, 1.f, 0, 2.f);

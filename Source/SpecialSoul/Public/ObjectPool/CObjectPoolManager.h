@@ -217,8 +217,8 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 	// PoolObj->SetActorLocation(GetActorLocation());
 	PoolObj->SetActorLocation(SpawnLocation);
 
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation()+(SpawnLocation-GetActorLocation()), FColor::Red, false, 1.f, 0, 2.f);
-	LOG_S(Warning, TEXT("-------Succeed-------"));
+	//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation()+(SpawnLocation-GetActorLocation()), FColor::Red, false, 1.f, 0, 2.f);
+	// LOG_S(Warning, TEXT("-------Succeed-------"));
 	EnemyOutFromPool_Dele.Broadcast();
 }
 

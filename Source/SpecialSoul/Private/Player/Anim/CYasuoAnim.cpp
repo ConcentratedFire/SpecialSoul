@@ -30,7 +30,7 @@ void UCYasuoAnim::PlayAttackMontage()
 void UCYasuoAnim::PlayESkillMontage(bool bAnimStart)
 {
 	if (!ESkillMontage || !Owner) return;
-	LOG_S(Warning, TEXT("ESkill : %d"), bAnimStart);
+	// LOG_S(Warning, TEXT("ESkill : %d"), bAnimStart);
 	if (bAnimStart)
 		Owner->PlayAnimMontage(ESkillMontage, 1, FName("DashStart"));
 	else

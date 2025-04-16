@@ -18,7 +18,7 @@ ACObjectPoolManager::ACObjectPoolManager()
 void ACObjectPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 
 	// 오브젝트 풀링 테스트
 	// FTimerHandle TimerHandle;
@@ -123,7 +123,7 @@ void ACObjectPoolManager::PlaceItemBox()
 	{
 		if (FMath::RandRange(1, 100) > 40)
 		{
-			LOG_S(Warning, TEXT("%d번째 아이템 생성 패스"), i);
+			// LOG_S(Warning, TEXT("%d번째 아이템 생성 패스"), i);
 			continue;
 		}
 
@@ -151,7 +151,7 @@ void ACObjectPoolManager::PlaceItemBox()
 				if (!OutHit.GetActor()->GetActorNameOrLabel().Contains(TEXT("EXP")))
 				{
 					bIsNonExp = true;
-					LOG_S(Error, TEXT("%d번째 위치에 다른 아이템이 존재"), i);
+					// LOG_S(Error, TEXT("%d번째 위치에 다른 아이템이 존재"), i);
 					break;
 				}
 			}
@@ -159,11 +159,11 @@ void ACObjectPoolManager::PlaceItemBox()
 			if (bIsNonExp) continue; // 해당 위치에 경험치가 아닌 다른 아이템이 있으면 생성하지 않는다
 		}
 
-		LOG_S(Log, TEXT("%d번째 아이템 생성"), i);
+		// LOG_S(Log, TEXT("%d번째 아이템 생성"), i);
 		FTransform Transform(FRotator::ZeroRotator, ItemBoxLocation[i], FVector(1));
 		PlaceActorSetPlace(ItemBoxPool, AppendItemBoxSize, ItemBoxActor, Transform);
 	}
-	LOG_S(Warning, TEXT("===========아이템=========="));
+	// LOG_S(Warning, TEXT("===========아이템=========="));
 }
 
 template <>

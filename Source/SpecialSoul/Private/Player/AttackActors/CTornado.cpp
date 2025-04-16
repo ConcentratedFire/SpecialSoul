@@ -46,7 +46,7 @@ void ACTornado::BeginPlay()
 
 	OwnerYasuo = Cast<ACYasuo>(GetOwner());
 
-	LOG_S(Warning, TEXT("OwnerYasuo : %s"), OwnerYasuo==nullptr?TEXT("Owner Null"):*OwnerYasuo->GetName());
+	// LOG_S(Warning, TEXT("OwnerYasuo : %s"), OwnerYasuo==nullptr?TEXT("Owner Null"):*OwnerYasuo->GetName());
 	// 이동 경로 방향으로 회전
 	// if (!TornadoDirection.IsZero())
 	// {

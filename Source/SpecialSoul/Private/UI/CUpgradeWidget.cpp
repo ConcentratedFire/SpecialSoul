@@ -19,6 +19,6 @@ void UCUpgradeWidget::NativeConstruct()
 void UCUpgradeWidget::OnSelect()
 {
 	// LOG_S(Warning, TEXT("%s"), PlayerState?*PlayerState->GetName():TEXT("NULL PlayerState"));
-	LOG_S(Warning, TEXT("%s"), *CardName);
+	// LOG_S(Warning, TEXT("%s"), *CardName);
 	PlayerState->UpgradeStat(CardName);
 }

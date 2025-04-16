@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SkillComponent.h"
 #include "Player/CBasePlayer.h"
 #include "CYasuo.generated.h"
 
@@ -76,4 +77,12 @@ private: // Passive Movement
 
 private:
 	virtual void RotateArrow() override;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Yasuo")
+	TObjectPtr<USkillComponent> SkillComponent;
+
+public: // E Skill
+	void ESkill(const bool bAnimStart);
+	void ActivateSkillMovement(bool bActivate);
 };

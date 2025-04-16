@@ -8,15 +8,20 @@
 #include "Components/WidgetComponent.h"
 #include "Game/CGameState.h"
 #include "Game/CPlayerState.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
+#include "Player/Components/CMovementComponent.h"
+#include "Player/Components/SkillComponent.h"
+#include "Skill/Yasuo/CYasuo_ESkill.h"
 #include "Utility/CDataSheetUtility.h"
 
 ACYasuo::ACYasuo()
 {
+	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 }
 
 void ACYasuo::BeginPlay()
@@ -27,6 +32,7 @@ void ACYasuo::BeginPlay()
 	// {
 	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
 	// }
+	SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
 
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
@@ -187,6 +193,18 @@ void ACYasuo::RotateArrow()
 	FRotator newRot = ArrowRotation;
 	newRot.Roll += rotateValue;
 	ArrowWidgetComp->SetWorldRotation(newRot);
+}
+
+void ACYasuo::ESkill(const bool bAnimStart)
+{
+	Anim->PlayESkillMontage(bAnimStart);
+	GetCharacterMovement()->GravityScale= bAnimStart ? 0.f : 1.f;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
+}
+
+void ACYasuo::ActivateSkillMovement(bool bActivate)
+{
+	MoveComp->bCanMove = !bActivate;
 }
 
 void ACYasuo::UpgradeWeapon(const int32 Level)

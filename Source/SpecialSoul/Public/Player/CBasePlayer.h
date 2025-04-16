@@ -7,6 +7,12 @@
 #include "GameFramework/Character.h"
 #include "CBasePlayer.generated.h"
 
+UENUM(BlueprintType)
+enum class ESkillKey : uint8
+{
+	Attack, Passive, E, R
+};
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FInputBindingDelegate, class UEnhancedInputComponent*)
 
 UCLASS()

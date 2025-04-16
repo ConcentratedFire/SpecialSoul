@@ -22,6 +22,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void ApplyLifeTime() override;
 	
 
 	// UPROPERTY(VisibleAnywhere, Category = "Stat")

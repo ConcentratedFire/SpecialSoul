@@ -16,4 +16,11 @@ class SPECIALSOUL_API ARangedEnemyProjectile : public AProjectile
 
 public:
 	ARangedEnemyProjectile();
+	virtual void Tick(float DeltaSeconds) override;
+
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void ApplyLifeTime() override;
+	virtual void InitMoveComp() override;
 };

@@ -37,6 +37,10 @@ ARocketLauncherBullet::ARocketLauncherBullet()
 void ARocketLauncherBullet::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ARocketLauncherBullet::ApplyLifeTime()
+{
 	// 사정거리 / 속도 = 수명 (초 단위)
 	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
 	SetLifeSpan(LifeSpan); // 수명 설정

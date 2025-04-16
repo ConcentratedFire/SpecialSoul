@@ -23,7 +23,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void SetLifeTime();
 
 	UFUNCTION()
 	virtual void Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -34,6 +33,7 @@ public:
 
 protected:
 	virtual void InitMoveComp();	
+	virtual void ApplyLifeTime();
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Projectile")

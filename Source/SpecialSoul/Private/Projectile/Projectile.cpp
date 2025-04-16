@@ -36,7 +36,7 @@ void AProjectile::BeginPlay()
 	
 	InitMoveComp();
 	
-	SetLifeTime();
+	ApplyLifeTime();
 }
 
 void AProjectile::InitMoveComp()
@@ -50,7 +50,7 @@ void AProjectile::InitMoveComp()
 	ProjectileMovementComp->Activate(true);
 }
 
-void AProjectile::SetLifeTime()
+void AProjectile::ApplyLifeTime()
 { }
 
 void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

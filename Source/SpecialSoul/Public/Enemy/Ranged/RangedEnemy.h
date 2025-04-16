@@ -22,11 +22,13 @@ public:
 	ARangedEnemy();
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void DieEndAction() override;
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void FindTarget() override;
-	
+
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	TObjectPtr<UEnemyFSMComponent> FSMComponent;

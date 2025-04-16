@@ -39,6 +39,7 @@ public:
 
 	// Return To ObjectPool
 	void ReturnEnemy(ACMeleeEnemy* Enemy);
+	void ReturnEnemy(ARangedEnemy* Enemy);
 	void ReturnTornado(ACTornado* Tornado);
 	void ReturnExp(ACExp* EXP);
 	void ReturnItemBox(ACItemBox* ItemBox);

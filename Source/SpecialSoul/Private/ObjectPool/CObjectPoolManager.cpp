@@ -59,6 +59,16 @@ void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
 	MeleePool.Push(Enemy);
 }
 
+void ACObjectPoolManager::ReturnEnemy(ARangedEnemy* Enemy)
+{
+	Enemy->SetActorEnableCollision(false);
+	Enemy->SetActorHiddenInGame(true);
+	Enemy->SetActorTickEnabled(false);
+
+	EnemyGotoPool_Dele.Broadcast();
+	RangePool.Push(Enemy);
+}
+
 void ACObjectPoolManager::ReturnTornado(ACTornado* Tornado)
 {
 	Tornado->SetActorEnableCollision(false);

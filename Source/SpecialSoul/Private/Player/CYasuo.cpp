@@ -21,7 +21,7 @@
 
 ACYasuo::ACYasuo()
 {
-	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
+	
 }
 
 void ACYasuo::BeginPlay()
@@ -198,8 +198,18 @@ void ACYasuo::RotateArrow()
 void ACYasuo::ESkill(const bool bAnimStart)
 {
 	Anim->PlayESkillMontage(bAnimStart);
-	GetCharacterMovement()->GravityScale= bAnimStart ? 0.f : 1.f;
+	GetCharacterMovement()->GravityScale = bAnimStart ? 0.f : 1.f;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
+
+	if (bAnimStart) return;
+	
+	FTransform Transform;
+	FVector curLocation = GetActorLocation();
+	curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	Transform.SetLocation(curLocation);
+	Transform.SetRotation(FQuat::Identity);
+	Transform.SetScale3D(FVector(1, 1, 1));
+	ObjectPoolManager->TornadoESpawn(Transform);
 }
 
 void ACYasuo::ActivateSkillMovement(bool bActivate)

@@ -95,6 +95,9 @@ public: // Update Info
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UWidgetComponent* ArrowWidgetComp;
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Comp")
+	TObjectPtr<class USkillComponent> SkillComponent;
 
 protected: // Arrow UI
 	FRotator ArrowRotation{90, 0, -45};
@@ -152,4 +155,7 @@ public:
 	virtual void UpgradeWeapon(const int32 Level)
 	{
 	};
+
+public:
+	void SkillEnd(ESkillKey Key);
 };

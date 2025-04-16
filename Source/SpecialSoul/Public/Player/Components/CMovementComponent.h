@@ -25,6 +25,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+public:
+	bool bCanMove = true;
+	
 private:
 	UPROPERTY()
 	class ACBasePlayer* BaseOwnerCharacter;

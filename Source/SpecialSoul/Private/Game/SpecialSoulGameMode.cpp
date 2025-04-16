@@ -2,9 +2,12 @@
 
 #include "SpecialSoul/Public/Game/SpecialSoulGameMode.h"
 
+#include "EngineUtils.h"
+#include "Game/CGameState.h"
 #include "Player/CBasePlayer.h"
 #include "Player/CPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Utility/CDataSheetUtility.h"
 
 ASpecialSoulGameMode::ASpecialSoulGameMode()
 {
@@ -28,17 +31,29 @@ ASpecialSoulGameMode::ASpecialSoulGameMode()
 	}
 }
 
-void ASpecialSoulGameMode::PrintRegenDataMap()
+void ASpecialSoulGameMode::BeginPlay()
 {
-	// for (const auto& Pair : RegenDataMap)
-	// {
-	// 	UE_LOG(LogTemp, Log,
-	// 	       TEXT(
-	// 		       "RegenDataMap || ID: %d) MeleeEnemyCount: %d, RangeEnemyCount: %d, MidleBossCount: %d, FinalBossCount: %d"
-	// 	       ),
-	// 	       Pair.Key, Pair.Value.MeleeEnemyCount, Pair.Value.RangeEnemyCount, Pair.Value.MidleBossCount,
-	// 	       Pair.Value.FinalBossCount);
-	// }
+	Super::BeginPlay();
+	DataSheetUtility = NewObject<UCDataSheetUtility>(this);
+}
+
+void ASpecialSoulGameMode::ReadExcelData()
+{
+	DataSheetUtility->FetchGoogleSheetData<FYasuoAttackData>("Yasuo", "A1", "H8", YasuoAttackDataMap);
+	DataSheetUtility->FetchGoogleSheetData<FYasuoMoveData>("YasuoMove", "A1", "D5", YasuoMoveDataMap);
+	DataSheetUtility->FetchGoogleSheetData<FJinxAttackData>("Jinx", "A1", "G8", JinxAttackDataMap);
+	DataSheetUtility->FetchGoogleSheetData<FUpgradeData>("Upgrade", "A1", "G6", UpgradeDataMap);
+	DataSheetUtility->FetchGoogleSheetData<FRegenData>("Regen", "A1", "E23", RegenDataMap);
+
+	DataSheetUtility->OnDataFetched.AddDynamic(this, &ASpecialSoulGameMode::SetData);
+}
+
+void ASpecialSoulGameMode::SetData()
+{
+	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
+	{
+		Cast<ACPlayerState>((*It)->GetPlayerState())->SetInitialData();
+	}
 
 	// 초기 데이터 세팅
 	if (RegenDataMap.Num() > 0)
@@ -55,4 +70,13 @@ void ASpecialSoulGameMode::UpdateRegenInfo(const int32 Level)
 	RegenInfo.RangeEnemyCount = StatData.RangeEnemyCount;
 	RegenInfo.MidleBossCount = StatData.MidleBossCount;
 	RegenInfo.FinalBossCount = StatData.FinalBossCount;
+
+	auto GS = GetGameState<ACGameState>();
+	GS->CalcEnemyRegenTime(RegenInfo);
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+	{
+		bIsStartRegen = true;
+	}, 3.0f, false);
 }

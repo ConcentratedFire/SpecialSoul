@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SpecialSoulGameMode.h"
 #include "GameFramework/GameStateBase.h"
 #include "CGameState.generated.h"
 
@@ -44,10 +45,23 @@ private:
 
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;
+	UPROPERTY()
+	class ACObjectPoolManager* ObjectPoolManager;
 
 	UPROPERTY(EditDefaultsOnly, Category="Game")
 	float StageTime = 20.f;
 	float CurStageTime = 0.f;
+
+	float RegenTime;
+	float CurRegenTime = 0.f;
+	int32 RegenCount;
+	int32 CurRegenCount;
+	int32 MiddleBossCount = 0;
+	int32 CurMiddleBossCount = 0;
+	float MiddleBossRegenTime = 0.f;
+	int32 FinalBossCount = 0;
+	int32 CurFinalBossCount = 0;
+	float FinalBossRegenTime = 0.f;
 
 public:
 	const int32 MaxLevel = 21;
@@ -64,6 +78,9 @@ public:
 	void AddExp(const int32 exp);
 	void NextStage();
 
+	void CalcEnemyRegenTime(const FRegenData& RegenData);
+
+	void ReadExcelData(class UCDataSheetUtility* Utility);
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	int32 curStage = 1;

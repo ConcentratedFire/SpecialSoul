@@ -77,6 +77,8 @@ void UCMovementComponent::SetInputBinding(class UEnhancedInputComponent* Input)
 
 void UCMovementComponent::Move(const FInputActionValue& Value)
 {
+	if (!bCanMove) return;
+	
 	FVector2D v = Value.Get<FVector2D>();
 
 	FVector direction(v.X, v.Y, 0);
@@ -87,6 +89,7 @@ void UCMovementComponent::Move(const FInputActionValue& Value)
 void UCMovementComponent::RotationToMouseCursor(const float& DeltaTime)
 {
 	if (!PC) return;
+	if (!bCanMove) return;
 
 	FHitResult HitResult;
 	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);

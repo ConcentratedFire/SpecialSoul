@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SkillComponent.h"
 #include "Player/CBasePlayer.h"
 #include "CYasuo.generated.h"
 
@@ -47,7 +48,7 @@ private: // Attack
 public:
 	UPROPERTY(BlueprintReadOnly, Category=Attck)
 	FVector AttackFrontVector;
-	
+
 	void SetAttackFrontVector();
 	TArray<FVector> GetAttackVector();
 
@@ -55,10 +56,11 @@ private: // Anim
 	UPROPERTY()
 	class UCYasuoAnim* Anim;
 
-private: // Spec
+public: // Spec
 	UFUNCTION()
 	virtual void PrintAttackDataMap() override; // 임시
 
+private:
 	virtual void UpgradeWeapon(const int32 Level) override;
 	void UpdateYasuoMoveStat(const int32 Level);
 
@@ -75,5 +77,12 @@ private: // Passive Movement
 
 private:
 	virtual void RotateArrow() override;
-	
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Yasuo")
+	TObjectPtr<USkillComponent> SkillComponent;
+
+public: // E Skill
+	void ESkill(const bool bAnimStart);
+	void ActivateSkillMovement(bool bActivate);
 };

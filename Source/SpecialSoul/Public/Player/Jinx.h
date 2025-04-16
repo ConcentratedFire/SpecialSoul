@@ -14,12 +14,6 @@ class UCDataSheetUtility;
 class UJinxAnim;
 class ISkillStrategy;
 
-UENUM(BlueprintType)
-enum class ESkillKey : uint8
-{
-	Attack, Passive, E, R
-};
-
 // 스킬 사용 중에는 방향 회전 막기
 
 

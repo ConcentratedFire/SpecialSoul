@@ -7,6 +7,12 @@
 #include "GameFramework/Character.h"
 #include "CBasePlayer.generated.h"
 
+UENUM(BlueprintType)
+enum class ESkillKey : uint8
+{
+	Attack, Passive, E, R
+};
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FInputBindingDelegate, class UEnhancedInputComponent*)
 
 UCLASS()
@@ -70,6 +76,7 @@ protected: // Get Player Data
 	UPROPERTY()
 	class UCDataSheetUtility* DataSheetUtility;
 
+public:	
 	// Base는 virtual로만 만들고, Child에서 구현
 	// Child의 BeginPlay에서 델리게이트 바인딩
 	// Child에서는 override할때 UFUNCTION 붙여줘야 함.

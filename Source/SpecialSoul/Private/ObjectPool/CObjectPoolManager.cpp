@@ -18,19 +18,15 @@ ACObjectPoolManager::ACObjectPoolManager()
 void ACObjectPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
-	InitPool(ItemBoxPool, AppendItemBoxSize, ItemBoxActor);
-	InitPool(ExpPool, AppendExpPoolSize, ExpActor);
-	InitPool(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor);
-
-	InitPool(MeleePool, AppendMeleePoolSize, MeleeEnemy);
+	
 
 	// 오브젝트 풀링 테스트
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [&]()
-	{
-		for (int i = 0; i < 3; ++i)
-			PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
-	}, 1.5f, true);
+	// FTimerHandle TimerHandle;
+	// GetWorldTimerManager().SetTimer(TimerHandle, [&]()
+	// {
+	// 	for (int i = 0; i < 3; ++i)
+	// 		PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
+	// }, 1.5f, true);
 
 	if (auto GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode()))
 	{
@@ -40,6 +36,16 @@ void ACObjectPoolManager::BeginPlay()
 			GS->OnNextStage.Broadcast();
 		}
 	}
+}
+
+void ACObjectPoolManager::InitSettings()
+{
+	InitPool(ItemBoxPool, AppendItemBoxSize, ItemBoxActor);
+	InitPool(ExpPool, AppendExpPoolSize, ExpActor);
+	InitPool(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor);
+
+	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	InitPool(RangePool, AppendEnemyPoolSize, RangeEnemy);
 }
 
 void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
@@ -87,7 +93,7 @@ void ACObjectPoolManager::ReturnExpMagnet(ACExpMagnet* ExpMagnet)
 	ExpMagnet->SetActorHiddenInGame(true);
 	ExpMagnet->SetActorTickEnabled(false);
 	ExpMagnet->SetActorLocation(PoolLocation);
-	
+
 	ItemMagnetPool.Push(ExpMagnet);
 }
 
@@ -126,7 +132,7 @@ void ACObjectPoolManager::PlaceItemBox()
 		FVector End = Start;
 		FCollisionObjectQueryParams ObjectQueryParams;
 		ObjectQueryParams.AddObjectTypesToQuery(ECC_GameTraceChannel4);
-		
+
 		bool bHit = GetWorld()->SweepMultiByObjectType(
 			OutHits, // 충돌 결과를 저장할 변수
 			Start, // 레이의 시작 지점
@@ -149,7 +155,7 @@ void ACObjectPoolManager::PlaceItemBox()
 					break;
 				}
 			}
-			
+
 			if (bIsNonExp) continue; // 해당 위치에 경험치가 아닌 다른 아이템이 있으면 생성하지 않는다
 		}
 
@@ -185,4 +191,12 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 	}
 
 	EnemyGotoPool_Dele.Broadcast(); // 특수화 목적
+}
+
+void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
+{
+	if (bIsMelee)
+		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	else
+		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
 }

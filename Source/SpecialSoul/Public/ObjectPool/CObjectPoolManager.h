@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SpecialSoul.h"
 #include "Enemy/CMeleeEnemy.h"
 #include "Enemy/Ranged/RangedEnemy.h"
 #include "GameFramework/Actor.h"
@@ -30,6 +31,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	void InitSettings();
+	
+public:
 	FEnemyOutFromPool EnemyOutFromPool_Dele;
 	FEnemyGotoPool EnemyGotoPool_Dele;
 
@@ -48,6 +52,9 @@ public:
 	void ExpSpawn(FTransform SpawnTransform);
 	void MagnetSpawn(FTransform SpawnTransform);
 
+	// Enemy Setting
+	void EnemySpawn(bool bIsMelee);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ABaseEnemy> MeleeEnemy;
@@ -65,10 +72,10 @@ private:
 private: // Object Pool
 	UPROPERTY(EditDefaultsOnly, Category="ObjectPool")
 	FVector PoolLocation = FVector(-1000, 2000, 500);
-
+	
 	// 한번에 스폰시킬 Enemy 마리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
-	int32 AppendMeleePoolSize = 100;
+	int32 AppendEnemyPoolSize = 100;
 	// 한번에 스폰시킬 회오리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendTornadoPoolSize = 100;
@@ -178,12 +185,13 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 
 	// 지면 높이 조정 (옵션)
 	FHitResult Hit;
-	FVector TraceStart = SpawnLocation + FVector(0, 0, 1000.f);
-	FVector TraceEnd = SpawnLocation - FVector(0, 0, 1000.f);
+	FVector TraceStart = SpawnLocation + FVector(0, 0, 300);
+	FVector TraceEnd = SpawnLocation - FVector(0, 0, 300);
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility);
 	if (Hit.bBlockingHit)
 	{
-		SpawnLocation.Z = Hit.Location.Z;
+		// SpawnLocation.Z = Hit.Location.Z;
+		SpawnLocation.Z = GetActorLocation().Z;
 	}
 
 	if (PoolArray.Num() == 0)
@@ -206,8 +214,11 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);
 	PoolObj->SetActorTickEnabled(true);
+	// PoolObj->SetActorLocation(GetActorLocation());
 	PoolObj->SetActorLocation(SpawnLocation);
 
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation()+(SpawnLocation-GetActorLocation()), FColor::Red, false, 1.f, 0, 2.f);
+	LOG_S(Warning, TEXT("-------Succeed-------"));
 	EnemyOutFromPool_Dele.Broadcast();
 }
 

@@ -16,7 +16,8 @@ class SPECIALSOUL_API UCYasuoAnim : public UAnimInstance
 
 public:
 	void PlayAttackMontage();
-	
+	void PlayESkillMontage(bool bAnimStart);
+
 private:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
@@ -32,4 +33,8 @@ private: // Attack Anim
 
 	UFUNCTION()
 	void AnimNotify_YasuoDefaultAttack();
+
+private: // E Skill
+	UPROPERTY(EditDefaultsOnly, category = "Attack")
+	class UAnimMontage* ESkillMontage;
 };

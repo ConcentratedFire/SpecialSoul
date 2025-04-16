@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Data/JinxData.h"
+#include "Data/CYasuoData.h"
+#include "Game/CPlayerState.h"
 #include "SpecialSoulGameMode.generated.h"
 
 USTRUCT(BlueprintType)
@@ -39,17 +42,37 @@ class ASpecialSoulGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
+private:
 	ASpecialSoulGameMode();
+	virtual void BeginPlay() override;
+	
+public:
 	void UpdateRegenInfo(int32 Level);
+	
+public:
+	UPROPERTY()
+	class UCDataSheetUtility* DataSheetUtility;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	TMap<int32, FYasuoMoveData> YasuoMoveDataMap;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	TMap<int32, FJinxAttackData> JinxAttackDataMap;
+	UPROPERTY(VisibleAnywhere, Category = "Data")
+	TMap<FString, FUpgradeData> UpgradeDataMap;
+
+	void ReadExcelData();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FRegenData> RegenDataMap;
 
-	UFUNCTION()
-	void PrintRegenDataMap();
-
+	bool bIsStartRegen = false;
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	FRegenData RegenInfo;
+
+	private:
+	UFUNCTION()
+	void SetData();
 };

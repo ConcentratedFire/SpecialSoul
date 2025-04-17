@@ -54,7 +54,7 @@ void ACEnemyController::Tick(float DeltaSeconds)
 			auto MoveDir = FFStrategy->GetFlowFieldDirection(MyPawn->GetActorLocation());
 			FVector TargetLocation = MyPawn->GetActorLocation() + FVector(MoveDir.X, MoveDir.Y, 0) * 50;
 			BB_Enemy->SetValueAsVector(FName("TargetLocation"),TargetLocation);
-			// BB_Enemy->SetValueAsVector(FName("MoveDir"), FVector(MoveDir.X, MoveDir.Y, 0));
+			BB_Enemy->SetValueAsVector(FName("MoveDir"), FVector(MoveDir.X, MoveDir.Y, 0));
 		}
 	}
 }

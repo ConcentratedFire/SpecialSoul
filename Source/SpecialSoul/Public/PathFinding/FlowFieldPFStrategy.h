@@ -20,7 +20,8 @@ public:
 	virtual void MoveTo(const FVector& InTargetLocation) override;
 	virtual void TickMove(float DeltaTime) override;
 
-	void Initialize(ACharacter* InCharacter, AFlowFieldActor* InFlowField);
+	void Initialize(AFlowFieldActor* InFlowField, ACharacter* InCharacter=nullptr);
+	FVector2D GetFlowFieldDirection(const FVector& InLocation);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PathFinding)
 	ACharacter* ControlledCharacter;

@@ -23,6 +23,7 @@
 #include "Utility/CDataSheetUtility.h"
 #include "Data/JinxData.h"
 #include "Data/CYasuoData.h"
+#include "Player/Components/SkillComponent.h"
 
 struct FJinxAttackData;
 class UEnhancedInputLocalPlayerSubsystem;
@@ -81,6 +82,8 @@ ACBasePlayer::ACBasePlayer()
 	GetCapsuleComponent()->SetCollisionProfileName(FName("Player"));
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -164,6 +167,20 @@ void ACBasePlayer::InitUpgradeUI()
 		SelectUpgradeWidget = pc->SelectUpgradeWidget;
 		SelectUpgradeWidget->AddToViewport();
 	}
+}
+
+void ACBasePlayer::SetSkillUsing(ESkillKey Key, bool bUseSkill)
+{
+	if (Key == ESkillKey::E)
+		SkillComponent->bUseESkill = bUseSkill;
+	else if (Key == ESkillKey::R)
+		SkillComponent->bUseRSkill = bUseSkill;
+}
+
+void ACBasePlayer::MyApplyDamage(float Damage, ABaseEnemy* DamagedActor)
+{
+	DamagedActor->MyDamage(Damage);
+	PS->AddKillScore();
 }
 
 void ACBasePlayer::EndUpgrade()

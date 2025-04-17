@@ -13,6 +13,13 @@ void AGameHUD::BeginPlay()
 		if (GameWidget)
 		{
 			GameWidget->AddToViewport();
+			GameWidget->SetKillScore(0);
 		}
 	}
+}
+
+void AGameHUD::SetKillScore(int32 KillScore)
+{
+	if (GameWidget)
+		GameWidget->SetKillScore(KillScore);
 }

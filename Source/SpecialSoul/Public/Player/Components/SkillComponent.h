@@ -34,6 +34,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	int32 UseSkillCount {0};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	bool bUseESkill {false};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	bool bUseRSkill {false};
 	
 	void Attack(); // 기본공격
 

@@ -32,6 +32,7 @@ public: // Using Charge Enemy
 public:
 	virtual void Attack() override;
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
+	void WindWall();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
@@ -40,6 +41,8 @@ private:
 	FYasuoMoveData YasuoMoveInfo;
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	int32 PassiveEnergy = 0;
+
+	bool bAttacking = false;
 
 private: // Attack
 	UPROPERTY(EditDefaultsOnly, category=Attack)
@@ -78,11 +81,8 @@ private: // Passive Movement
 private:
 	virtual void RotateArrow() override;
 
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Yasuo")
-	TObjectPtr<USkillComponent> SkillComponent;
-
 public: // E Skill
 	void ESkill(const bool bAnimStart);
+	void RSkill();
 	void ActivateSkillMovement(bool bActivate);
 };

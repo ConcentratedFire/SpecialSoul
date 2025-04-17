@@ -13,8 +13,10 @@ UCYasuo_ESkill::UCYasuo_ESkill()
 
 void UCYasuo_ESkill::UseSkill(ACBasePlayer* Caster)
 {
+	if (SkillChargeCount == 0 || bIsESkillActive) return;
+
 	// E 키를 눌렀을때 들어오는 부분
-	ACYasuo* Yasuo = Cast<ACYasuo>(Caster);
+	Yasuo = Cast<ACYasuo>(Caster);
 
 	// 야스오의 전방 100cm 앞에 벽이 있는지 확인
 	TArray<FHitResult> HitResults;
@@ -31,35 +33,40 @@ void UCYasuo_ESkill::UseSkill(ACBasePlayer* Caster)
 	                                                             EDrawDebugTrace::ForDuration,
 	                                                             HitResults,
 	                                                             true);
-	
+
 	if (!bHit)
 	{
+		Yasuo->SetSkillUsing(ESkillKey::E, true);
 		// 도착 지점에 충돌체가 없으면 사용
 		if (Yasuo)
 		{
 			Yasuo->ActivateSkillMovement(true);
-			Yasuo->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 			Yasuo->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
+			
+			DashTime=0.f;
+			--SkillChargeCount;
+			bIsESkillActive = true;
 		}
 
+		// 스킬 시전
+		StartUseSkill();
 		// 2. CastingTime후에 스킬을 시작한다.
-		TWeakObjectPtr<UCYasuo_ESkill> WeakThis(this); // GC에 의해 댕글링 포인터될 때를 위해 WeakPtr 사용
-		TWeakObjectPtr<ACYasuo> WeakYasuo(Yasuo);
-
-
-		Yasuo->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
-			                                              [WeakThis, WeakYasuo]()
-			                                              {
-				                                              if (WeakThis.IsValid() && WeakYasuo.IsValid())
-				                                              {
-					                                              WeakThis->StartUseSkill(WeakYasuo.Get());
-				                                              }
-			                                              }),
-		                                              CastingTime, false, CastingTime);
+		// TWeakObjectPtr<UCYasuo_ESkill> WeakThis(this); // GC에 의해 댕글링 포인터될 때를 위해 WeakPtr 사용
+		// TWeakObjectPtr<ACYasuo> WeakYasuo(Yasuo);
+		//
+		// Yasuo->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
+		// 	                                              [WeakThis, WeakYasuo]()
+		// 	                                              {
+		// 		                                              if (WeakThis.IsValid() && WeakYasuo.IsValid())
+		// 		                                              {
+		// 			                                              WeakThis->StartUseSkill();
+		// 		                                              }
+		// 	                                              }),
+		//                                               CastingTime, false, CastingTime);
 	}
 }
 
-void UCYasuo_ESkill::StartUseSkill(ACYasuo* Yasuo)
+void UCYasuo_ESkill::StartUseSkill()
 {
 	TWeakObjectPtr<UCYasuo_ESkill> WeakThis(this); // GC에 의해 댕글링 포인터될 때를 위해 WeakPtr 사용
 	TWeakObjectPtr<ACYasuo> WeakYasuo(Yasuo);
@@ -68,7 +75,7 @@ void UCYasuo_ESkill::StartUseSkill(ACYasuo* Yasuo)
 
 	FVector EndPos = Yasuo->GetActorLocation() + Yasuo->GetActorForwardVector() * MoveDist;
 
-	Yasuo->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
+	Yasuo->GetWorld()->GetTimerManager().SetTimer(FireTimer, FTimerDelegate::CreateLambda(
 		                                              [WeakThis, WeakYasuo, EndPos]()
 		                                              {
 			                                              // 이동 끝
@@ -76,9 +83,18 @@ void UCYasuo_ESkill::StartUseSkill(ACYasuo* Yasuo)
 				                                              Get()->MoveThreshold > FVector::Dist(
 					                                              EndPos, WeakYasuo.Get()->GetActorLocation()))
 			                                              {
-				                                              WeakThis->EndUseSkill(WeakYasuo.Get());
+				                                              WeakThis->EndUseSkill();
 				                                              return;
 			                                              }
+			                                              if (WeakThis->DashTime >= 1.f)
+			                                              {
+				                                              WeakThis->EndUseSkill();
+				                                              return;
+			                                              }
+		                                              	
+			                                              WeakThis->DashTime += WeakYasuo->GetWorldTimerManager().
+				                                              GetTimerElapsed(WeakThis->FireTimer);
+
 			                                              FVector curLoc = WeakYasuo.Get()->GetActorLocation();
 			                                              FVector newLoc = FMath::VInterpTo(
 				                                              curLoc, EndPos,
@@ -89,11 +105,34 @@ void UCYasuo_ESkill::StartUseSkill(ACYasuo* Yasuo)
 	);
 }
 
-void UCYasuo_ESkill::EndUseSkill(ACYasuo* Yasuo)
+void UCYasuo_ESkill::EndUseSkill()
 {
 	Yasuo->ESkill(false);;
-	Yasuo->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	Yasuo->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 
-	Yasuo->ActivateSkillMovement(false);
+	bIsESkillActive = false; // 스킬 사용 완료
+	StartChargeTimer();
+}
+
+void UCYasuo_ESkill::StartChargeTimer()
+{
+	// 누적 개수가 최대치 미만일 때만 충전
+	if (SkillChargeCount < MaxChargeCount && !Yasuo->GetWorld()->GetTimerManager().IsTimerActive(ChargeTimerHandle))
+	{
+		float CalcChargeCooldown = Yasuo->CalcHaste(ChargeCooldown);
+		Yasuo->GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle, this, &UCYasuo_ESkill::OnChargeCompleted,
+		                                              CalcChargeCooldown, false);
+	}
+}
+
+void UCYasuo_ESkill::OnChargeCompleted()
+{
+	Yasuo->GetWorld()->GetTimerManager().ClearTimer(ChargeTimerHandle);
+
+	if (SkillChargeCount < MaxChargeCount)
+	{
+		SkillChargeCount++; // 누적 개수 증가
+		// 추가 충전이 필요하면 타이머 재시작
+		StartChargeTimer();
+	}
 }

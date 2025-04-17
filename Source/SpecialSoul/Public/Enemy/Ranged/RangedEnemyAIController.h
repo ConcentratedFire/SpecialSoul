@@ -21,12 +21,8 @@ public:
 
 private:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	bool bUseFlowField {true};
-
-	UPROPERTY()
-	TObjectPtr<AFlowFieldActor> FlowField;
+	
 
 	void InitPFStrategy();
-	bool FindFlowField();
+	
 };

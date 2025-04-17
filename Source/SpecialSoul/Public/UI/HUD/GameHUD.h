@@ -16,6 +16,9 @@ class SPECIALSOUL_API AGameHUD : public AHUD
 	GENERATED_BODY()
 
 public:
+	void SetKillScore(int32 KillScore);
+	
+public:
 	//AGameHUD();
 
 	virtual void BeginPlay() override;
@@ -24,4 +27,5 @@ public:
 	TSubclassOf<UGameWidget> GameWidgetClass;
 
 	TObjectPtr<UGameWidget> GameWidget;
+	// TObjectPtr<UGameWidget> GameWidget;
 };

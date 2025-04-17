@@ -120,7 +120,8 @@ void ABaseEnemy::FindTarget()
 	if (ClosestPlayer)
 	{
 		Target = ClosestPlayer;
-		MyController->TargetPlayer = Target; // 클라 추가하면 크래시 발생
+		if (HasAuthority())
+			MyController->TargetPlayer = Target; // 클라 추가하면 크래시 발생
 	}
 }
 
@@ -163,6 +164,24 @@ void ABaseEnemy::OnMyControllerTickOff()
 
 	ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
 	EC->SetActorTickEnabled(false);
+}
+
+bool ABaseEnemy::GetIsPlayerInRange(const float Range) const
+{
+	TArray<FHitResult> HitResults;
+	FVector Start = GetActorLocation();
+	FVector End = Start;
+	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes;
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+	TArray<AActor*> ActorsToIgnore;
+
+	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, MoveDistance, objectTypes, false,
+																 ActorsToIgnore,
+																 EDrawDebugTrace::ForDuration,
+																 HitResults,
+																 true);
+	
+	return bHit;
 }
 
 void ABaseEnemy::MyDamage(int32 DamageAmount)

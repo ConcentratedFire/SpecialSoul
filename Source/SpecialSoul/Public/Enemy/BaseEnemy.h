@@ -19,24 +19,24 @@ public:
 	ABaseEnemy();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
-	
+
 public:
 	UPROPERTY()
 	class ACEnemyController* MyController;
 	UPROPERTY(EditDefaultsOnly, Category = "AI|MoveDistance")
-	float MoveDistance {100.f};
-	
+	float MoveDistance{100.f};
+
 	UFUNCTION()
 	virtual void HandleAttack();
 
 	// UFUNCTION()
 	// virtual void HandleDamaged();
-	
+
 	UFUNCTION()
 	virtual void HandleDie();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BaseEnemy")
-	bool bIsAttacking {false};
+	bool bIsAttacking{false};
 
 	virtual void ResetEnemy();
 
@@ -50,6 +50,9 @@ public: // Damage
 	virtual void DieEndAction()
 	{
 	}; // 사망 애니메이션 종료 후, Pool로 돌아가도록 처리
+
+public: // Speed
+	float GetMoveSpeed() const { return MoveSpeed; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -99,4 +102,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Enemy")
 	bool bIsDead{false};
+
+public:
+	bool GetIsPlayerInRange(const float Range) const;
 };

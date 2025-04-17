@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "Player/CBasePlayer.h"
+#include "Player/CYasuo.h"
 #include "Player/Jinx.h"
 
 // Sets default values for this component's properties
@@ -12,7 +13,7 @@ USkillComponent::USkillComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	bWantsInitializeComponent = true;
-	
+
 	ConstructorHelpers::FObjectFinder<UInputAction> tempESkill(
 		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Input/IA_ESkill.IA_ESkill'"));
 	if (tempESkill.Succeeded())
@@ -48,7 +49,7 @@ void USkillComponent::InitializeComponent()
 
 void USkillComponent::CastSkill(ESkillKey Key)
 {
-	if (!SkillMap.Contains(Key) )
+	if (!SkillMap.Contains(Key))
 	{
 		UE_LOG(LogTemp, Error, TEXT("!SkillMap.Contains(Key) "));
 		return;
@@ -58,7 +59,11 @@ void USkillComponent::CastSkill(ESkillKey Key)
 		UE_LOG(LogTemp, Error, TEXT("!OwnerCharacter"));
 		return;
 	}
+
+	if ((Key == ESkillKey::E || Key == ESkillKey::R) && (bUseESkill || bUseRSkill)) return; // 스킬 사용중에는 다른 스킬 사용 방지
+
 	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
+	
 	// UseSkillCount++;
 }
 

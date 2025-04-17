@@ -27,6 +27,8 @@ void ACObjectPoolManager::BeginPlay()
 	// 	for (int i = 0; i < 3; ++i)
 	// 		PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
 	// }, 1.5f, true);
+	// PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	// PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
 
 	if (auto GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode()))
 	{
@@ -46,6 +48,9 @@ void ACObjectPoolManager::InitSettings()
 
 	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	InitPool(RangePool, AppendEnemyPoolSize, RangeEnemy);
+
+	InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
+	InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
 }
 
 void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
@@ -78,6 +83,24 @@ void ACObjectPoolManager::ReturnTornado(ACTornado* Tornado)
 	TornadoPool.Push(Tornado);
 }
 
+void ACObjectPoolManager::ReturnTornadoE(ACTornado_E* Tornado)
+{
+	Tornado->SetActorEnableCollision(false);
+	Tornado->SetActorHiddenInGame(true);
+	Tornado->SetActorTickEnabled(false);
+
+	TornadoEPool.Push(Tornado);
+}
+
+void ACObjectPoolManager::ReturnWindWall(ACWindWall* WindWall)
+{
+	WindWall->SetActorEnableCollision(false);
+	WindWall->SetActorHiddenInGame(true);
+	WindWall->SetActorTickEnabled(false);
+
+	WindWallPool.Push(WindWall);
+}
+
 void ACObjectPoolManager::ReturnExp(ACExp* EXP)
 {
 	EXP->SetActorEnableCollision(false);
@@ -107,15 +130,38 @@ void ACObjectPoolManager::ReturnExpMagnet(ACExpMagnet* ExpMagnet)
 	ItemMagnetPool.Push(ExpMagnet);
 }
 
+void ACObjectPoolManager::ReturnMiddleBossBullet(ACMiddleBossBullet* MiddleBossBullet)
+{
+	MiddleBossBullet->SetActorEnableCollision(false);
+	MiddleBossBullet->SetActorHiddenInGame(true);
+	MiddleBossBullet->SetActorTickEnabled(false);
+	MiddleBossBullet->SetActorLocation(PoolLocation);
+
+	MiddleBossBulletPool.Push(MiddleBossBullet);
+}
+
 void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 {
 	InitPool(TornadoPool, AppendTornadoPoolSize, TornadoActor, NewOwner);
+	InitPool(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, NewOwner);
+	InitPool(WindWallPool, AppendWindWallPoolSize, WindWallActor, NewOwner);
 }
 
 void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform)
 {
 	PlaceActorSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform);
 }
+
+void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform);
+}
+
+void ACObjectPoolManager::WindWallSpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(WindWallPool, AppendWindWallPoolSize, WindWallActor, SpawnTransform);
+}
+
 
 void ACObjectPoolManager::ExpSpawn(FTransform SpawnTransform)
 {
@@ -209,4 +255,14 @@ void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
 		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	else
 		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
+}
+
+void ACObjectPoolManager::MiddleBossSpawn()
+{
+	PlaceEnemyRandomPlace(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
+}
+
+void ACObjectPoolManager::MiddleBossBulletSpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor, SpawnTransform);
 }

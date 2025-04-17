@@ -32,6 +32,7 @@ public: // Using Charge Enemy
 public:
 	virtual void Attack() override;
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
+	void WindWall();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
@@ -80,5 +81,6 @@ private:
 
 public: // E Skill
 	void ESkill(const bool bAnimStart);
+	void RSkill();
 	void ActivateSkillMovement(bool bActivate);
 };

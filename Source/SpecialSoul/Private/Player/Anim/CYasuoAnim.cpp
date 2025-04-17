@@ -37,7 +37,26 @@ void UCYasuoAnim::PlayESkillMontage(bool bAnimStart)
 		Owner->PlayAnimMontage(ESkillMontage, 1, FName("Attack"));
 }
 
+void UCYasuoAnim::PlayRSkillMontage()
+{
+	if (!RSkillMontage || !Owner) return;
+	Owner->PlayAnimMontage(RSkillMontage, 1, FName("WindWall"));
+}
+
 void UCYasuoAnim::AnimNotify_YasuoDefaultAttack()
 {
 	Owner->Attack();
+}
+
+void UCYasuoAnim::AnimNotify_ESkillEnd()
+{
+	Owner->ActivateSkillMovement(false);
+	Owner->SetSkillUsing(ESkillKey::E, false);
+}
+
+void UCYasuoAnim::AnimNotify_WindWallSkill()
+{
+	Owner->WindWall();
+	Owner->ActivateSkillMovement(false);
+	Owner->SetSkillUsing(ESkillKey::R, false);
 }

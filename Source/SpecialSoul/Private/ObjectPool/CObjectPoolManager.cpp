@@ -77,6 +77,15 @@ void ACObjectPoolManager::ReturnTornadoE(ACTornado_E* Tornado)
 	TornadoEPool.Push(Tornado);
 }
 
+void ACObjectPoolManager::ReturnWindWall(ACWindWall* WindWall)
+{
+	WindWall->SetActorEnableCollision(false);
+	WindWall->SetActorHiddenInGame(true);
+	WindWall->SetActorTickEnabled(false);
+
+	WindWallPool.Push(WindWall);
+}
+
 void ACObjectPoolManager::ReturnExp(ACExp* EXP)
 {
 	EXP->SetActorEnableCollision(false);
@@ -110,6 +119,7 @@ void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 {
 	InitPool(TornadoPool, AppendTornadoPoolSize, TornadoActor, NewOwner);
 	InitPool(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, NewOwner);
+	InitPool(WindWallPool, AppendWindWallPoolSize, WindWallActor, NewOwner);
 }
 
 void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform)
@@ -121,6 +131,12 @@ void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform)
 {
 	PlaceActorSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform);
 }
+
+void ACObjectPoolManager::WindWallSpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(WindWallPool, AppendWindWallPoolSize, WindWallActor, SpawnTransform);
+}
+
 
 void ACObjectPoolManager::ExpSpawn(FTransform SpawnTransform)
 {

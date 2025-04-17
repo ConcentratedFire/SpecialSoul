@@ -157,5 +157,8 @@ public:
 	};
 
 public:
-	void SkillEnd(ESkillKey Key);
+	void SetSkillUsing(ESkillKey Key, bool bUseSkill);
+
+public:
+	float CalcHaste(float CurHaste){return PS->CalcAbilityHaste(CurHaste);}
 };

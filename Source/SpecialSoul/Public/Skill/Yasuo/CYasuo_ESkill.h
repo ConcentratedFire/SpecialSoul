@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Interface/SkillStrategy.h"
 #include "Player/CYasuo.h"
-#include "UObject/NoExportTypes.h"
 #include "CYasuo_ESkill.generated.h"
 
 /**
@@ -32,12 +31,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	float MoveThreshold = 10.f;
 
-	FTimerHandle CastingTimer;
-	float CastingTime = 0.1f;
-
 	FTimerHandle FireTimer;
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	float FireDelay = 0.1f;
+
+	float DashTime = 0.f;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	int32 MaxChargeCount{3};

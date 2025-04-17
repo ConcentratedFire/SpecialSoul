@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/AttackActors/CTornado.h"
 #include "Player/AttackActors/CTornado_E.h"
+#include "Player/AttackActors/CWindWall.h"
 #include "CObjectPoolManager.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FEnemyGotoPool);
@@ -42,6 +43,7 @@ public:
 	void ReturnEnemy(ACMeleeEnemy* Enemy);
 	void ReturnTornado(ACTornado* Tornado);
 	void ReturnTornadoE(ACTornado_E* Tornado);
+	void ReturnWindWall(ACWindWall* WindWall);
 	void ReturnExp(ACExp* EXP);
 	void ReturnItemBox(ACItemBox* ItemBox);
 	void ReturnExpMagnet(ACExpMagnet* ExpMagnet);
@@ -50,6 +52,9 @@ public:
 	void MakeTornadoPool(AActor* NewOwner);
 	void TornadoSpawn(FTransform SpawnTransform);
 	void TornadoESpawn(FTransform SpawnTransform);
+
+	// Wind Wall
+	void WindWallSpawn(FTransform SpawnTransform);
 
 	// Object Setting
 	void ExpSpawn(FTransform SpawnTransform);
@@ -68,6 +73,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACTornado_E> TornadoEActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACWindWall> WindWallActor;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACExp> ExpActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACItemBox> ItemBoxActor;
@@ -84,9 +91,12 @@ private: // Object Pool
 	// 한번에 스폰시킬 회오리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendTornadoPoolSize = 100;
-	// 한번에 스폰시킬 회오리수
+	// 한번에 스폰시킬 EQ회오리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendTornadoEPoolSize = 10;
+	// 한번에 스폰시킬 장막
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendWindWallPoolSize = 3;
 	// 한번에 스폰시킬 경험치수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendExpPoolSize = 100;
@@ -106,9 +116,12 @@ private: // Object Pool
 	// 회오리 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACTornado*> TornadoPool;
-	// 자석 아이템 풀
+	// EQ 회오리 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACTornado_E*> TornadoEPool;
+	// 장막 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACWindWall*> WindWallPool;
 	// 경험치 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACExp*> ExpPool;

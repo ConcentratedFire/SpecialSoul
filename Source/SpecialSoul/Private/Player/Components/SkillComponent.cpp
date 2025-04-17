@@ -65,13 +65,6 @@ void USkillComponent::CastSkill(ESkillKey Key)
 	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
 	
 	// UseSkillCount++;
-	if (OwnerCharacter.IsA(ACYasuo::StaticClass()))
-	{
-		if (Key == ESkillKey::E)
-			bUseESkill = true;
-		else if (Key == ESkillKey::R)
-			bUseRSkill = true;
-	}	
 }
 
 void USkillComponent::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill)

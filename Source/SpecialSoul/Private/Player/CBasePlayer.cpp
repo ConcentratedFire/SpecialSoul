@@ -169,12 +169,12 @@ void ACBasePlayer::InitUpgradeUI()
 	}
 }
 
-void ACBasePlayer::SkillEnd(ESkillKey Key)
+void ACBasePlayer::SetSkillUsing(ESkillKey Key, bool bUseSkill)
 {
 	if (Key == ESkillKey::E)
-		SkillComponent->bUseESkill = false;
+		SkillComponent->bUseESkill = bUseSkill;
 	else if (Key == ESkillKey::R)
-		SkillComponent->bUseRSkill = false;
+		SkillComponent->bUseRSkill = bUseSkill;
 }
 
 void ACBasePlayer::EndUpgrade()

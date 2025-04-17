@@ -17,11 +17,11 @@
 #include "Player/Components/CMovementComponent.h"
 #include "Player/Components/SkillComponent.h"
 #include "Skill/Yasuo/CYasuo_ESkill.h"
+#include "Skill/Yasuo/CYasuo_RSkill.h"
 #include "Utility/CDataSheetUtility.h"
 
 ACYasuo::ACYasuo()
 {
-	
 }
 
 void ACYasuo::BeginPlay()
@@ -33,6 +33,7 @@ void ACYasuo::BeginPlay()
 	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
 	// }
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
+	SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
 
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
@@ -58,19 +59,21 @@ void ACYasuo::Tick(float DeltaTime)
 		//CheckMoveData();
 
 		// 이동 거리가 충분하면 기류를 충전
-		float calcDistance = PS->CalcAbilityHaste(YasuoMoveInfo.StackDistance);
+		float calcDistance = CalcHaste(YasuoMoveInfo.StackDistance);
 		if (MoveDistance >= calcDistance)
 		{
 			ChargePassiveEnergy();
 			MoveDistance -= calcDistance;
 		}
 	}
-
-	// 기류가 100이 되면 회오리 발사
-	if (PassiveEnergy >= 100)
+	
+	if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
 	{
-		PassiveEnergy -= 100;
-		Anim->PlayAttackMontage();
+		// 기류가 100이 되면 회오리 발사
+		if (PassiveEnergy >= 100)
+		{
+			Anim->PlayAttackMontage();
+		}
 	}
 }
 
@@ -83,7 +86,6 @@ float ACYasuo::GetDamage(bool& OutbIsCri) const
 void ACYasuo::Attack()
 {
 	TArray<FVector> AttackVectors = GetAttackVector();
-	// Test
 	for (const FVector& Vector : AttackVectors)
 	{
 		FTransform Transform;
@@ -93,12 +95,21 @@ void ACYasuo::Attack()
 		Transform.SetRotation(Vector.Rotation().Quaternion());
 		Transform.SetScale3D(FVector(1.f));
 		ObjectPoolManager->TornadoSpawn(Transform);
-		// ACTornado* Tornado = GetWorld()->SpawnActorDeferred<ACTornado>(TornadoFactory, Transform, GetOwner());
-		// Tornado->TornadoDirection = Vector;
-		// UGameplayStatics::FinishSpawningActor(Tornado, Transform);
-		// DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + Vector * 100.f, FColor::Red, false, 0.f, 0,
-		//               10.f);
 	}
+	
+	// 회오리가 나가고 기류를 깍아주기 위해 옮김
+	PassiveEnergy -= 100;
+}
+
+void ACYasuo::WindWall()
+{
+	FTransform Transform;
+	FVector curLocation = GetActorLocation();
+	curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	Transform.SetLocation(curLocation);
+	Transform.SetRotation(GetActorRotation().Quaternion());
+	Transform.SetScale3D(FVector(1.f));
+	ObjectPoolManager->WindWallSpawn(Transform);
 }
 
 void ACYasuo::SetAttackFrontVector()
@@ -202,7 +213,7 @@ void ACYasuo::ESkill(const bool bAnimStart)
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
 
 	if (bAnimStart) return;
-	
+
 	FTransform Transform;
 	FVector curLocation = GetActorLocation();
 	curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
@@ -210,6 +221,11 @@ void ACYasuo::ESkill(const bool bAnimStart)
 	Transform.SetRotation(FQuat::Identity);
 	Transform.SetScale3D(FVector(1, 1, 1));
 	ObjectPoolManager->TornadoESpawn(Transform);
+}
+
+void ACYasuo::RSkill()
+{
+	Anim->PlayRSkillMontage();
 }
 
 void ACYasuo::ActivateSkillMovement(bool bActivate)

@@ -15,7 +15,7 @@ AMainBoss::AMainBoss()
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetRelativeScale3D(FVector(0.015f));
 
-
+	
 }
 
 void AMainBoss::Tick(float DeltaTime)
@@ -26,4 +26,6 @@ void AMainBoss::Tick(float DeltaTime)
 void AMainBoss::BeginPlay()
 {
 	Super::BeginPlay();
+	MaxHP = 5000;
+	HP = MaxHP;
 }

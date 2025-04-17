@@ -97,7 +97,8 @@ void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
 	{
-		Enemy->MyDamage(Damage);
+		// Enemy->MyDamage(Damage);
+		OwnerYasuo->MyApplyDamage(Damage, Enemy);
 	}
 	else if (auto Item = Cast<ACBaseItem>(OtherActor))
 	{

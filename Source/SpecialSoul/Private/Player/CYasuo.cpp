@@ -66,13 +66,14 @@ void ACYasuo::Tick(float DeltaTime)
 			MoveDistance -= calcDistance;
 		}
 	}
-	
+
 	if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
 	{
 		// 기류가 100이 되면 회오리 발사
-		if (PassiveEnergy >= 100)
+		if (!bAttacking && PassiveEnergy >= 100)
 		{
 			Anim->PlayAttackMontage();
+			bAttacking = true;
 		}
 	}
 }
@@ -96,9 +97,10 @@ void ACYasuo::Attack()
 		Transform.SetScale3D(FVector(1.f));
 		ObjectPoolManager->TornadoSpawn(Transform);
 	}
-	
+
 	// 회오리가 나가고 기류를 깍아주기 위해 옮김
 	PassiveEnergy -= 100;
+	bAttacking = false;
 }
 
 void ACYasuo::WindWall()

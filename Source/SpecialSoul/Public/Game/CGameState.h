@@ -81,6 +81,7 @@ public:
 	void CalcEnemyRegenTime(const FRegenData& RegenData);
 
 	void ReadExcelData(class UCDataSheetUtility* Utility);
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	int32 curStage = 1;

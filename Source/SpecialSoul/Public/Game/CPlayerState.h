@@ -191,6 +191,8 @@ private:
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;
 	UPROPERTY()
+	class AGameHUD* HUD;
+	UPROPERTY()
 	class ACBasePlayer* Player;
 
 	UPROPERTY(VisibleAnywhere, Category = "Data")
@@ -211,4 +213,11 @@ private:
 
 	void ShuffleArray(TArray<FString>& Array);
 	void RemoveArrayElement(const FString Element);
+
+private:
+	UPROPERTY(visibleAnywhere, Category = "Data")
+	int32 KillScore{0};
+
+public:
+	void AddKillScore();
 };

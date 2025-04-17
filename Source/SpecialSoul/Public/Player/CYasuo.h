@@ -42,6 +42,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	int32 PassiveEnergy = 0;
 
+	bool bAttacking = false;
+
 private: // Attack
 	UPROPERTY(EditDefaultsOnly, category=Attack)
 	TSubclassOf<class ACTornado> TornadoFactory;

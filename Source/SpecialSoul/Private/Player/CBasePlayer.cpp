@@ -177,6 +177,12 @@ void ACBasePlayer::SetSkillUsing(ESkillKey Key, bool bUseSkill)
 		SkillComponent->bUseRSkill = bUseSkill;
 }
 
+void ACBasePlayer::MyApplyDamage(float Damage, ABaseEnemy* DamagedActor)
+{
+	DamagedActor->MyDamage(Damage);
+	PS->AddKillScore();
+}
+
 void ACBasePlayer::EndUpgrade()
 {
 	if (SelectUpgradeWidget)

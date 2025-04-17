@@ -27,7 +27,7 @@ void ACObjectPoolManager::BeginPlay()
 	// 	for (int i = 0; i < 3; ++i)
 	// 		PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
 	// }, 1.5f, true);
-	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	// PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	// PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
 
 	if (auto GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode()))

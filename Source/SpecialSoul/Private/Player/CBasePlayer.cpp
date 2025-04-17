@@ -82,7 +82,7 @@ ACBasePlayer::ACBasePlayer()
 	GetCapsuleComponent()->SetCollisionProfileName(FName("Player"));
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
+
 	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 }
 
@@ -146,7 +146,7 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 	// 업그레이드 가능 항목이 없으면 진행하지 않음
 	TArray<FString> cardList = PS->ChooseUpgradeCardList();
 	if (cardList.Num() == 0) return;
-	
+
 	SelectUpgradeWidget->SetCardData(cardList);
 	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
@@ -175,6 +175,8 @@ void ACBasePlayer::SetSkillUsing(ESkillKey Key, bool bUseSkill)
 		SkillComponent->bUseESkill = bUseSkill;
 	else if (Key == ESkillKey::R)
 		SkillComponent->bUseRSkill = bUseSkill;
+
+	bAttacking = bUseSkill;
 }
 
 void ACBasePlayer::MyApplyDamage(float Damage, ABaseEnemy* DamagedActor)

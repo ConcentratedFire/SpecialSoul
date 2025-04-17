@@ -10,6 +10,7 @@
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
+#include "UI/HUD/GameHUD.h"
 #include "Utility/CDataSheetUtility.h"
 
 ACGameState::ACGameState()
@@ -22,6 +23,7 @@ void ACGameState::BeginPlay()
 	Super::BeginPlay();
 
 	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	HUD = Cast<AGameHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if (GM->DataSheetUtility)
 	{
 		GM->ReadExcelData();
@@ -43,6 +45,7 @@ void ACGameState::Tick(float DeltaSeconds)
 	{
 		if (ObjectPoolManager)
 		{
+			GamePlayTime += DeltaSeconds;
 			CurStageTime += DeltaSeconds;
 			CurRegenTime += DeltaSeconds;
 			LOG_SCREEN_IDX(0, FColor::Blue, "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f", curStage, CurStageTime, RegenTime);
@@ -83,6 +86,8 @@ void ACGameState::Tick(float DeltaSeconds)
 		curExp -= ExpInfo.XP;
 		UpdateExpInfo(ExpInfo.ID + 1);
 	}
+
+	SetTime();
 }
 
 void ACGameState::PrintExpDataMap()
@@ -147,4 +152,9 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 	{
 		(*It)->UpdatePlayerData(Level);
 	}
+}
+
+void ACGameState::SetTime()
+{
+	HUD->SetTime(GamePlayTime);
 }

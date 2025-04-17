@@ -165,4 +165,7 @@ public:
 
 public:
 	void MyApplyDamage(float Damage, class ABaseEnemy* DamagedActor);
+
+public:
+	bool bAttacking = false;
 };

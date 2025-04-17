@@ -23,3 +23,9 @@ void AGameHUD::SetKillScore(int32 KillScore)
 	if (GameWidget)
 		GameWidget->SetKillScore(KillScore);
 }
+
+void AGameHUD::SetTime(float Time)
+{
+	if (GameWidget)
+		GameWidget->SetTime(Time);
+}

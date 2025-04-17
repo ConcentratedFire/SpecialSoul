@@ -17,6 +17,7 @@ class SPECIALSOUL_API AGameHUD : public AHUD
 
 public:
 	void SetKillScore(int32 KillScore);
+	void SetTime(float Time);
 	
 public:
 	//AGameHUD();
@@ -26,6 +27,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameWidget> GameWidgetClass;
 
+	UPROPERTY()
 	TObjectPtr<UGameWidget> GameWidget;
-	// TObjectPtr<UGameWidget> GameWidget;
 };

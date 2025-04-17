@@ -177,7 +177,7 @@ bool ABaseEnemy::GetIsPlayerInRange(const float Range) const
 
 	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, MoveDistance, objectTypes, false,
 																 ActorsToIgnore,
-																 EDrawDebugTrace::ForDuration,
+																 EDrawDebugTrace::None,
 																 HitResults,
 																 true);
 	

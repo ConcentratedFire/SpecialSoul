@@ -36,4 +36,14 @@ protected:
 	UPROPERTY()
 	class APawn* MyPawn;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	bool bUseFlowField {true};
+
+	UPROPERTY()
+	TObjectPtr<class AFlowFieldActor> FlowField;
+
+	bool FindFlowField();
+
+	UPROPERTY()
+	class UFlowFieldPFStrategy* FFStrategy;
 };

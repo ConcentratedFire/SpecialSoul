@@ -7,12 +7,13 @@
 #include "PathFinding/FlowFieldActor.h"
 
 
-void UFlowFieldPFStrategy::Initialize(ACharacter* InCharacter, AFlowFieldActor* InFlowField)
+void UFlowFieldPFStrategy::Initialize(AFlowFieldActor* InFlowField, ACharacter* InCharacter)
 {
-	ControlledCharacter = InCharacter;
 	FlowField = InFlowField;
+	
+	if (InCharacter)
+		ControlledCharacter = InCharacter;
 }
-
 
 void UFlowFieldPFStrategy::MoveTo(const FVector& InTargetLocation)
 {
@@ -21,7 +22,13 @@ void UFlowFieldPFStrategy::MoveTo(const FVector& InTargetLocation)
 
 void UFlowFieldPFStrategy::TickMove(float DeltaTime)
 {
-	FVector2D MoveDir = FlowField->FindFlowDirection(ControlledCharacter->GetActorLocation());
+	if (!ControlledCharacter) return;
+	
+	FVector2D MoveDir = GetFlowFieldDirection(ControlledCharacter->GetActorLocation());
 	ControlledCharacter->AddMovementInput(FVector(MoveDir.X, MoveDir.Y, 0.f));
 }
 
+FVector2D UFlowFieldPFStrategy::GetFlowFieldDirection(const FVector& InLocation)
+{
+	return FlowField->FindFlowDirection(InLocation);
+}

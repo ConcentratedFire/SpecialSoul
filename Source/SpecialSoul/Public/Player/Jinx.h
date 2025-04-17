@@ -40,8 +40,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	TObjectPtr<ACPlayerController> PC;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	TObjectPtr<USkillComponent> SkillComponent;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
+	// TObjectPtr<USkillComponent> SkillComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FJinxAttackData AttackData; // 기본공격 데이터

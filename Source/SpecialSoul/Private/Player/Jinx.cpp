@@ -32,7 +32,7 @@ AJinx::AJinx()
 	
 	// GetCharacterMovement()->bOrientRotationToMovement = false;
 	
-	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
+	// SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 	//GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;

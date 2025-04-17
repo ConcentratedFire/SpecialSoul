@@ -21,18 +21,32 @@ public:
 	virtual void UseSkill(ACBasePlayer* Caster) override;
 
 private:
-	void StartUseSkill(ACYasuo* Yasuo);
-	void EndUseSkill(ACYasuo* Yasuo);
+	UPROPERTY()
+	class ACYasuo* Yasuo;
+	
+	void StartUseSkill();
+	void EndUseSkill();
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	float MoveDist = 300.f;
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	float MoveThreshold = 10.f;
-	
+
 	FTimerHandle CastingTimer;
 	float CastingTime = 0.1f;
 
 	FTimerHandle FireTimer;
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	float FireDelay = 0.1f;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	int32 MaxChargeCount{3};
+	int32 SkillChargeCount{MaxChargeCount};
+	bool bIsESkillActive = false;
+	float ChargeCooldown = 20.f;
+	FTimerHandle ChargeTimerHandle; // 충전 타이머
+
+	void StartChargeTimer();
+	UFUNCTION()
+	void OnChargeCompleted();
 };

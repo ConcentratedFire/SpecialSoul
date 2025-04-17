@@ -12,6 +12,7 @@
 #include "Item/CItemBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AttackActors/CTornado.h"
+#include "Player/AttackActors/CTornado_E.h"
 #include "CObjectPoolManager.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FEnemyGotoPool);
@@ -41,6 +42,7 @@ public:
 	void ReturnEnemy(ACMeleeEnemy* Enemy);
 	void ReturnEnemy(ARangedEnemy* Enemy);
 	void ReturnTornado(ACTornado* Tornado);
+	void ReturnTornadoE(ACTornado_E* Tornado);
 	void ReturnExp(ACExp* EXP);
 	void ReturnItemBox(ACItemBox* ItemBox);
 	void ReturnExpMagnet(ACExpMagnet* ExpMagnet);
@@ -48,6 +50,7 @@ public:
 	// Tornado
 	void MakeTornadoPool(AActor* NewOwner);
 	void TornadoSpawn(FTransform SpawnTransform);
+	void TornadoESpawn(FTransform SpawnTransform);
 
 	// Object Setting
 	void ExpSpawn(FTransform SpawnTransform);
@@ -63,6 +66,8 @@ private:
 	TSubclassOf<ABaseEnemy> RangeEnemy;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACTornado> TornadoActor;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACTornado_E> TornadoEActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACExp> ExpActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -80,6 +85,9 @@ private: // Object Pool
 	// 한번에 스폰시킬 회오리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendTornadoPoolSize = 100;
+	// 한번에 스폰시킬 회오리수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendTornadoEPoolSize = 10;
 	// 한번에 스폰시킬 경험치수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendExpPoolSize = 100;
@@ -99,6 +107,9 @@ private: // Object Pool
 	// 회오리 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACTornado*> TornadoPool;
+	// 자석 아이템 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACTornado_E*> TornadoEPool;
 	// 경험치 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACExp*> ExpPool;

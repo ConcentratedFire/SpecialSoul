@@ -53,16 +53,18 @@ void ACGameState::Tick(float DeltaSeconds)
 				if (RegenCount > CurRegenCount)
 				{
 					++CurRegenCount;
-					//ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
+					ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
 				}
 
-				// if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
-				// {
-				// }
-				//
-				// if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
-				// {
-				// }
+				if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
+				{
+					ObjectPoolManager->MiddleBossSpawn();
+					++MiddleBossCount;
+				}
+				
+				if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
+				{
+				}
 
 				CurRegenTime -= RegenTime;
 			}

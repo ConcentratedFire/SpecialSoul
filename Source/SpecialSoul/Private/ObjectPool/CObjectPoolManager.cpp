@@ -46,6 +46,9 @@ void ACObjectPoolManager::InitSettings()
 
 	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	InitPool(RangePool, AppendEnemyPoolSize, RangeEnemy);
+
+	InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
+	InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
 }
 
 void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
@@ -113,6 +116,16 @@ void ACObjectPoolManager::ReturnExpMagnet(ACExpMagnet* ExpMagnet)
 	ExpMagnet->SetActorLocation(PoolLocation);
 
 	ItemMagnetPool.Push(ExpMagnet);
+}
+
+void ACObjectPoolManager::ReturnMiddleBossBullet(ACMiddleBossBullet* MiddleBossBullet)
+{
+	MiddleBossBullet->SetActorEnableCollision(false);
+	MiddleBossBullet->SetActorHiddenInGame(true);
+	MiddleBossBullet->SetActorTickEnabled(false);
+	MiddleBossBullet->SetActorLocation(PoolLocation);
+
+	MiddleBossBulletPool.Push(MiddleBossBullet);
 }
 
 void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
@@ -230,4 +243,14 @@ void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
 		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	else
 		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
+}
+
+void ACObjectPoolManager::MiddleBossSpawn()
+{
+	PlaceEnemyRandomPlace(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
+}
+
+void ACObjectPoolManager::MiddleBossBulletSpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor, SpawnTransform);
 }

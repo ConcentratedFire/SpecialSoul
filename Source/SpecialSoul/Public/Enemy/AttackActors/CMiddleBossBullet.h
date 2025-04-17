@@ -15,6 +15,11 @@ public:
 	// Sets default values for this actor's properties
 	ACMiddleBossBullet();
 
+public:
+	UPROPERTY()
+	class ACObjectPoolManager* ObjectPoolManager;
+	void SetManager(class ACObjectPoolManager* Manager) { ObjectPoolManager = Manager; }
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -22,6 +27,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 	
 	UPROPERTY(EditAnywhere)
 	FVector StartLocation;

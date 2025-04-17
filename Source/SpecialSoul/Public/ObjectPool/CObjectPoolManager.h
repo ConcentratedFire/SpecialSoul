@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "SpecialSoul.h"
 #include "Enemy/CMeleeEnemy.h"
+#include "Enemy/CMiddleBoss.h"
+#include "Enemy/AttackActors/CMiddleBossBullet.h"
 #include "Enemy/Ranged/RangedEnemy.h"
 #include "GameFramework/Actor.h"
 #include "Item/CExp.h"
@@ -34,7 +36,7 @@ protected:
 
 public:
 	void InitSettings();
-	
+
 public:
 	FEnemyOutFromPool EnemyOutFromPool_Dele;
 	FEnemyGotoPool EnemyGotoPool_Dele;
@@ -47,6 +49,7 @@ public:
 	void ReturnExp(ACExp* EXP);
 	void ReturnItemBox(ACItemBox* ItemBox);
 	void ReturnExpMagnet(ACExpMagnet* ExpMagnet);
+	void ReturnMiddleBossBullet(ACMiddleBossBullet* MiddleBossBullet);
 
 	// Tornado
 	void MakeTornadoPool(AActor* NewOwner);
@@ -62,6 +65,8 @@ public:
 
 	// Enemy Setting
 	void EnemySpawn(bool bIsMelee);
+	void MiddleBossSpawn();
+	void MiddleBossBulletSpawn(FTransform SpawnTransform);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -81,10 +86,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACExpMagnet> ItemMagnetActor;
 
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACMiddleBoss> MiddleBossActor;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ACMiddleBossBullet> MiddleBossBulletActor;
+
 private: // Object Pool
 	UPROPERTY(EditDefaultsOnly, Category="ObjectPool")
 	FVector PoolLocation = FVector(-1000, 2000, 500);
-	
+
 	// 한번에 스폰시킬 Enemy 마리수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendEnemyPoolSize = 100;
@@ -107,6 +117,13 @@ private: // Object Pool
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendItemMagnetSize = 10;
 
+	// 한번에 스폰시킬 중간보스 개수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendMiddleBossSize = 2;
+	// 한번에 스폰시킬 중간보스 투사체 개수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendMiddleBossBulletSize = 10;
+	
 	// 근거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ABaseEnemy*> MeleePool;
@@ -131,6 +148,13 @@ private: // Object Pool
 	// 자석 아이템 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACExpMagnet*> ItemMagnetPool;
+
+	// 중간보스 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACMiddleBoss*> MiddleBossPool;
+	// 중간보스 투사체 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ACMiddleBossBullet*> MiddleBossBulletPool;
 
 private: // ItemBox	
 	UPROPERTY(EditAnywhere, Category = "ObjectPool|ItemBox")

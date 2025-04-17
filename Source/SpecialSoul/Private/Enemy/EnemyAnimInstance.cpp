@@ -29,14 +29,7 @@ void UEnemyAnimInstance::AnimNotify_EnemyAttack()
 	OwnerEnemy = Cast<ABaseEnemy>(OwnerPawn);
 
 	if (!OwnerEnemy || !ProjectileActor) return;
-	
-	FVector SpawnPoint = OwnerEnemy->GetActorLocation();
-	SpawnPoint += OwnerEnemy->GetActorForwardVector() * 300;
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerEnemy;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	
-	GetWorld()->SpawnActor<AActor>(ProjectileActor, SpawnPoint, OwnerEnemy->GetActorRotation(), SpawnParams);
+
 }
 
 void UEnemyAnimInstance::AnimNotify_DieEnd()

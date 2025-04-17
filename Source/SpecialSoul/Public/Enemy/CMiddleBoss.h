@@ -16,4 +16,9 @@ class SPECIALSOUL_API ACMiddleBoss : public ABaseEnemy
 
 private:
 	ACMiddleBoss();
+
+public:
+	void Attack();
+
+	virtual void DieEndAction() override;
 };

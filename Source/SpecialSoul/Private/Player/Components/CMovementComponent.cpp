@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "SpecialSoul.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/CBasePlayer.h"
 #include "Player/CPlayerController.h"
 #include "Player/CYasuo.h"
@@ -64,7 +65,7 @@ void UCMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	CRPC_RotationToMouseCursor();
 
 	// 플레이중인 캐릭터가 야스오 일때, 이동거리를 체크하고 기력을 충전시킴
-	if (YasuoCharacer)
+	if (YasuoCharacer && YasuoCharacer->IsLocallyControlled())
 	{
 		CRPC_CheckMoveDistance();
 	}
@@ -84,6 +85,13 @@ void UCMovementComponent::Move(const FInputActionValue& Value)
 	FVector direction(v.X, v.Y, 0);
 	// BaseOwnerCharacter->AddMovementInput(BaseOwnerCharacter->GetTransform().TransformVector(direction));
 	BaseOwnerCharacter->AddMovementInput(direction);
+}
+
+void UCMovementComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UCMovementComponent, BeforeLocation);
 }
 
 void UCMovementComponent::CRPC_RotationToMouseCursor_Implementation()
@@ -126,11 +134,6 @@ void UCMovementComponent::CRPC_CheckMoveDistance_Implementation()
 	FVector CurrentLocation = YasuoCharacer->GetActorLocation();
 	float Distance = FVector::Dist(CurrentLocation, BeforeLocation);
 	BeforeLocation = CurrentLocation;
-	SRPC_AddMoveDistance(Distance);
-}
-
-void UCMovementComponent::SRPC_AddMoveDistance_Implementation(const float Dist)
-{
 	if (!YasuoCharacer) return;
-	YasuoCharacer->MoveDistance += Dist;
+	YasuoCharacer->MoveDistance += Distance;
 }

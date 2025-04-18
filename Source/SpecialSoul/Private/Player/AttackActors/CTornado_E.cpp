@@ -15,6 +15,8 @@ ACTornado_E::ACTornado_E()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	SetReplicateMovement(true);
 
 	TornadoBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TornadoBox"));
 	TornadoBox->SetBoxExtent(FVector(80, 80, 32));
@@ -50,10 +52,8 @@ void ACTornado_E::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetActorRotation(GetActorRotation() + Rot);
-	AppendYaw += Rot.Yaw;
-	if (AppendYaw >= 360)
-		ObjectPoolManager->ReturnTornadoE(this);
+	if (!OwnerYasuo->IsLocallyControlled()) return;
+	SRPC_MoveTornado();
 }
 
 void ACTornado_E::SetActorHiddenInGame(bool bNewHidden)
@@ -66,7 +66,6 @@ void ACTornado_E::SetActorHiddenInGame(bool bNewHidden)
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
 		SetActorLocation(UpLocation);
-		// LOG_S(Warning, TEXT("Tornado E Hidden"));
 		Damage = OwnerYasuo->GetDamage(IsCri);
 	}
 }
@@ -75,6 +74,8 @@ void ACTornado_E::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                      const FHitResult& SweepResult)
 {
+	if (!HasAuthority()) return;
+
 	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
 	{
 		// Enemy->MyDamage(Damage);
@@ -92,4 +93,12 @@ void ACTornado_E::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACTornado_E, Damage);
+}
+
+void ACTornado_E::SRPC_MoveTornado_Implementation()
+{
+	SetActorRotation(GetActorRotation() + Rot);
+	AppendYaw += Rot.Yaw;
+	if (AppendYaw >= 360)
+		ObjectPoolManager->ReturnTornadoE(this);
 }

@@ -59,6 +59,8 @@ private:
 	void SetInputBinding(class UEnhancedInputComponent* Input);
 	
 	void CastSkill(ESkillKey Key);
+	UFUNCTION(Server, Reliable)
+	void SRPC_CastSkill(ESkillKey Key);
 	
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<UInputAction> IA_ESkill;

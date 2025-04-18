@@ -57,10 +57,13 @@ private:
 private: // Yasuo Move Distance Check
 	UPROPERTY()
 	class ACYasuo* YasuoCharacer;
+
+	UPROPERTY(Replicated)
 	FVector BeforeLocation = FVector::ZeroVector;
 
 	UFUNCTION(Client, Reliable)
 	void CRPC_CheckMoveDistance();
-	UFUNCTION(Server, Reliable)
-	void SRPC_AddMoveDistance(const float Dist);
+
+	private:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

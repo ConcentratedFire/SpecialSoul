@@ -55,4 +55,8 @@ private:
 
 private:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+	UFUNCTION(server, Unreliable)
+	void SRPC_MoveTornado();
 };

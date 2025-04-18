@@ -150,6 +150,8 @@ void ACBasePlayer::Tick(float DeltaTime)
 	{
 		PS = Cast<ACPlayerState>(GetPlayerState());
 	}
+	if (!PC)
+		PC = Cast<ACPlayerController>(GetController());
 }
 
 // Called to bind functionality to input

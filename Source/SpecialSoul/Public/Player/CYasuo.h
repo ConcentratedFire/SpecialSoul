@@ -25,8 +25,10 @@ private:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public: // Using Charge Enemy
-	UPROPERTY(VisibleAnywhere, Category = "Data|MoveDistance", Replicated)
+	UPROPERTY(VisibleAnywhere, Category = "Data|MoveDistance", ReplicatedUsing=OnRep_MoveDist)
 	float MoveDistance = 0.0f;
+	UFUNCTION()
+	void OnRep_MoveDist();
 
 	float GetDamage(bool& OutbIsCri) const;
 	int32 GetRange() const { return YasuoStat.ProjectileRange; }
@@ -71,7 +73,7 @@ private: // Passive Energy
 	const int32 PassiveEnergyRegen = 4;
 	FTimerHandle ChargePassiveEnergyTimer;
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Client, Reliable)
 	void SRPC_ChargePassiveEnergy();
 	UFUNCTION(Server, Reliable)
 	void SRPC_ChargePassiveEnergy_Timer();
@@ -80,6 +82,8 @@ private: // Passive Energy
 
 public: // E Skill
 	void ESkill(const bool bAnimStart);
+	UFUNCTION(NetMulticast, Reliable)
+	void PlayESkillAnim(const bool bAnimStart);
 	void RSkill();
 	void ActivateSkillMovement(bool bActivate);
 

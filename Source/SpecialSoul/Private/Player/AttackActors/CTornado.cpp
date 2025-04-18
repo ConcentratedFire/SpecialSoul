@@ -60,7 +60,7 @@ void ACTornado::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
 
-	if (!bNewHidden)
+	if (HasAuthority() &&!bNewHidden)
 	{
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
@@ -85,6 +85,8 @@ void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                    const FHitResult& SweepResult)
 {
+	if (!HasAuthority()) return;
+	
 	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
 	{
 		// Enemy->MyDamage(Damage);

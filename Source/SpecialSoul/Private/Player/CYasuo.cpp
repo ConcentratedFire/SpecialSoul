@@ -30,10 +30,12 @@ void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
+	SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>(this));
 	// SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
 
-	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::SRPC_ChargePassiveEnergy_Timer, 1.f, true);
+	if (HasAuthority())
+		GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::SRPC_ChargePassiveEnergy_Timer, 1.f,
+		                                true);
 
 	if (HasAuthority() && IsLocallyControlled() && ObjectPoolManager)
 	{
@@ -69,8 +71,9 @@ void ACYasuo::Tick(float DeltaTime)
 	PrintNetLog();
 
 	// 기본 공격
-	if (YasuoMoveInfo.ID > 0)
+	if (IsLocallyControlled() && YasuoMoveInfo.ID > 0)
 	{
+		// LOG_S(Warning, TEXT("YasuoMoveInfo.ID : %d"), YasuoMoveInfo.ID);
 		// 이동 거리가 충분하면 기류를 충전
 		SRPC_ChargePassiveEnergy();
 
@@ -90,6 +93,11 @@ void ACYasuo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ACYasuo, AttackFrontVector);
 	DOREPLIFETIME(ACYasuo, MoveDistance);
+}
+
+void ACYasuo::OnRep_MoveDist()
+{
+	// LOG_S(Warning, TEXT("Move Dist %.2f"), MoveDistance);
 }
 
 float ACYasuo::GetDamage(bool& OutbIsCri) const
@@ -192,8 +200,8 @@ void ACYasuo::MRPC_EndDefaultAttack_Implementation()
 void ACYasuo::SRPC_ChargePassiveEnergy_Implementation()
 {
 	if (!PC) return;
-
 	float calcDistance = PC->CalcHaste(YasuoMoveInfo.StackDistance);
+	// LOG_S(Warning, TEXT("calcDistance %.2f"), calcDistance);
 	if (MoveDistance >= calcDistance)
 	{
 		// 4의 기류를 획득
@@ -215,8 +223,8 @@ void ACYasuo::MRPC_ChargePassiveEnergy_Implementation(const int32 NewEnergy)
 
 void ACYasuo::ESkill(const bool bAnimStart)
 {
-	// LOG_S(Warning, TEXT("ESkill"));
-	Anim->PlayESkillMontage(bAnimStart);
+	LOG_S(Warning, TEXT("ESkill"));
+	PlayESkillAnim(bAnimStart);
 	GetCharacterMovement()->GravityScale = bAnimStart ? 0.f : 1.f;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
 
@@ -229,6 +237,11 @@ void ACYasuo::ESkill(const bool bAnimStart)
 	Transform.SetRotation(FQuat::Identity);
 	Transform.SetScale3D(FVector(1, 1, 1));
 	ObjectPoolManager->TornadoESpawn(Transform);
+}
+
+void ACYasuo::PlayESkillAnim_Implementation(const bool bAnimStart)
+{
+	Anim->PlayESkillMontage(bAnimStart);
 }
 
 void ACYasuo::RSkill()

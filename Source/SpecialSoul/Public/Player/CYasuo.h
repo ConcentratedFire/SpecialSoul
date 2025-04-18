@@ -36,7 +36,6 @@ public:
 	void WindWall();
 
 private:
-	
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	int32 PassiveEnergy = 0;
 
@@ -54,13 +53,13 @@ public:
 	void SRPC_ReplicateAttackVector(FVector AttackDir);
 	UFUNCTION()
 	void OnRep_RotateArrow();
-	
+
 	TArray<FVector> GetAttackVector();
 
 private: // Anim
 	UPROPERTY()
 	class UCYasuoAnim* Anim;
- 
+
 private: // Passive Energy
 	const int32 PassiveEnergyMax = 100;
 	const int32 PassiveEnergyRegen = 4;
@@ -70,7 +69,7 @@ private: // Passive Energy
 	void ChargePassiveEnergy();
 
 private: // Passive Movement
-	void CheckMoveData();
+	void UpdateCheckMoveData();
 
 private:
 	virtual void RotateArrow() override;

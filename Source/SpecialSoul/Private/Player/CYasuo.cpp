@@ -33,8 +33,6 @@ void ACYasuo::BeginPlay()
 	// SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
 	// SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
 
-	// Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
-
 	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::ChargePassiveEnergy, 1.f, true);
 
 	// if (ObjectPoolManager)
@@ -55,21 +53,21 @@ void ACYasuo::Tick(float DeltaTime)
 	if (IsLocallyControlled())
 		CRPC_SetAttackFrontVector();
 
-	// // 데이터가 들어왔는지 체크
-	// if (PS && PS->YasuoMoveDataMap.Num() > 0)
-	// {
-	// 	// 데이터 업데이트 체크
-	// 	//CheckMoveData();
-	//
-	// 	// 이동 거리가 충분하면 기류를 충전
-	// 	float calcDistance = CalcHaste(YasuoMoveInfo.StackDistance);
-	// 	if (MoveDistance >= calcDistance)
-	// 	{
-	// 		ChargePassiveEnergy();
-	// 		MoveDistance -= calcDistance;
-	// 	}
-	// }
-	//
+	// 데이터가 들어왔는지 체크
+	if (PS && PS->YasuoMoveDataMap.Num() > 0)
+	{
+		// 데이터 업데이트 체크
+		//CheckMoveData();
+	
+		// 이동 거리가 충분하면 기류를 충전
+		float calcDistance = CalcHaste(YasuoMoveInfo.StackDistance);
+		if (MoveDistance >= calcDistance)
+		{
+			ChargePassiveEnergy();
+			MoveDistance -= calcDistance;
+		}
+	}
+	
 	// if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
 	// {
 	// 	// 기류가 100이 되면 회오리 발사
@@ -183,10 +181,9 @@ void ACYasuo::ChargePassiveEnergy()
 	PassiveEnergy = NewEnergy;
 }
 
-void ACYasuo::CheckMoveData()
+void ACYasuo::UpdateCheckMoveData()
 {
-	if (GS->GetCurLevel() > YasuoMoveInfo.RangeTo)
-		PC->UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
+	PC->GetNextLevelYasuoMoveStat();
 }
 
 void ACYasuo::RotateArrow()

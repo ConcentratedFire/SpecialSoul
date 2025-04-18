@@ -165,10 +165,13 @@ public:
 	bool bAttacking = false;
 
 public:
-	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat", Replicated)
 	FYasuoAttackData YasuoStat;
-	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat", Replicated)
 	FYasuoMoveData YasuoMoveInfo;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data", Replicated)
 	FJinxAttackData JinxAttackData; // 기본공격 데이터
+
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

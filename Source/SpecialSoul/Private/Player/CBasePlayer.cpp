@@ -23,6 +23,7 @@
 #include "Utility/CDataSheetUtility.h"
 #include "Data/JinxData.h"
 #include "Data/CYasuoData.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
 #include "Player/Components/SkillComponent.h"
@@ -117,17 +118,17 @@ void ACBasePlayer::BeginPlay()
 
 void ACBasePlayer::PrintNetLog()
 {
-	FString logStr = TEXT("Data Count : 0"); // 기본값 설정
+	FString logStr = TEXT("Damage : 0"); // 기본값 설정
 
 	if (PS != nullptr)
 	{
 		int32 dataCount =0;
 		if (this->IsA(ACYasuo::StaticClass()))
-			dataCount = PS->YasuoAttackDataMap.Num();
+			dataCount = YasuoStat.Damage;
 		else if (this->IsA(AJinx::StaticClass()))
-			dataCount = PS->JinxAttackDataMap.Num();
+			dataCount = JinxAttackData.Damage;
 		
-		logStr = FString::Printf(TEXT("Data Count : %d"), dataCount);
+		logStr = FString::Printf(TEXT("Damage : %d"), dataCount);
 	}
 	else
 	{
@@ -182,6 +183,11 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+	if (this->IsA(ACYasuo::StaticClass()))
+	{
+		PC->GetNextLevelYasuoMoveStat();
+	}
 }
 
 void ACBasePlayer::InitUpgradeUI()
@@ -214,6 +220,14 @@ void ACBasePlayer::MyApplyDamage(float Damage, ABaseEnemy* DamagedActor)
 {
 	DamagedActor->MyDamage(Damage);
 	PS->AddKillScore();
+}
+
+void ACBasePlayer::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACBasePlayer, YasuoStat);
+	DOREPLIFETIME(ACBasePlayer, YasuoMoveInfo);
+	DOREPLIFETIME(ACBasePlayer, JinxAttackData);
 }
 
 void ACBasePlayer::EndUpgrade()

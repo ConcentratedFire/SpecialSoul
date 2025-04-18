@@ -38,4 +38,7 @@ private:
 public:
 	void UpgradeWeapon(int32 Level);
 	void UpdateYasuoMoveStat(int32 Level);
+
+public: // For Yasuo
+	void GetNextLevelYasuoMoveStat();
 };

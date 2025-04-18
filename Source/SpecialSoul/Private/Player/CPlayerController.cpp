@@ -76,3 +76,9 @@ void ACPlayerController::UpdateYasuoMoveStat(int32 Level)
 	MyPlayer->YasuoMoveInfo.RangeTo = StatData.RangeTo;
 	MyPlayer->YasuoMoveInfo.StackDistance = StatData.StackDistance;
 }
+
+void ACPlayerController::GetNextLevelYasuoMoveStat()
+{
+	if (GS->GetCurLevel() > MyPlayer->YasuoMoveInfo.RangeTo)
+		UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
+}

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CPlayerController.h"
 #include "Components/SkillComponent.h"
 #include "Player/CBasePlayer.h"
 #include "CYasuo.generated.h"
@@ -75,4 +76,7 @@ public: // E Skill
 	void ESkill(const bool bAnimStart);
 	void RSkill();
 	void ActivateSkillMovement(bool bActivate);
+
+public:
+	float CalcHaste(float CurHaste) { return PC->CalcHaste(CurHaste); }
 };

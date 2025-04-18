@@ -16,11 +16,12 @@ class SPECIALSOUL_API ARangedEnemyProjectile : public AProjectile
 
 public:
 	ARangedEnemyProjectile();
-	virtual void Tick(float DeltaSeconds) override;
-
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	void SetManager(class ACObjectPoolManager* Manager) { ObjectPoolManager = Manager; }
 
 protected:
-	virtual void BeginPlay() override;
-	virtual void ApplyLifeTime() override;
-	virtual void InitMoveComp() override;
+	virtual void OnDestroy() override;
+	
+	UPROPERTY()
+	TObjectPtr<ACObjectPoolManager> ObjectPoolManager;
 };

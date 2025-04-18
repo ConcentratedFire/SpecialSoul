@@ -19,9 +19,9 @@ class SPECIALSOUL_API AMinigunBullet : public AProjectile
 public:
 	AMinigunBullet();
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaSeconds) override;
 protected:
-	virtual void ApplyLifeTime() override;
+	//virtual void ApplyLifeTime() override;
 	
 	UFUNCTION()
 	void OnMeshCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,

@@ -6,6 +6,7 @@
 #include "Enemy/BaseEnemy.h"
 #include "RangedEnemy.generated.h"
 
+class ARangedEnemyProjectile;
 class AProjectile;
 class IPathFindingStrategy;
 class AFlowFieldActor;
@@ -33,11 +34,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	TObjectPtr<UEnemyFSMComponent> FSMComponent;
 
-	// UFUNCTION()
-	// void OnFSMStateChanged(EEnemyState NewState);
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-	TSubclassOf<AProjectile> ProjectileActor;
+	TSubclassOf<ARangedEnemyProjectile> ProjectileActor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM", meta = (AllowPrivateAccess = "true"))
 	float AttackRange { 100.f};

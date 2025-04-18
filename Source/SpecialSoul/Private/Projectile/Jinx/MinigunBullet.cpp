@@ -44,12 +44,17 @@ void AMinigunBullet::BeginPlay()
 	
 }
 
-void AMinigunBullet::ApplyLifeTime()
+void AMinigunBullet::Tick(float DeltaSeconds)
 {
-	// 사정거리 / 속도 = 수명 (초 단위)
-	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
-	SetLifeSpan(LifeSpan); // 수명 설정
+	Super::Tick(DeltaSeconds);
 }
+
+// void AMinigunBullet::ApplyLifeTime()
+// {
+// 	// 사정거리 / 속도 = 수명 (초 단위)
+// 	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
+// 	SetLifeSpan(LifeSpan); // 수명 설정
+// }
 
 void AMinigunBullet::OnMeshCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

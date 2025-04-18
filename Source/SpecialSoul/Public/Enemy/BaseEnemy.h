@@ -96,10 +96,11 @@ private: // Montage CallBack
 	UFUNCTION()
 	void OnMyControllerTickOff();
 
-protected:
+public:
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
+protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Enemy")
 	bool bIsDead{false};
 

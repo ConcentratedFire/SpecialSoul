@@ -10,6 +10,8 @@
 
 AProjectile::AProjectile()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	RootSceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(RootSceneComp);
 
@@ -23,9 +25,6 @@ AProjectile::AProjectile()
 	TailVfx = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TailVFX"));
 	TailVfx->SetupAttachment(RootComponent);
 	
-	// HitVfx = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ExplosionVFX"));
-	// HitVfx->SetupAttachment(RootComponent);
-	
 	 // 이벤트 세팅
 	MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::Hit);
 }
@@ -33,10 +32,18 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	InitMoveComp();
-	
-	ApplyLifeTime();
+}
+
+void AProjectile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FVector CurLocation = GetActorLocation();
+	CurrentDistance = FVector::Dist(StartLocation, CurLocation);
+	if (CurrentDistance >= AttackRange)
+	{
+		OnDestroy(); // 제거
+	}
 }
 
 void AProjectile::InitMoveComp()
@@ -50,11 +57,8 @@ void AProjectile::InitMoveComp()
 	ProjectileMovementComp->Activate(true);
 }
 
-void AProjectile::ApplyLifeTime()
-{ }
-
 void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                      int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (HitVfxAsset)
 	{
@@ -63,8 +67,13 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 	Penetration--;
 	if (Penetration <= 0)
 	{
-		Destroy();
+		OnDestroy();
 	}
+}
+
+void AProjectile::OnDestroy()
+{
+	Destroy();
 }
 
 void AProjectile::ApplyCasterStat(ACBasePlayer* Caster)

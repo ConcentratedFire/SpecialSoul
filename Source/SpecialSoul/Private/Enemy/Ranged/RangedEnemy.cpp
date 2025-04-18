@@ -34,20 +34,11 @@ ARangedEnemy::ARangedEnemy()
 	}
 	GetMesh()->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
 	GetCapsuleComponent()->SetCapsuleSize(70.f, 90.f);
-
-	
 }
 
 void ARangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (FSMComponent)
-	{
-		//FSMComponent->OnStateChange.AddDynamic(this, &ARangedEnemy::OnFSMStateChanged);
-		//FSMComponent->OnAttack.AddDynamic(this, &ARangedEnemy::HandleAttack);
-		//FSMComponent->OnDie.AddDynamic(this, &ARangedEnemy::HandleDie);
-	}
 }
 
 void ARangedEnemy::FindTarget()

@@ -18,6 +18,8 @@
 #include "Player/AttackActors/CWindWall.h"
 #include "CObjectPoolManager.generated.h"
 
+class ARangedEnemyProjectile;
+class AMinigunBullet;
 DECLARE_MULTICAST_DELEGATE(FEnemyGotoPool);
 DECLARE_MULTICAST_DELEGATE(FEnemyOutFromPool);
 
@@ -51,6 +53,7 @@ public:
 	void ReturnItemBox(ACItemBox* ItemBox);
 	void ReturnExpMagnet(ACExpMagnet* ExpMagnet);
 	void ReturnMiddleBossBullet(ACMiddleBossBullet* MiddleBossBullet);
+	void ReturnRangedEnemyProjectile(ARangedEnemyProjectile* Projectile);
 
 	// Tornado
 	void MakeTornadoPool(AActor* NewOwner);
@@ -68,12 +71,15 @@ public:
 	void EnemySpawn(bool bIsMelee);
 	void MiddleBossSpawn();
 	void MiddleBossBulletSpawn(FTransform SpawnTransform);
+	
+	// Enemy Projectile
+	void RangedEnemyProjectileSpawn(FTransform SpawnTransform);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ABaseEnemy> MeleeEnemy;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
-	TSubclassOf<ABaseEnemy> RangeEnemy;
+	TSubclassOf<ABaseEnemy> RangedEnemy;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACTornado> TornadoActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -86,6 +92,8 @@ private:
 	TSubclassOf<ACItemBox> ItemBoxActor;
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACExpMagnet> ItemMagnetActor;
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	TSubclassOf<ARangedEnemyProjectile> RangedEnemyProjectileActor;
 
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	TSubclassOf<ACMiddleBoss> MiddleBossActor;
@@ -117,6 +125,9 @@ private: // Object Pool
 	// 한번에 스폰시킬 자석 아이템 개수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendItemMagnetSize = 10;
+	// 한번에 스폰시킬 원거리 미니언 투사체 개수
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
+	int32 AppendRangedMinionProjectileSize = 20;
 
 	// 한번에 스폰시킬 중간보스 개수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
@@ -149,6 +160,9 @@ private: // Object Pool
 	// 자석 아이템 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ACExpMagnet*> ItemMagnetPool;
+	// 원거리 미니언 투사체 풀
+	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
+	TArray<ARangedEnemyProjectile*> RangedEnemyProjectilePool;
 
 	// 중간보스 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")

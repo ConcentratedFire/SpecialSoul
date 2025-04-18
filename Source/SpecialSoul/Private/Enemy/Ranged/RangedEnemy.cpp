@@ -3,6 +3,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Enemy/Components/EnemyFSMComponent.h"
 #include "Enemy/Ranged/RangedEnemyAIController.h"
+#include "ObjectPool/CObjectPoolManager.h"
 
 ARangedEnemy::ARangedEnemy()
 {
@@ -12,6 +13,16 @@ ARangedEnemy::ARangedEnemy()
 	TEXT("/Script/Engine.Blueprint'/Game/Enemy/Ranged/BP_RangedEnemyAIController.BP_RangedEnemyAIController_C'"));
 	if (tempController.Succeeded())
 		AIControllerClass = tempController.Class;
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tmpAttackMontage(
+		TEXT("/Script/Engine.AnimMontage'/Game/Enemy/Ranged/Anim/AM_RangedEnemy_Attack.AM_RangedEnemy_Attack'"));
+	if (tmpAttackMontage.Succeeded())
+		AttackMontage = tmpAttackMontage.Object;
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tmpDieMontage(
+		TEXT("/Script/Engine.AnimMontage'/Game/Enemy/Ranged/Anim/AM_RangedEnemy_Die.AM_RangedEnemy_Die'"));
+	if (tmpDieMontage.Succeeded())
+		DieMontage = tmpDieMontage.Object;
 	
 	FSMComponent = CreateDefaultSubobject<UEnemyFSMComponent>(TEXT("FSMComponent"));
 
@@ -28,13 +39,6 @@ ARangedEnemy::ARangedEnemy()
 void ARangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (FSMComponent)
-	{
-		//FSMComponent->OnStateChange.AddDynamic(this, &ARangedEnemy::OnFSMStateChanged);
-		//FSMComponent->OnAttack.AddDynamic(this, &ARangedEnemy::HandleAttack);
-		//FSMComponent->OnDie.AddDynamic(this, &ARangedEnemy::HandleDie);
-	}
 }
 
 void ARangedEnemy::FindTarget()
@@ -47,17 +51,13 @@ void ARangedEnemy::FindTarget()
 	}
 }
 
+void ARangedEnemy::DieEndAction()
+{
+	if (!ObjectPoolManager) return;
+	ObjectPoolManager->ReturnEnemy(this);
+}
+
 void ARangedEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
-// void ARangedEnemy::OnFSMStateChanged(EEnemyState NewState)
-// {
-// 	if (!AnimInstance) return;
-// 	
-// 	auto REAnimInst = Cast<URangedEnemyAnimInstance>(AnimInstance);
-// 	if (!REAnimInst) return;
-// 	
-// 	REAnimInst->CurrentState = NewState;
-// }

@@ -18,12 +18,12 @@ class SPECIALSOUL_API AProjectile : public AActor
 	
 public:	
 	AProjectile();
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
-
+	
 public:
-	void SetLifeTime();
 
 	UFUNCTION()
 	virtual void Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -32,8 +32,7 @@ public:
 	 // TODO: BasePlayer의 공통 스탯 적용하기!!
 	void ApplyCasterStat(ACBasePlayer* Caster);
 
-protected:
-	virtual void InitMoveComp();	
+	virtual void InitMoveComp(); // Pool에서 꺼낸 후 사용	
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Projectile")
@@ -54,8 +53,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	TObjectPtr<UNiagaraSystem> HitVfxAsset;
 	
-	//UPROPERTY(VisibleAnywhere, Category = "Projectile")
-	//TObjectPtr<UNiagaraComponent> HitVfx;
+	UPROPERTY(VisibleAnywhere, Category = "Projectile")
+	FVector StartLocation;
+
+protected:
+	virtual void OnDestroy(); // Destory OR Pool->Push
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Projectile")
@@ -66,6 +68,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float AttackRange {1500.f}; // 사거리
+	
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	float CurrentDistance;
 };
 
 //NS_FireArrow & NS_FireArrow_Hit=> 징키 평타 꼬리VFX(크기 줄이기) & E공격 꼬리 VFX

@@ -6,6 +6,7 @@
 #include "Enemy/BaseEnemy.h"
 #include "RangedEnemy.generated.h"
 
+class ARangedEnemyProjectile;
 class AProjectile;
 class IPathFindingStrategy;
 class AFlowFieldActor;
@@ -22,21 +23,17 @@ public:
 	ARangedEnemy();
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void DieEndAction() override;
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void FindTarget() override;
-	
+
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	TObjectPtr<UEnemyFSMComponent> FSMComponent;
 
-	// UFUNCTION()
-	// void OnFSMStateChanged(EEnemyState NewState);
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-	TSubclassOf<AProjectile> ProjectileActor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM", meta = (AllowPrivateAccess = "true"))
-	float AttackRange { 100.f};
+	TSubclassOf<ARangedEnemyProjectile> ProjectileActor;
 };

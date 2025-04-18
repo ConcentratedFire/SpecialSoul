@@ -16,4 +16,12 @@ class SPECIALSOUL_API ARangedEnemyProjectile : public AProjectile
 
 public:
 	ARangedEnemyProjectile();
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	void SetManager(class ACObjectPoolManager* Manager) { ObjectPoolManager = Manager; }
+
+protected:
+	virtual void OnDestroy() override;
+	
+	UPROPERTY()
+	TObjectPtr<ACObjectPoolManager> ObjectPoolManager;
 };

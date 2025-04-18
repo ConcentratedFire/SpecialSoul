@@ -13,7 +13,7 @@ EBTNodeResult::Type UCBTTMoveToDirection::ExecuteTask(UBehaviorTreeComponent& Ow
 	{
 		FVector Direction = OwnerComp.GetBlackboardComponent()->GetValueAsVector(FName("MoveDir"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(FName("TargetLocation"), MyEnemy->GetActorLocation()+Direction*Speed);
-		// MyEnemy->AddMovementInput(Direction.GetSafeNormal() * Speed);
+		MyEnemy->AddMovementInput(Direction.GetSafeNormal() * Speed);
 	}
 
 	return Super::ExecuteTask(OwnerComp, NodeMemory);

@@ -41,10 +41,13 @@ AMegaRocketBullet::AMegaRocketBullet()
 void AMegaRocketBullet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
-	SetLifeSpan(LifeSpan); // 수명 설정
 }
+
+// void AMegaRocketBullet::ApplyLifeTime()
+// {
+// 	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
+// 	SetLifeSpan(LifeSpan); // 수명 설정
+// }
 
 void AMegaRocketBullet::Tick(float DeltaSeconds)
 {

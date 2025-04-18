@@ -84,7 +84,7 @@ void UJinx_Attack::HandleOneShot(ACBasePlayer* Caster, FRotator SpawnRot)
 
 	FString SocketName = FString::Printf(TEXT("Minigun_FirePos%d"), ShotBulletCount);
 	FVector SpawnPos = Caster->GetMesh()->GetSocketLocation(FName(*SocketName));
-		
+
 	auto Bullet = Caster->GetWorld()->SpawnActor<AMinigunBullet>(BulletClass,
 		SpawnPos, SpawnRot, SpawnParams);
 		

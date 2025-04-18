@@ -3,8 +3,10 @@
 
 #include "Enemy/Ranged/RangedEnemyAnimInstance.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Enemy/Ranged/RangedEnemy.h"
-#include "Projectile/Projectile.h"
+#include "ObjectPool/CObjectPoolManager.h"
+#include "Projectile/Enemy/RangedEnemyProjectile.h"
 
 void URangedEnemyAnimInstance::AnimNotify_EnemyAttack()
 {
@@ -23,17 +25,20 @@ void URangedEnemyAnimInstance::AnimNotify_EnemyAttack()
 	
 	// 투사체 발사
 	FVector SpawnPoint = RangedEnemy->GetActorLocation();
-	SpawnPoint += RangedEnemy->GetActorForwardVector() * 300;
+	SpawnPoint += RangedEnemy->GetActorForwardVector() * 30;
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = RangedEnemy;
 	SpawnParams.Instigator = RangedEnemy;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	GetWorld()->SpawnActor<AProjectile>(RangedEnemy->ProjectileActor, SpawnPoint, OwnerEnemy->GetActorRotation(), SpawnParams);
+	FTransform spawnTransform;
+	spawnTransform.SetLocation(SpawnPoint);
+	spawnTransform.SetRotation(OwnerEnemy->GetActorRotation().Quaternion());
+	
+	RangedEnemy->ObjectPoolManager->RangedEnemyProjectileSpawn(spawnTransform);
 }
 
 void URangedEnemyAnimInstance::AnimNotify_AttackEnd()
 {
-	//UE_LOG(LogTemp, Log, TEXT("AnimNotify_AttackEnd"));
 	OwnerEnemy->bIsAttacking = false;
 }

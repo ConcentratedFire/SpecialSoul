@@ -37,16 +37,20 @@ ARocketLauncherBullet::ARocketLauncherBullet()
 void ARocketLauncherBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	// 사정거리 / 속도 = 수명 (초 단위)
-	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
-	SetLifeSpan(LifeSpan); // 수명 설정
 }
+
+// void ARocketLauncherBullet::ApplyLifeTime()
+// {
+// 	// 사정거리 / 속도 = 수명 (초 단위)
+// 	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
+// 	SetLifeSpan(LifeSpan); // 수명 설정
+// }
 
 void ARocketLauncherBullet::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// 좌우 왔다갔다 하면서 날라감
+	// 좌우 왔다갔다 하면서 날라감sd
 		// Root기준으로 좌우 와리가리
 	if (bMoveRight)
 	{

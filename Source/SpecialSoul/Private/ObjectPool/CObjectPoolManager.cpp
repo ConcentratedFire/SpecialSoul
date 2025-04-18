@@ -6,6 +6,7 @@
 #include "SpecialSoul.h"
 #include "Game/CGameState.h"
 #include "Game/SpecialSoulGameMode.h"
+#include "Projectile/Enemy/RangedEnemyProjectile.h"
 
 // Sets default values
 ACObjectPoolManager::ACObjectPoolManager()
@@ -47,10 +48,12 @@ void ACObjectPoolManager::InitSettings()
 	InitPool(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor);
 
 	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	InitPool(RangePool, AppendEnemyPoolSize, RangeEnemy);
+	InitPool(RangePool, AppendEnemyPoolSize, RangedEnemy);
 
 	InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
 	InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
+	
+	InitPool(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor);
 }
 
 void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
@@ -62,6 +65,16 @@ void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
 	EnemyGotoPool_Dele.Broadcast();
 	// LOG_S(Warning, TEXT("Enemy Add : %p\tName : %s"), Enemy, Enemy==nullptr?TEXT("nullptr"):*Enemy->GetName());
 	MeleePool.Push(Enemy);
+}
+
+void ACObjectPoolManager::ReturnEnemy(ARangedEnemy* Enemy)
+{
+	Enemy->SetActorEnableCollision(false);
+	Enemy->SetActorHiddenInGame(true);
+	Enemy->SetActorTickEnabled(false);
+
+	EnemyGotoPool_Dele.Broadcast();
+	RangePool.Push(Enemy);
 }
 
 void ACObjectPoolManager::ReturnTornado(ACTornado* Tornado)
@@ -130,6 +143,16 @@ void ACObjectPoolManager::ReturnMiddleBossBullet(ACMiddleBossBullet* MiddleBossB
 	MiddleBossBulletPool.Push(MiddleBossBullet);
 }
 
+void ACObjectPoolManager::ReturnRangedEnemyProjectile(ARangedEnemyProjectile* Projectile)
+{
+	Projectile->SetActorEnableCollision(false);
+	Projectile->SetActorHiddenInGame(true);
+	Projectile->SetActorTickEnabled(false);
+	Projectile->SetActorLocation(PoolLocation);
+
+	RangedEnemyProjectilePool.Push(Projectile);
+}
+
 void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 {
 	InitPool(TornadoPool, AppendTornadoPoolSize, TornadoActor, NewOwner);
@@ -161,6 +184,11 @@ void ACObjectPoolManager::ExpSpawn(FTransform SpawnTransform)
 void ACObjectPoolManager::MagnetSpawn(FTransform SpawnTransform)
 {
 	PlaceActorSetPlace(ItemMagnetPool, AppendItemMagnetSize, ItemMagnetActor, SpawnTransform);
+}
+
+void ACObjectPoolManager::RangedEnemyProjectileSpawn(FTransform SpawnTransform)
+{
+	PlaceActorSetPlace(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor, SpawnTransform);
 }
 
 void ACObjectPoolManager::PlaceItemBox()
@@ -244,7 +272,7 @@ void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
 	if (bIsMelee)
 		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	else
-		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
+		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangedEnemy);
 }
 
 void ACObjectPoolManager::MiddleBossSpawn()

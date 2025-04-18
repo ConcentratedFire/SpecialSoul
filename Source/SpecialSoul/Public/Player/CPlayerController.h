@@ -41,4 +41,7 @@ public:
 
 public: // For Yasuo
 	void GetNextLevelYasuoMoveStat();
+
+public:
+	float CalcHaste(float CurHaste);
 };

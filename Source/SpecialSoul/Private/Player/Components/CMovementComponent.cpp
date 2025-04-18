@@ -42,9 +42,9 @@ void UCMovementComponent::InitializeComponent()
 void UCMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (!BaseOwnerCharacter || !BaseOwnerCharacter->IsLocallyControlled()) return;
-	
+
 	PC = Cast<ACPlayerController>(BaseOwnerCharacter->GetController());
 
 	YasuoCharacer = Cast<ACYasuo>(PC->GetPawn());
@@ -66,10 +66,7 @@ void UCMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// 플레이중인 캐릭터가 야스오 일때, 이동거리를 체크하고 기력을 충전시킴
 	if (YasuoCharacer)
 	{
-		FVector CurrentLocation = YasuoCharacer->GetActorLocation();
-		float Distance = FVector::Dist(CurrentLocation, BeforeLocation);
-		YasuoCharacer->MoveDistance += Distance;
-		BeforeLocation = CurrentLocation;
+		CRPC_CheckMoveDistance();
 	}
 }
 
@@ -81,7 +78,7 @@ void UCMovementComponent::SetInputBinding(class UEnhancedInputComponent* Input)
 void UCMovementComponent::Move(const FInputActionValue& Value)
 {
 	if (!bCanMove) return;
-	
+
 	FVector2D v = Value.Get<FVector2D>();
 
 	FVector direction(v.X, v.Y, 0);
@@ -93,7 +90,7 @@ void UCMovementComponent::CRPC_RotationToMouseCursor_Implementation()
 {
 	if (!PC) return;
 	// if (!bCanMove) return;
-	
+
 	FHitResult HitResult;
 	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	if (bHit)
@@ -103,22 +100,37 @@ void UCMovementComponent::CRPC_RotationToMouseCursor_Implementation()
 		directionToMouseCursor.Normalize();
 
 		// 회전 적용
-		SRPC_RotationToMouseCursor(directionToMouseCursor);		
+		SRPC_RotationToMouseCursor(directionToMouseCursor);
 	}
 }
 
 void UCMovementComponent::SRPC_RotationToMouseCursor_Implementation(const FVector MouseDirection)
-{	
+{
 	// 목표 회전값
 	FRotator targetRot = FRotationMatrix::MakeFromX(MouseDirection).Rotator();
 
 	// 현재 회전값에서 목표 회전값으로 보간
 	FRotator CurrentRotation = BaseOwnerCharacter->GetActorRotation();
-	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, targetRot, BaseOwnerCharacter->GetWorld()->GetDeltaSeconds(), RoationInteropSpeed);
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, targetRot,
+	                                        BaseOwnerCharacter->GetWorld()->GetDeltaSeconds(), RoationInteropSpeed);
 	MRPC_RotationToMouseCursor(NewRotation);
 }
 
 void UCMovementComponent::MRPC_RotationToMouseCursor_Implementation(const FRotator NewRotation)
 {
 	BaseOwnerCharacter->SetActorRotation(NewRotation);
+}
+
+void UCMovementComponent::CRPC_CheckMoveDistance_Implementation()
+{
+	FVector CurrentLocation = YasuoCharacer->GetActorLocation();
+	float Distance = FVector::Dist(CurrentLocation, BeforeLocation);
+	BeforeLocation = CurrentLocation;
+	SRPC_AddMoveDistance(Distance);
+}
+
+void UCMovementComponent::SRPC_AddMoveDistance_Implementation(const float Dist)
+{
+	if (!YasuoCharacer) return;
+	YasuoCharacer->MoveDistance += Dist;
 }

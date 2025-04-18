@@ -3,6 +3,7 @@
 
 #include "Skill/Yasuo/CYasuo_RSkill.h"
 
+#include "Player/CPlayerController.h"
 #include "Player/CYasuo.h"
 
 void UCYasuo_RSkill::UseSkill(ACBasePlayer* Caster)
@@ -28,7 +29,7 @@ void UCYasuo_RSkill::StartUseSkill()
 	Yasuo->SetSkillUsing(ESkillKey::R, true);
 	Yasuo->RSkill();
 
-	float CalcChargeCooldown = Yasuo->CalcHaste(ChargeCooldown);
+	float CalcChargeCooldown = Yasuo->PC->CalcHaste(ChargeCooldown);
 	Yasuo->GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle, this, &UCYasuo_RSkill::OnChargeCompleted,
 											   CalcChargeCooldown, false);
 }

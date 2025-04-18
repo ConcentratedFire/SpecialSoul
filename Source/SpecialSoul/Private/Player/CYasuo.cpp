@@ -41,6 +41,19 @@ void ACYasuo::BeginPlay()
 	// }
 }
 
+void ACYasuo::PrintNetLog()
+{
+	FString logStr = TEXT("PassiveEnergy : 0"); // 기본값 설정
+
+	int32 dataCount = 0;
+	dataCount = PassiveEnergy;
+
+	logStr = FString::Printf(TEXT("PassiveEnergy : %d"), dataCount);
+
+	DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 200.0f, logStr, nullptr, FColor::Red, 0, true,
+	                1);
+}
+
 void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -53,21 +66,19 @@ void ACYasuo::Tick(float DeltaTime)
 	if (IsLocallyControlled())
 		CRPC_SetAttackFrontVector();
 
-	// 데이터가 들어왔는지 체크
-	if (PS && PS->YasuoMoveDataMap.Num() > 0)
+	 PrintNetLog();
+	if (IsLocallyControlled())
 	{
-		// 데이터 업데이트 체크
-		//CheckMoveData();
-	
-		// 이동 거리가 충분하면 기류를 충전
-		float calcDistance = CalcHaste(YasuoMoveInfo.StackDistance);
-		if (MoveDistance >= calcDistance)
-		{
-			ChargePassiveEnergy();
-			MoveDistance -= calcDistance;
-		}
+		LOG_SCREEN_IDX(3, FColor::Cyan, "Energy : %d", PassiveEnergy);
 	}
-	
+
+	// 기본 공격
+	if (YasuoMoveInfo.ID > 0)
+	{
+		// 이동 거리가 충분하면 기류를 충전
+		SRPC_ChargePassiveEnergy();
+	}
+
 	// if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
 	// {
 	// 	// 기류가 100이 되면 회오리 발사
@@ -83,6 +94,8 @@ void ACYasuo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ACYasuo, AttackFrontVector);
+	DOREPLIFETIME(ACYasuo, MoveDistance);
+	DOREPLIFETIME(ACYasuo, PassiveEnergy);
 }
 
 float ACYasuo::GetDamage(bool& OutbIsCri) const
@@ -174,20 +187,23 @@ TArray<FVector> ACYasuo::GetAttackVector()
 	return AttackVectors;
 }
 
+void ACYasuo::SRPC_ChargePassiveEnergy_Implementation()
+{
+	if (!PC) return;
+
+	float calcDistance = PC->CalcHaste(YasuoMoveInfo.StackDistance);
+	if (MoveDistance >= calcDistance)
+	{
+		// 4의 기류를 획득
+		ChargePassiveEnergy();
+		MoveDistance -= calcDistance;
+	}
+}
+
 void ACYasuo::ChargePassiveEnergy()
 {
-	// 4의 기류를 획득
 	int32 NewEnergy = FMath::Clamp(PassiveEnergy + PassiveEnergyRegen, 0.f, 100.f);
 	PassiveEnergy = NewEnergy;
-}
-
-void ACYasuo::UpdateCheckMoveData()
-{
-	PC->GetNextLevelYasuoMoveStat();
-}
-
-void ACYasuo::RotateArrow()
-{
 }
 
 void ACYasuo::ESkill(const bool bAnimStart)

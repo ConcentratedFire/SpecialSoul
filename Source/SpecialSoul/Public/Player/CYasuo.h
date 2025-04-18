@@ -20,11 +20,12 @@ private:
 
 private:
 	virtual void BeginPlay() override;
+	void PrintNetLog();
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public: // Using Charge Enemy
-	UPROPERTY(VisibleAnywhere, Category = "Data|MoveDistance")
+	UPROPERTY(VisibleAnywhere, Category = "Data|MoveDistance", Replicated)
 	float MoveDistance = 0.0f;
 
 	float GetDamage(bool& OutbIsCri) const;
@@ -36,7 +37,7 @@ public:
 	void WindWall();
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat", Replicated)
 	int32 PassiveEnergy = 0;
 
 private: // Attack
@@ -65,14 +66,10 @@ private: // Passive Energy
 	const int32 PassiveEnergyRegen = 4;
 	FTimerHandle ChargePassiveEnergyTimer;
 
+	UFUNCTION(Server, Reliable)
+	void SRPC_ChargePassiveEnergy();
 	UFUNCTION()
 	void ChargePassiveEnergy();
-
-private: // Passive Movement
-	void UpdateCheckMoveData();
-
-private:
-	virtual void RotateArrow() override;
 
 public: // E Skill
 	void ESkill(const bool bAnimStart);

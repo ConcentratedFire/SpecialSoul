@@ -29,7 +29,7 @@ void ACPlayerController::OnPossess(APawn* InPawn)
 
 	if (HasAuthority())
 		GS = Cast<ACGameState>(GetWorld()->GetGameState());
-	
+
 	if (HasAuthority() && !IsLocalController())
 		MyPlayerState->SRPC_SetInitialData();
 }
@@ -81,4 +81,10 @@ void ACPlayerController::GetNextLevelYasuoMoveStat()
 {
 	if (GS->GetCurLevel() > MyPlayer->YasuoMoveInfo.RangeTo)
 		UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
+}
+
+float ACPlayerController::CalcHaste(float CurHaste)
+{
+	if (!MyPlayerState) return CurHaste;
+	return MyPlayerState->CalcAbilityHaste(CurHaste);
 }

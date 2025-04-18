@@ -7,6 +7,7 @@
 #include "Components/ArrowComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/CPlayerController.h"
 
 UCYasuo_ESkill::UCYasuo_ESkill()
 {
@@ -76,7 +77,7 @@ void UCYasuo_ESkill::StartChargeTimer()
 	// 누적 개수가 최대치 미만일 때만 충전
 	if (SkillChargeCount < MaxChargeCount && !Yasuo->GetWorld()->GetTimerManager().IsTimerActive(ChargeTimerHandle))
 	{
-		float CalcChargeCooldown = Yasuo->CalcHaste(ChargeCooldown);
+		float CalcChargeCooldown = Yasuo->PC->CalcHaste(ChargeCooldown);
 		Yasuo->GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle, this, &UCYasuo_ESkill::OnChargeCompleted,
 		                                              CalcChargeCooldown, false);
 	}

@@ -58,5 +58,9 @@ private: // Yasuo Move Distance Check
 	UPROPERTY()
 	class ACYasuo* YasuoCharacer;
 	FVector BeforeLocation = FVector::ZeroVector;
-	
+
+	UFUNCTION(Client, Reliable)
+	void CRPC_CheckMoveDistance();
+	UFUNCTION(Server, Reliable)
+	void SRPC_AddMoveDistance(const float Dist);
 };

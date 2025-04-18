@@ -36,10 +36,12 @@ protected:
 	UPROPERTY()
 	class ACPlayerState* PS;
 	UPROPERTY()
-	class ACPlayerController* PC;
-	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
+public:
+	UPROPERTY()
+	class ACPlayerController* PC;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -154,9 +156,6 @@ public:
 
 public:
 	void SetSkillUsing(ESkillKey Key, bool bUseSkill);
-
-public:
-	float CalcHaste(float CurHaste) { return PS->CalcAbilityHaste(CurHaste); }
 
 public:
 	void MyApplyDamage(float Damage, class ABaseEnemy* DamagedActor);

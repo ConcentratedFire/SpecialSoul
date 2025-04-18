@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "CPlayerController.h"
-#include "Components/SkillComponent.h"
 #include "Player/CBasePlayer.h"
 #include "CYasuo.generated.h"
 

@@ -38,7 +38,7 @@ public:
 	void WindWall();
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Data|Stat", Replicated)
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	int32 PassiveEnergy = 0;
 
 private: // Attack
@@ -56,7 +56,12 @@ public:
 	UFUNCTION()
 	void OnRep_RotateArrow();
 
-	TArray<FVector> GetAttackVector();
+	UFUNCTION(Client, Reliable)
+	void CRPC_GetAttackVectors();
+	UFUNCTION(Server, Reliable)
+	void SRPC_TryDefaultAttack(const TArray<FVector>& AttackVectors);
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_EndDefaultAttack();
 
 private: // Anim
 	UPROPERTY()
@@ -69,8 +74,10 @@ private: // Passive Energy
 
 	UFUNCTION(Server, Reliable)
 	void SRPC_ChargePassiveEnergy();
-	UFUNCTION()
-	void ChargePassiveEnergy();
+	UFUNCTION(Server, Reliable)
+	void SRPC_ChargePassiveEnergy_Timer();
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_ChargePassiveEnergy(const int32 NewEnergy);
 
 public: // E Skill
 	void ESkill(const bool bAnimStart);
@@ -79,4 +86,10 @@ public: // E Skill
 
 public:
 	float CalcHaste(float CurHaste) { return PC->CalcHaste(CurHaste); }
+
+private:
+	UFUNCTION(Server, Reliable)
+	void SRPC_PlayAttackAnim();
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_PlayAttackAnim();
 };

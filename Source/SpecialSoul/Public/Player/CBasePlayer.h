@@ -161,6 +161,7 @@ public:
 	void MyApplyDamage(float Damage, class ABaseEnemy* DamagedActor);
 
 public:
+	UPROPERTY(Replicated)
 	bool bAttacking = false;
 
 public:

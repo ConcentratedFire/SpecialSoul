@@ -13,6 +13,8 @@ ACTornado::ACTornado()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	SetReplicateMovement(true);
 
 	TornadoBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TornadoBox"));
 	RootComponent = TornadoBox;
@@ -75,20 +77,8 @@ void ACTornado::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
-
-	FRotator meshRot1 = TornadoMesh1->GetRelativeRotation();
-	meshRot1.Yaw += 10;
-	TornadoMesh1->SetRelativeRotation(meshRot1);
-	FRotator meshRot2 = TornadoMesh2->GetRelativeRotation();
-	meshRot2.Yaw += -10;
-	TornadoMesh2->SetRelativeRotation(meshRot2);
-
-	FVector TornadoCurLocation = GetActorLocation();
-	if (FVector::Dist(TornadoStartLocation, TornadoCurLocation) >= Range)
-	{
-		ObjectPoolManager->ReturnTornado(this);
-	}
+	if (!OwnerYasuo->IsLocallyControlled()) return;
+	SRPC_MoveTornado(DeltaTime);	
 }
 
 void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -104,5 +94,23 @@ void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
 			Item->ActiveItem();
+	}
+}
+
+void ACTornado::SRPC_MoveTornado_Implementation(const float DeltaTime)
+{
+	SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
+
+	FRotator meshRot1 = TornadoMesh1->GetRelativeRotation();
+	meshRot1.Yaw += 10;
+	TornadoMesh1->SetRelativeRotation(meshRot1);
+	FRotator meshRot2 = TornadoMesh2->GetRelativeRotation();
+	meshRot2.Yaw += -10;
+	TornadoMesh2->SetRelativeRotation(meshRot2);
+
+	FVector TornadoCurLocation = GetActorLocation();
+	if (FVector::Dist(TornadoStartLocation, TornadoCurLocation) >= Range)
+	{
+		ObjectPoolManager->ReturnTornado(this);
 	}
 }

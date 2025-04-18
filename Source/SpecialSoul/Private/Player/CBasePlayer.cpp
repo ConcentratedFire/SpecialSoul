@@ -107,13 +107,17 @@ void ACBasePlayer::BeginPlay()
 		DataSheetUtility = GM->DataSheetUtility;
 	}
 
-	// // 오브젝트 풀 매니저 가져오기
-	// for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
-	// {
-	// 	ObjectPoolManager = *It;
-	// }
+	// 오브젝트 풀 매니저 가져오기
+	if (HasAuthority())
+	{
+		for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+		{
+			ObjectPoolManager = *It;
+		}
+	}
 
-	// InitUpgradeUI(); // 업그레이드 UI 생성 (추가는 안함)
+	// if (IsLocallyControlled())
+	// 	InitUpgradeUI(); // 업그레이드 UI 생성
 }
 
 void ACBasePlayer::PrintNetLog()
@@ -122,12 +126,12 @@ void ACBasePlayer::PrintNetLog()
 
 	if (PS != nullptr)
 	{
-		int32 dataCount =0;
+		int32 dataCount = 0;
 		if (this->IsA(ACYasuo::StaticClass()))
 			dataCount = YasuoStat.Damage;
 		else if (this->IsA(AJinx::StaticClass()))
 			dataCount = JinxAttackData.Damage;
-		
+
 		logStr = FString::Printf(TEXT("Damage : %d"), dataCount);
 	}
 	else
@@ -136,7 +140,7 @@ void ACBasePlayer::PrintNetLog()
 	}
 
 	DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100.0f, logStr, nullptr, FColor::Red, 0, true,
-					1);
+	                1);
 }
 
 // Called every frame
@@ -228,6 +232,7 @@ void ACBasePlayer::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& O
 	DOREPLIFETIME(ACBasePlayer, YasuoStat);
 	DOREPLIFETIME(ACBasePlayer, YasuoMoveInfo);
 	DOREPLIFETIME(ACBasePlayer, JinxAttackData);
+	DOREPLIFETIME(ACBasePlayer, bAttacking);
 }
 
 void ACBasePlayer::EndUpgrade()

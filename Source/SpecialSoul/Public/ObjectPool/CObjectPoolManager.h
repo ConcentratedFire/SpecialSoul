@@ -294,5 +294,5 @@ void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32&
 	PoolObj->SetActorTransform(SpawnTransform);
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);
-	// PoolObj->SetActorTickEnabled(true);
+	PoolObj->SetActorTickEnabled(true);
 }

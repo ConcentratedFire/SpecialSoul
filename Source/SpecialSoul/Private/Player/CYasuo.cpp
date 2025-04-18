@@ -33,12 +33,12 @@ void ACYasuo::BeginPlay()
 	// SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
 	// SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
 
-	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::ChargePassiveEnergy, 1.f, true);
+	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::SRPC_ChargePassiveEnergy_Timer, 1.f, true);
 
-	// if (ObjectPoolManager)
-	// {
-	// 	ObjectPoolManager->MakeTornadoPool(this);
-	// }
+	if (HasAuthority() && IsLocallyControlled() && ObjectPoolManager)
+	{
+		ObjectPoolManager->MakeTornadoPool(this);
+	}
 }
 
 void ACYasuo::PrintNetLog()
@@ -66,28 +66,23 @@ void ACYasuo::Tick(float DeltaTime)
 	if (IsLocallyControlled())
 		CRPC_SetAttackFrontVector();
 
-	 PrintNetLog();
-	if (IsLocallyControlled())
-	{
-		LOG_SCREEN_IDX(3, FColor::Cyan, "Energy : %d", PassiveEnergy);
-	}
+	PrintNetLog();
 
 	// 기본 공격
 	if (YasuoMoveInfo.ID > 0)
 	{
 		// 이동 거리가 충분하면 기류를 충전
 		SRPC_ChargePassiveEnergy();
-	}
 
-	// if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
-	// {
-	// 	// 기류가 100이 되면 회오리 발사
-	// 	if (!bAttacking && PassiveEnergy >= 100)
-	// 	{
-	// 		//Anim->PlayAttackMontage();
-	// 		bAttacking = true;
-	// 	}
-	// }
+		// if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
+		// {
+		// 기류가 100이 되면 회오리 발사
+		if (!bAttacking && PassiveEnergy >= 100)
+		{
+			SRPC_PlayAttackAnim();
+		}
+		// }
+	}
 }
 
 void ACYasuo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -95,7 +90,6 @@ void ACYasuo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ACYasuo, AttackFrontVector);
 	DOREPLIFETIME(ACYasuo, MoveDistance);
-	DOREPLIFETIME(ACYasuo, PassiveEnergy);
 }
 
 float ACYasuo::GetDamage(bool& OutbIsCri) const
@@ -107,22 +101,7 @@ float ACYasuo::GetDamage(bool& OutbIsCri) const
 void ACYasuo::Attack()
 {
 	if (!HasAuthority()) return;
-
-	TArray<FVector> AttackVectors = GetAttackVector();
-	for (const FVector& Vector : AttackVectors)
-	{
-		FTransform Transform;
-		FVector curLocation = GetActorLocation();
-		curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-		Transform.SetLocation(curLocation);
-		Transform.SetRotation(Vector.Rotation().Quaternion());
-		Transform.SetScale3D(FVector(1.f));
-		ObjectPoolManager->TornadoSpawn(Transform);
-	}
-
-	// 회오리가 나가고 기류를 깍아주기 위해 옮김
-	PassiveEnergy -= 100;
-	bAttacking = false;
+	CRPC_GetAttackVectors();
 }
 
 void ACYasuo::WindWall()
@@ -169,7 +148,7 @@ void ACYasuo::OnRep_RotateArrow()
 	ArrowWidgetComp->SetWorldRotation(newRot);
 }
 
-TArray<FVector> ACYasuo::GetAttackVector()
+void ACYasuo::CRPC_GetAttackVectors_Implementation()
 {
 	int AttackCnt = YasuoStat.ProjectileCount;
 	AttackCnt = PS->CalcProjectile(AttackCnt);
@@ -184,7 +163,30 @@ TArray<FVector> ACYasuo::GetAttackVector()
 		AttackVectors.Add(RotatedVector);
 	}
 
-	return AttackVectors;
+	SRPC_TryDefaultAttack(AttackVectors);
+}
+
+void ACYasuo::SRPC_TryDefaultAttack_Implementation(const TArray<FVector>& AttackVectors)
+{
+	for (const FVector& Vector : AttackVectors)
+	{
+		FTransform Transform;
+		FVector curLocation = GetActorLocation();
+		curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		Transform.SetLocation(curLocation);
+		Transform.SetRotation(Vector.Rotation().Quaternion());
+		Transform.SetScale3D(FVector(1.f));
+		ObjectPoolManager->TornadoSpawn(Transform);
+	}
+
+	MRPC_EndDefaultAttack();
+	bAttacking = false;
+}
+
+void ACYasuo::MRPC_EndDefaultAttack_Implementation()
+{
+	// 회오리가 나가고 기류를 깍아주기 위해 옮김
+	PassiveEnergy -= 100;
 }
 
 void ACYasuo::SRPC_ChargePassiveEnergy_Implementation()
@@ -195,14 +197,19 @@ void ACYasuo::SRPC_ChargePassiveEnergy_Implementation()
 	if (MoveDistance >= calcDistance)
 	{
 		// 4의 기류를 획득
-		ChargePassiveEnergy();
+		SRPC_ChargePassiveEnergy_Timer();
 		MoveDistance -= calcDistance;
 	}
 }
 
-void ACYasuo::ChargePassiveEnergy()
+void ACYasuo::SRPC_ChargePassiveEnergy_Timer_Implementation()
 {
 	int32 NewEnergy = FMath::Clamp(PassiveEnergy + PassiveEnergyRegen, 0.f, 100.f);
+	MRPC_ChargePassiveEnergy(NewEnergy);
+}
+
+void ACYasuo::MRPC_ChargePassiveEnergy_Implementation(const int32 NewEnergy)
+{
 	PassiveEnergy = NewEnergy;
 }
 
@@ -240,4 +247,15 @@ void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)
 	// MoveData는 키값 체크 후 넘기기
 	if (PS->YasuoMoveDataMap.Contains(PlayerLevel))
 		PC->UpdateYasuoMoveStat(PlayerLevel);
+}
+
+void ACYasuo::SRPC_PlayAttackAnim_Implementation()
+{
+	MRPC_PlayAttackAnim();
+	bAttacking = true;
+}
+
+void ACYasuo::MRPC_PlayAttackAnim_Implementation()
+{
+	Anim->PlayAttackMontage();
 }

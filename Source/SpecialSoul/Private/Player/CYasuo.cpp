@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
@@ -32,7 +33,7 @@ void ACYasuo::BeginPlay()
 	// {
 	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
 	// }
-	
+
 	// SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
 	// SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
 
@@ -50,33 +51,38 @@ void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// SetAttackFrontVector();
-	// RotateArrow();
+	CRPC_SetAttackFrontVector();
 
-	// 데이터가 들어왔는지 체크
-	if (PS && PS->YasuoMoveDataMap.Num() > 0)
-	{
-		// 데이터 업데이트 체크
-		//CheckMoveData();
+	// // 데이터가 들어왔는지 체크
+	// if (PS && PS->YasuoMoveDataMap.Num() > 0)
+	// {
+	// 	// 데이터 업데이트 체크
+	// 	//CheckMoveData();
+	//
+	// 	// 이동 거리가 충분하면 기류를 충전
+	// 	float calcDistance = CalcHaste(YasuoMoveInfo.StackDistance);
+	// 	if (MoveDistance >= calcDistance)
+	// 	{
+	// 		ChargePassiveEnergy();
+	// 		MoveDistance -= calcDistance;
+	// 	}
+	// }
+	//
+	// if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
+	// {
+	// 	// 기류가 100이 되면 회오리 발사
+	// 	if (!bAttacking && PassiveEnergy >= 100)
+	// 	{
+	// 		//Anim->PlayAttackMontage();
+	// 		bAttacking = true;
+	// 	}
+	// }
+}
 
-		// 이동 거리가 충분하면 기류를 충전
-		float calcDistance = CalcHaste(YasuoMoveInfo.StackDistance);
-		if (MoveDistance >= calcDistance)
-		{
-			ChargePassiveEnergy();
-			MoveDistance -= calcDistance;
-		}
-	}
-
-	if (!SkillComponent->bUseESkill && !SkillComponent->bUseRSkill)
-	{
-		// 기류가 100이 되면 회오리 발사
-		if (!bAttacking && PassiveEnergy >= 100)
-		{
-			//Anim->PlayAttackMontage();
-			bAttacking = true;
-		}
-	}
+void ACYasuo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACYasuo, AttackFrontVector);
 }
 
 float ACYasuo::GetDamage(bool& OutbIsCri) const
@@ -88,7 +94,7 @@ float ACYasuo::GetDamage(bool& OutbIsCri) const
 void ACYasuo::Attack()
 {
 	if (!HasAuthority()) return;
-	
+
 	TArray<FVector> AttackVectors = GetAttackVector();
 	for (const FVector& Vector : AttackVectors)
 	{
@@ -117,7 +123,7 @@ void ACYasuo::WindWall()
 	ObjectPoolManager->WindWallSpawn(Transform);
 }
 
-void ACYasuo::SetAttackFrontVector()
+void ACYasuo::CRPC_SetAttackFrontVector_Implementation()
 {
 	FVector forwardVec = GetActorForwardVector();
 	FVector Velocity = GetVelocity().GetSafeNormal();
@@ -129,7 +135,26 @@ void ACYasuo::SetAttackFrontVector()
 	}
 	Dir.Normalize();
 
-	AttackFrontVector = Dir;
+	SRPC_ReplicateAttackVector(Dir);
+}
+
+void ACYasuo::SRPC_ReplicateAttackVector_Implementation(FVector AttackDir)
+{
+	AttackFrontVector = AttackDir;
+
+	if (HasAuthority())
+		OnRep_RotateArrow();
+}
+
+void ACYasuo::OnRep_RotateArrow()
+{
+	// RotateArrow();
+	LOG_S(Warning, TEXT("AttackFrontVector : %.2f, %.2f, %.2f"), AttackFrontVector.X, AttackFrontVector.Y,
+	      AttackFrontVector.Z);
+	float rotateValue = UKismetMathLibrary::MakeRotFromX(AttackFrontVector).Yaw * -1;
+	FRotator newRot = ArrowRotation;
+	newRot.Roll += rotateValue;
+	ArrowWidgetComp->SetWorldRotation(newRot);
 }
 
 TArray<FVector> ACYasuo::GetAttackVector()
@@ -205,10 +230,6 @@ void ACYasuo::CheckMoveData()
 
 void ACYasuo::RotateArrow()
 {
-	float rotateValue = UKismetMathLibrary::MakeRotFromX(AttackFrontVector).Yaw * -1;
-	FRotator newRot = ArrowRotation;
-	newRot.Roll += rotateValue;
-	ArrowWidgetComp->SetWorldRotation(newRot);
 }
 
 void ACYasuo::ESkill(const bool bAnimStart)
@@ -219,7 +240,7 @@ void ACYasuo::ESkill(const bool bAnimStart)
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
 
 	if (bAnimStart) return;
-	
+
 	FTransform Transform;
 	FVector curLocation = GetActorLocation();
 	curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();

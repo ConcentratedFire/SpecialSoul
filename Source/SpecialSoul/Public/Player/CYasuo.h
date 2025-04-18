@@ -21,6 +21,7 @@ private:
 private:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public: // Using Charge Enemy
 	UPROPERTY(VisibleAnywhere, Category = "Data|MoveDistance")
@@ -47,10 +48,16 @@ private: // Attack
 	TSubclassOf<class ACTornado> TornadoFactory;
 
 public:
-	UPROPERTY(BlueprintReadOnly, Category=Attck)
+	UPROPERTY(BlueprintReadOnly, Category=Attck, ReplicatedUsing=OnRep_RotateArrow)
 	FVector AttackFrontVector;
 
-	void SetAttackFrontVector();
+	UFUNCTION(Client, Unreliable)
+	void CRPC_SetAttackFrontVector();
+	UFUNCTION(Server, Unreliable)
+	void SRPC_ReplicateAttackVector(FVector AttackDir);
+	UFUNCTION()
+	void OnRep_RotateArrow();
+	
 	TArray<FVector> GetAttackVector();
 
 private: // Anim

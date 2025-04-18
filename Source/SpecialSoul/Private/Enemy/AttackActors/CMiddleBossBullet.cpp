@@ -3,22 +3,18 @@
 
 #include "Enemy/AttackActors/CMiddleBossBullet.h"
 
+#include "ObjectPool/CObjectPoolManager.h"
+
 // Sets default values
 ACMiddleBossBullet::ACMiddleBossBullet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void ACMiddleBossBullet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	StartLocation = GetActorLocation();
-	TargetLocation = GetActorLocation() + GetActorForwardVector() * 500;
-	CurrentTime = 0.f;
 }
 
 // Called every frame
@@ -35,7 +31,19 @@ void ACMiddleBossBullet::Tick(float DeltaTime)
 		CurrentTime += DeltaTime;
 	}
 	else
-		Destroy();
+		ObjectPoolManager->ReturnMiddleBossBullet(this);
+}
+
+void ACMiddleBossBullet::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+
+	if (!bNewHidden)
+	{
+		StartLocation = GetActorLocation();
+		TargetLocation = GetActorLocation() + GetActorForwardVector() * 500;
+		CurrentTime = 0.f;
+	}
 }
 
 float ACMiddleBossBullet::easeInOutExpo(float x)

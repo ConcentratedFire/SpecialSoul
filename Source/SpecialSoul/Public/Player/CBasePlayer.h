@@ -76,7 +76,7 @@ protected: // Get Player Data
 	UPROPERTY()
 	class UCDataSheetUtility* DataSheetUtility;
 
-public:	
+public:
 	// Base는 virtual로만 만들고, Child에서 구현
 	// Child의 BeginPlay에서 델리게이트 바인딩
 	// Child에서는 override할때 UFUNCTION 붙여줘야 함.
@@ -95,6 +95,7 @@ public: // Update Info
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UWidgetComponent* ArrowWidgetComp;
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Comp")
 	TObjectPtr<class USkillComponent> SkillComponent;
@@ -157,5 +158,11 @@ public:
 	};
 
 public:
-	void SkillEnd(ESkillKey Key);
+	void SetSkillUsing(ESkillKey Key, bool bUseSkill);
+
+public:
+	float CalcHaste(float CurHaste) { return PS->CalcAbilityHaste(CurHaste); }
+
+public:
+	void MyApplyDamage(float Damage, class ABaseEnemy* DamagedActor);
 };

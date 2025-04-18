@@ -22,21 +22,18 @@ void ARangedEnemyAIController::InitPFStrategy()
 	ARangedEnemy* RangedEnemy = Cast<ARangedEnemy>(MyPawn);
 	if (!RangedEnemy) return;
 	
-	if (!FindFlowField())
+	if (!FlowField/*!FindFlowField()*/)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Flow Field Actor"));
 		return;
 	}
 	
-	//if (bUsePathFindingStrategy)
-	//{
 	UEnemyFSMComponent* FSM = RangedEnemy->FindComponentByClass<UEnemyFSMComponent>();
 	if (!FSM) return;
 	
 	if (bUseFlowField) // Custom FlowField
 	{
-		UFlowFieldPFStrategy* FFStrategy = NewObject<UFlowFieldPFStrategy>(this);
-		FFStrategy->Initialize(RangedEnemy, FlowField); // PF전략이 폰(RangedEnemy) 제어 
+		FFStrategy->Initialize(FlowField, RangedEnemy); // PF전략이 폰(RangedEnemy) 제어 
 		FSM->InitPathFindingStrategy(FFStrategy); // FSM이 PF전략을 사용할 수 있도록 DI
 	}
 	else // NavMeshAI
@@ -45,16 +42,5 @@ void ARangedEnemyAIController::InitPFStrategy()
 		NavStrategy->Initialize(RangedEnemy); 
 		FSM->InitPathFindingStrategy(NavStrategy);
 	}
-//}
-}
-
-bool ARangedEnemyAIController::FindFlowField()
-{
-	for (TActorIterator<AFlowFieldActor> It(GetWorld(), AFlowFieldActor::StaticClass()); It; ++It)
-	{
-		FlowField = *It;
-		return true;
-	}
-	return false;
 }
 

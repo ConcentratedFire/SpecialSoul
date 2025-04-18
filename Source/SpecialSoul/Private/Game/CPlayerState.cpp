@@ -6,6 +6,7 @@
 #include "SpecialSoul.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "Player/CYasuo.h"
+#include "UI/HUD/GameHUD.h"
 #include "Utility/CDataSheetUtility.h"
 
 void ACPlayerState::BeginPlay()
@@ -13,8 +14,8 @@ void ACPlayerState::BeginPlay()
 	Super::BeginPlay();
 
 	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	HUD = Cast<AGameHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	Player = Cast<ACBasePlayer>(GetPawn());
-	
 }
 
 void ACPlayerState::SetInitialData()
@@ -29,15 +30,15 @@ void ACPlayerState::SetInitialData()
 		JinxAttackDataMap = GM->JinxAttackDataMap;
 	}
 	Player->PrintAttackDataMap();
-	
-	UpgradeDataMap=GM->UpgradeDataMap;
+
+	UpgradeDataMap = GM->UpgradeDataMap;
 }
 
 float ACPlayerState::CalcDamage(float CurDamage, bool& OutbIsCri)
 {
 	OutbIsCri = false;
 	if (UpgradeDataMap.Num() == 0) return CurDamage;
-	
+
 	// 추가해야되는 퍼센트
 	int32 CalcDamagePercent = UpgradeDataMap["Damage"].DefaultValue + UpgradeDataMap["Damage"].AppendValue *
 		CurDamageGrade;
@@ -80,7 +81,7 @@ float ACPlayerState::CalcAbilityHaste(float CurHaste)
 int32 ACPlayerState::CalcProjectile(int32 CurProjectile)
 {
 	if (UpgradeDataMap.Num() == 0) return CurProjectile;
-	
+
 	int32 CalcValue = UpgradeDataMap["Projectiles"].AppendValue * CurProjectilesGrade;
 	return CurProjectile + CalcValue;
 }
@@ -179,4 +180,10 @@ void ACPlayerState::ShuffleArray(TArray<FString>& Array)
 void ACPlayerState::RemoveArrayElement(const FString Element)
 {
 	UpgradeData.Remove(Element);
+}
+
+void ACPlayerState::AddKillScore()
+{
+	++KillScore;
+	HUD->SetKillScore(KillScore);
 }

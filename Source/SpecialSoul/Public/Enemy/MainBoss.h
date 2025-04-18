@@ -16,8 +16,13 @@ class SPECIALSOUL_API AMainBoss : public ABaseEnemy
 
 public:
 	AMainBoss();
-	virtual void Tick(float DeltaTime) override;
-
+	virtual void DieEndAction() override;
+	
 protected:
 	virtual void BeginPlay() override;
+
+public: // 몽타쥬 ===========
+	UPROPERTY(EditDefaultsOnly, Category = "Anim")
+	TObjectPtr<UAnimMontage> SkillQMontage;
+
 };

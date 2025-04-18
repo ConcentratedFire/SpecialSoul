@@ -59,7 +59,7 @@ public:
 	float ElapsedTime {0.0f}; // 현재 상태에서의 경과시간
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-	float AttackRange {600.f};
+	float AttackRange {1000.f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	float AttackSpeed {4.f};

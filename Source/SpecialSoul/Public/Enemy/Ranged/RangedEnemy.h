@@ -36,7 +36,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	TSubclassOf<ARangedEnemyProjectile> ProjectileActor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM", meta = (AllowPrivateAccess = "true"))
-	float AttackRange { 100.f};
 };

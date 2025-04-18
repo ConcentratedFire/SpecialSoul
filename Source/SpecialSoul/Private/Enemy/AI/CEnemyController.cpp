@@ -7,6 +7,7 @@
 #include "Enemy/CMeleeEnemy.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Enemy/CMiddleBoss.h"
+#include "Enemy/MainBoss.h"
 #include "PathFinding/FlowFieldActor.h"
 #include "PathFinding/FlowFieldPFStrategy.h"
 
@@ -19,7 +20,9 @@ void ACEnemyController::OnPossess(APawn* InPawn)
 	FTimerHandle possessTimer;
 	GetWorldTimerManager().SetTimer(possessTimer, [this, InPawn]()
 	{
-		if (InPawn->IsA(ACMeleeEnemy::StaticClass()) || InPawn->IsA(ACMiddleBoss::StaticClass()))
+		// if (InPawn->IsA(ACMeleeEnemy::StaticClass()) || InPawn->IsA(ACMiddleBoss::StaticClass())
+		// 	|| InPawn->IsA(AMainBoss::StaticClass()))
+		if (InPawn->IsA(ABaseEnemy::StaticClass()))
 		{
 			if (!BT_Enemy) return;
 

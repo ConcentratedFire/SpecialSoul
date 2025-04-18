@@ -45,4 +45,10 @@ private:
 
 	FTimerHandle PoolTimer;
 	float PoolTime = 3.f;
+
+private:
+	UFUNCTION(Server, Unreliable)
+	void SRPC_MoveWall();
+	UFUNCTION(NetMulticast, Unreliable)
+	void MRPC_WallScale(const FVector& NewScale);
 };

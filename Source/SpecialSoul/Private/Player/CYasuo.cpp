@@ -31,7 +31,7 @@ void ACYasuo::BeginPlay()
 	Super::BeginPlay();
 
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>(this));
-	// SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
+	SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>(this));
 
 	if (HasAuthority())
 		GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::SRPC_ChargePassiveEnergy_Timer, 1.f,
@@ -114,12 +114,23 @@ void ACYasuo::Attack()
 
 void ACYasuo::WindWall()
 {
+	if (!HasAuthority()) return;
+	CRPC_GetWindWallTransfrom();	
+}
+
+void ACYasuo::CRPC_GetWindWallTransfrom_Implementation()
+{
 	FTransform Transform;
 	FVector curLocation = GetActorLocation();
 	curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	Transform.SetLocation(curLocation);
 	Transform.SetRotation(GetActorRotation().Quaternion());
 	Transform.SetScale3D(FVector(1.f));
+	SRPC_WindWall(Transform);
+}
+
+void ACYasuo::SRPC_WindWall_Implementation(const FTransform& Transform)
+{
 	ObjectPoolManager->WindWallSpawn(Transform);
 }
 
@@ -224,7 +235,7 @@ void ACYasuo::MRPC_ChargePassiveEnergy_Implementation(const int32 NewEnergy)
 void ACYasuo::ESkill(const bool bAnimStart)
 {
 	LOG_S(Warning, TEXT("ESkill"));
-	PlayESkillAnim(bAnimStart);
+	MRPC_PlayESkillAnim(bAnimStart);
 	GetCharacterMovement()->GravityScale = bAnimStart ? 0.f : 1.f;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
 
@@ -239,12 +250,17 @@ void ACYasuo::ESkill(const bool bAnimStart)
 	ObjectPoolManager->TornadoESpawn(Transform);
 }
 
-void ACYasuo::PlayESkillAnim_Implementation(const bool bAnimStart)
+void ACYasuo::MRPC_PlayESkillAnim_Implementation(const bool bAnimStart)
 {
 	Anim->PlayESkillMontage(bAnimStart);
 }
 
 void ACYasuo::RSkill()
+{
+	MRPC_PlayRSkillAnim();
+}
+
+void ACYasuo::MRPC_PlayRSkillAnim_Implementation()
 {
 	Anim->PlayRSkillMontage();
 }

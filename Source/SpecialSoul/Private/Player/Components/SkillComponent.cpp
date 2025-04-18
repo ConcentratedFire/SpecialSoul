@@ -119,5 +119,6 @@ void USkillComponent::OnESkillPressed()
 
 void USkillComponent::OnRSkillPressed()
 {
-	CastSkill(ESkillKey::R);
+	// CastSkill(ESkillKey::R);
+	SRPC_CastSkill(ESkillKey::R);
 }

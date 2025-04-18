@@ -15,6 +15,7 @@ class SPECIALSOUL_API UCYasuo_RSkill : public UObject, public ISkillStrategy
 	GENERATED_BODY()
 	
 public:
+	UCYasuo_RSkill();
 	virtual void UseSkill(ACBasePlayer* Caster) override;
 
 private:

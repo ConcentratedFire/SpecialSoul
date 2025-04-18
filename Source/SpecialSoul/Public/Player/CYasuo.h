@@ -37,6 +37,12 @@ public:
 	virtual void Attack() override;
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	void WindWall();
+	
+private:
+	UFUNCTION(Client, Reliable)
+	void CRPC_GetWindWallTransfrom();
+	UFUNCTION(Server, Reliable)
+	void SRPC_WindWall(const FTransform& Transform);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
@@ -83,8 +89,10 @@ private: // Passive Energy
 public: // E Skill
 	void ESkill(const bool bAnimStart);
 	UFUNCTION(NetMulticast, Reliable)
-	void PlayESkillAnim(const bool bAnimStart);
+	void MRPC_PlayESkillAnim(const bool bAnimStart);
 	void RSkill();
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_PlayRSkillAnim();
 	void ActivateSkillMovement(bool bActivate);
 
 public:

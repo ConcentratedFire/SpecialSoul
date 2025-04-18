@@ -22,72 +22,76 @@ void ACGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
 	HUD = Cast<AGameHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	if (GM->DataSheetUtility)
-	{
-		GM->ReadExcelData();
-		ReadExcelData(GM->DataSheetUtility);
-	}
 
-	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
-	{
-		ObjectPoolManager = *It;
-		//ObjectPoolManager->InitSettings();
-	}
+	// if (HasAuthority())
+	// {
+	// 	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	// 	if (GM->DataSheetUtility)
+	// 	{
+	// 		GM->ReadExcelData();
+	// 		ReadExcelData(GM->DataSheetUtility);
+	// 	}
+	//
+	// 	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+	// 	{
+	// 		ObjectPoolManager = *It;
+	// 		//ObjectPoolManager->InitSettings();
+	// 	}
+	// }	
 }
 
 void ACGameState::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (GM && GM->bIsStartRegen)
-	{
-		if (ObjectPoolManager)
-		{
-			GamePlayTime += DeltaSeconds;
-			CurStageTime += DeltaSeconds;
-			CurRegenTime += DeltaSeconds;
-			LOG_SCREEN_IDX(0, FColor::Blue, "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f", curStage, CurStageTime, RegenTime);
-			LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
-			LOG_SCREEN_IDX(2, FColor::Red, "RegenCount : %d, CurRegenCount : %d", RegenCount, CurRegenCount);
-			if (CurRegenTime >= RegenTime)
-			{
-				if (RegenCount > CurRegenCount)
-				{
-					++CurRegenCount;
-					ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
-				}
-				
-				if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
-				{
-					ObjectPoolManager->MiddleBossSpawn();
-					++MiddleBossCount;
-				}
-				
-				if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
-				{
-				}
-
-				CurRegenTime -= RegenTime;
-			}
-
-			if (CurStageTime >= StageTime)
-			{
-				NextStage();
-				CurStageTime = 0;
-			}
-		}
-	}
-
-	if (EXPDataMap.Num() > 0 && curExp >= ExpInfo.XP)
-	{
-		++curLevel;
-		curExp -= ExpInfo.XP;
-		UpdateExpInfo(ExpInfo.ID + 1);
-	}
-
-	SetTime();
+	// if (GM && GM->bIsStartRegen)
+	// {
+	// 	if (ObjectPoolManager)
+	// 	{
+	// 		GamePlayTime += DeltaSeconds;
+	// 		CurStageTime += DeltaSeconds;
+	// 		CurRegenTime += DeltaSeconds;
+	// 		LOG_SCREEN_IDX(0, FColor::Blue, "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f", curStage, CurStageTime, RegenTime);
+	// 		LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
+	// 		LOG_SCREEN_IDX(2, FColor::Red, "RegenCount : %d, CurRegenCount : %d", RegenCount, CurRegenCount);
+	// 		if (CurRegenTime >= RegenTime)
+	// 		{
+	// 			// if (RegenCount > CurRegenCount)
+	// 			// {
+	// 			// 	++CurRegenCount;
+	// 			// 	ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
+	// 			// }
+	// 			//
+	// 			// if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
+	// 			// {
+	// 			// 	ObjectPoolManager->MiddleBossSpawn();
+	// 			// 	++MiddleBossCount;
+	// 			// }
+	// 			//
+	// 			// if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
+	// 			// {
+	// 			// }
+	//
+	// 			CurRegenTime -= RegenTime;
+	// 		}
+	//
+	// 		if (CurStageTime >= StageTime)
+	// 		{
+	// 			NextStage();
+	// 			CurStageTime = 0;
+	// 		}
+	// 	}
+	// }
+	//
+	// if (EXPDataMap.Num() > 0 && curExp >= ExpInfo.XP)
+	// {
+	// 	++curLevel;
+	// 	curExp -= ExpInfo.XP;
+	// 	UpdateExpInfo(ExpInfo.ID + 1);
+	// }
+	//
+	// SetTime();
 }
 
 void ACGameState::PrintExpDataMap()

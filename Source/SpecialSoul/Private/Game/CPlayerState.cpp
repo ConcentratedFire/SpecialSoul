@@ -36,30 +36,33 @@ void ACPlayerState::SetInitialData()
 
 float ACPlayerState::CalcDamage(float CurDamage, bool& OutbIsCri)
 {
+	LOG_S(Warning, TEXT("CalcDamage : %f"), CurDamage);
 	OutbIsCri = false;
-	if (UpgradeDataMap.Num() == 0) return CurDamage;
-
-	// 추가해야되는 퍼센트
-	int32 CalcDamagePercent = UpgradeDataMap["Damage"].DefaultValue + UpgradeDataMap["Damage"].AppendValue *
-		CurDamageGrade;
-	// ex) 220%
-	// 180 + 180 * 220/100 + 180 * 220%100 / 100
-	float quotient = CalcDamagePercent / 100;
-	float remainder = CalcDamagePercent % 100;
-	float ResultDamage = CurDamage + (CurDamage * quotient) + (CurDamage * remainder / 100);
-
-	// 치명타 퍼센트
-	int32 CriPercent = UpgradeDataMap["CritChance"].DefaultValue + UpgradeDataMap["CritChance"].AppendValue *
-		CurCritChanceGrade;
-	if (FMath::RandRange(1, 100) <= CriPercent)
-	{
-		OutbIsCri = true;
-		return ResultDamage * 1.75; // 치명타 적용
-	}
-	else
-	{
-		return ResultDamage; // 치명타 미적용
-	}
+	return CurDamage;
+	
+	// if (UpgradeDataMap.Num() == 0) return CurDamage;
+	//
+	// // 추가해야되는 퍼센트
+	// int32 CalcDamagePercent = UpgradeDataMap["Damage"].DefaultValue + UpgradeDataMap["Damage"].AppendValue *
+	// 	CurDamageGrade;
+	// // ex) 220%
+	// // 180 + 180 * 220/100 + 180 * 220%100 / 100
+	// float quotient = CalcDamagePercent / 100;
+	// float remainder = CalcDamagePercent % 100;
+	// float ResultDamage = CurDamage + (CurDamage * quotient) + (CurDamage * remainder / 100);
+	//
+	// // 치명타 퍼센트
+	// int32 CriPercent = UpgradeDataMap["CritChance"].DefaultValue + UpgradeDataMap["CritChance"].AppendValue *
+	// 	CurCritChanceGrade;
+	// if (FMath::RandRange(1, 100) <= CriPercent)
+	// {
+	// 	OutbIsCri = true;
+	// 	return ResultDamage * 1.75; // 치명타 적용
+	// }
+	// else
+	// {
+	// 	return ResultDamage; // 치명타 미적용
+	// }
 }
 
 float ACPlayerState::CalcAbilityHaste(float CurHaste)

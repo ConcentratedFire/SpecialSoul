@@ -39,7 +39,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	int32 MaxChargeCount{3};
+	UPROPERTY(Replicated)
 	int32 SkillChargeCount{MaxChargeCount};
+	UPROPERTY(Replicated)
 	bool bIsESkillActive = false;
 	float ChargeCooldown = 20.f;
 	FTimerHandle ChargeTimerHandle; // 충전 타이머
@@ -47,4 +49,12 @@ private:
 	void StartChargeTimer();
 	UFUNCTION()
 	void OnChargeCompleted();
+
+private: // RPC
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UFUNCTION(Client, Reliable)
+	void CRPC_CheckCanSkill();
+	UFUNCTION(Server, Reliable)
+	void SRPC_UseSkill();
 };

@@ -44,7 +44,7 @@ private:
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
-	UPROPERTY(EditDefaultsOnly, category = Attack)
+	UPROPERTY(EditDefaultsOnly, category = Attack, Replicated)
 	float Damage = 100;
 	bool IsCri;
 
@@ -52,4 +52,7 @@ private:
 	FRotator Rot{0, 5, 0};
 
 	float AppendYaw =0;
+
+private:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

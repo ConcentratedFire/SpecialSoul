@@ -94,24 +94,24 @@ void ACBasePlayer::BeginPlay()
 	// TODO Init Data Settings
 	// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
 	// PlayerState의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
-	if (HasAuthority())
-	{
-		GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
-		GS = GM->GetGameState<ACGameState>();
-		PS = Cast<ACPlayerState>(GetPlayerState());
-
-		DataSheetUtility = GM->DataSheetUtility;
-	}
-
-	// 오브젝트 풀 매니저 가져오기
-	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
-	{
-		ObjectPoolManager = *It;
-	}
-
-	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
-
-	InitUpgradeUI(); // 업그레이드 UI 생성 (추가는 안함)
+	// if (HasAuthority())
+	// {
+	// 	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	// 	GS = GM->GetGameState<ACGameState>();
+	// 	PS = Cast<ACPlayerState>(GetPlayerState());
+	//
+	// 	DataSheetUtility = GM->DataSheetUtility;
+	// }
+	//
+	// // 오브젝트 풀 매니저 가져오기
+	// for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+	// {
+	// 	ObjectPoolManager = *It;
+	// }
+	//
+	// GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
+	//
+	// InitUpgradeUI(); // 업그레이드 UI 생성 (추가는 안함)
 }
 
 // Called every frame
@@ -125,6 +125,8 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if (!IsLocallyControlled()) return;
+	
 	if (auto pc = GetWorld()->GetFirstPlayerController())
 	{
 		auto LocalPlayer = pc->GetLocalPlayer();

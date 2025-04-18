@@ -32,25 +32,26 @@ void ACYasuo::BeginPlay()
 	// {
 	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
 	// }
-	SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
-	SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
+	
+	// SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
+	// SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
 
 	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
 	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::ChargePassiveEnergy, 1.f, true);
 
-	if (ObjectPoolManager)
-	{
-		ObjectPoolManager->MakeTornadoPool(this);
-	}
+	// if (ObjectPoolManager)
+	// {
+	// 	ObjectPoolManager->MakeTornadoPool(this);
+	// }
 }
 
 void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetAttackFrontVector();
-	RotateArrow();
+	// SetAttackFrontVector();
+	// RotateArrow();
 
 	// 데이터가 들어왔는지 체크
 	if (PS && PS->YasuoMoveDataMap.Num() > 0)
@@ -72,7 +73,7 @@ void ACYasuo::Tick(float DeltaTime)
 		// 기류가 100이 되면 회오리 발사
 		if (!bAttacking && PassiveEnergy >= 100)
 		{
-			Anim->PlayAttackMontage();
+			//Anim->PlayAttackMontage();
 			bAttacking = true;
 		}
 	}
@@ -86,6 +87,8 @@ float ACYasuo::GetDamage(bool& OutbIsCri) const
 
 void ACYasuo::Attack()
 {
+	if (!HasAuthority()) return;
+	
 	TArray<FVector> AttackVectors = GetAttackVector();
 	for (const FVector& Vector : AttackVectors)
 	{
@@ -210,12 +213,13 @@ void ACYasuo::RotateArrow()
 
 void ACYasuo::ESkill(const bool bAnimStart)
 {
+	LOG_S(Warning, TEXT("ESkill"));
 	Anim->PlayESkillMontage(bAnimStart);
 	GetCharacterMovement()->GravityScale = bAnimStart ? 0.f : 1.f;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
 
 	if (bAnimStart) return;
-
+	
 	FTransform Transform;
 	FVector curLocation = GetActorLocation();
 	curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();

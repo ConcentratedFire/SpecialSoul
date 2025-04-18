@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Enemy/BaseEnemy.h"
 #include "Item/CBaseItem.h"
+#include "Net/UnrealNetwork.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CYasuo.h"
 
@@ -58,14 +59,14 @@ void ACTornado_E::Tick(float DeltaTime)
 void ACTornado_E::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
-	if (!bNewHidden)
+	if (HasAuthority() && !bNewHidden)
 	{
 		AppendYaw = 0.f;
 
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
 		SetActorLocation(UpLocation);
-
+		LOG_S(Warning, TEXT("Tornado E Hidden"));
 		Damage = OwnerYasuo->GetDamage(IsCri);
 	}
 }
@@ -84,4 +85,11 @@ void ACTornado_E::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
 			Item->ActiveItem();
 	}
+}
+
+void ACTornado_E::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACTornado_E, Damage);
 }

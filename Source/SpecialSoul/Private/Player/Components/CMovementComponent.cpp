@@ -4,6 +4,7 @@
 #include "Player/Components/CMovementComponent.h"
 
 #include "EnhancedInputComponent.h"
+#include "SpecialSoul.h"
 #include "Player/CBasePlayer.h"
 #include "Player/CPlayerController.h"
 #include "Player/CYasuo.h"
@@ -24,9 +25,11 @@ void UCMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
+	LOG_S(Warning, TEXT("GetOwner : %s"), GetOwner()?TEXT("true"):TEXT("false"));
 	if (GetOwner())
 	{
 		BaseOwnerCharacter = Cast<ACBasePlayer>(GetOwner());
+		LOG_S(Warning, TEXT("BaseOwnerCharacter : %s"), BaseOwnerCharacter?TEXT("true"):TEXT("false"));
 		if (BaseOwnerCharacter)
 		{
 			BaseOwnerCharacter->OnInputBindingDel.AddUObject(this, &UCMovementComponent::SetInputBinding);
@@ -58,7 +61,7 @@ void UCMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	RotationToMouseCursor(DeltaTime);
+	CRPC_RotationToMouseCursor();
 
 	// 플레이중인 캐릭터가 야스오 일때, 이동거리를 체크하고 기력을 충전시킴
 	if (YasuoCharacer)
@@ -86,11 +89,11 @@ void UCMovementComponent::Move(const FInputActionValue& Value)
 	BaseOwnerCharacter->AddMovementInput(direction);
 }
 
-void UCMovementComponent::RotationToMouseCursor(const float& DeltaTime)
+void UCMovementComponent::CRPC_RotationToMouseCursor_Implementation()
 {
 	if (!PC) return;
-	if (!bCanMove) return;
-
+	// if (!bCanMove) return;
+	
 	FHitResult HitResult;
 	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	if (bHit)
@@ -99,14 +102,23 @@ void UCMovementComponent::RotationToMouseCursor(const float& DeltaTime)
 		directionToMouseCursor.Z = 0;
 		directionToMouseCursor.Normalize();
 
-		// 목표 회전값
-		FRotator targetRot = FRotationMatrix::MakeFromX(directionToMouseCursor).Rotator();
-
-		// 현재 회전값에서 목표 회전값으로 보간
-		FRotator CurrentRotation = BaseOwnerCharacter->GetActorRotation();
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, targetRot, DeltaTime, RoationInteropSpeed);
-
 		// 회전 적용
-		BaseOwnerCharacter->SetActorRotation(NewRotation);
+		SRPC_RotationToMouseCursor(directionToMouseCursor);		
 	}
+}
+
+void UCMovementComponent::SRPC_RotationToMouseCursor_Implementation(const FVector MouseDirection)
+{	
+	// 목표 회전값
+	FRotator targetRot = FRotationMatrix::MakeFromX(MouseDirection).Rotator();
+
+	// 현재 회전값에서 목표 회전값으로 보간
+	FRotator CurrentRotation = BaseOwnerCharacter->GetActorRotation();
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, targetRot, BaseOwnerCharacter->GetWorld()->GetDeltaSeconds(), RoationInteropSpeed);
+	MRPC_RotationToMouseCursor(NewRotation);
+}
+
+void UCMovementComponent::MRPC_RotationToMouseCursor_Implementation(const FRotator NewRotation)
+{
+	BaseOwnerCharacter->SetActorRotation(NewRotation);
 }

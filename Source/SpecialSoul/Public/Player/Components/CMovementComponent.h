@@ -46,8 +46,13 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Rotation)
 	float RoationInteropSpeed = 5.f;
-	
-	void RotationToMouseCursor(const float& DeltaTime);
+
+	UFUNCTION(client, Unreliable)
+	void CRPC_RotationToMouseCursor();
+	UFUNCTION(server, Reliable)
+	void SRPC_RotationToMouseCursor(const FVector MouseDirection);
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_RotationToMouseCursor(const FRotator NewRotation);	
 
 private: // Yasuo Move Distance Check
 	UPROPERTY()

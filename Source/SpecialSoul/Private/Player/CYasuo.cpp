@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "ObjectPool/CObjectPoolManager.h"
+#include "Player/CPlayerController.h"
 #include "Player/Anim/CYasuoAnim.h"
 #include "Player/AttackActors/CTornado.h"
 #include "Player/Components/CMovementComponent.h"
@@ -29,15 +30,10 @@ void ACYasuo::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// if (DataSheetUtility)
-	// {
-	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &ACYasuo::PrintAttackDataMap);
-	// }
-
 	// SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>());
 	// SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>());
 
-	Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
+	// Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 
 	GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::ChargePassiveEnergy, 1.f, true);
 
@@ -51,7 +47,13 @@ void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CRPC_SetAttackFrontVector();
+	if (!Anim && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
+	}
+
+	if (IsLocallyControlled())
+		CRPC_SetAttackFrontVector();
 
 	// // 데이터가 들어왔는지 체크
 	// if (PS && PS->YasuoMoveDataMap.Num() > 0)
@@ -148,9 +150,8 @@ void ACYasuo::SRPC_ReplicateAttackVector_Implementation(FVector AttackDir)
 
 void ACYasuo::OnRep_RotateArrow()
 {
-	// RotateArrow();
-	LOG_S(Warning, TEXT("AttackFrontVector : %.2f, %.2f, %.2f"), AttackFrontVector.X, AttackFrontVector.Y,
-	      AttackFrontVector.Z);
+	// LOG_S(Warning, TEXT("AttackFrontVector : %.2f, %.2f, %.2f"), AttackFrontVector.X, AttackFrontVector.Y,
+	// AttackFrontVector.Z);
 	float rotateValue = UKismetMathLibrary::MakeRotFromX(AttackFrontVector).Yaw * -1;
 	FRotator newRot = ArrowRotation;
 	newRot.Roll += rotateValue;
@@ -175,46 +176,6 @@ TArray<FVector> ACYasuo::GetAttackVector()
 	return AttackVectors;
 }
 
-void ACYasuo::PrintAttackDataMap()
-{
-	for (const auto& Pair : PS->YasuoAttackDataMap)
-	{
-		UE_LOG(LogTemp, Log,
-		       TEXT(
-			       "Yasuo's AttackDataMap || ID: %d) ProjectileCount: %d, ProjectileRange: %f, Damage: %f, UseAOE: %s, AOELifeTime: %f, AOEDamage: %f, AOEDamageCoolTime: %f"
-		       ),
-		       Pair.Key, Pair.Value.ProjectileCount, Pair.Value.ProjectileRange, Pair.Value.Damage, *Pair.Value.UseAOE,
-		       Pair.Value.AOELifeTime, Pair.Value.AOEDamage, Pair.Value.AOEDamageCoolTime);
-	}
-	for (const auto& Pair : PS->YasuoMoveDataMap)
-	{
-		UE_LOG(LogTemp, Log,
-		       TEXT(
-			       "Yasuo's AttackDataMap || ID: %d) ProjectileCount: %d, ProjectileRange: %d, Damage: %f"
-		       ),
-		       Pair.Key, Pair.Value.RangeFrom, Pair.Value.RangeTo, Pair.Value.StackDistance);
-	}
-
-	// 초기 데이터 세팅
-	if (PS->YasuoAttackDataMap.Num() > 0)
-		UpgradeWeapon(1);
-
-	if (PS->YasuoMoveDataMap.Num() > 0)
-		UpdateYasuoMoveStat(1);
-}
-
-void ACYasuo::UpdateYasuoMoveStat(const int32 Level)
-{
-	if (PS->YasuoMoveDataMap.Num() == 0) return;
-	if (Level == GS->MaxLevel) return;
-
-	const auto& StatData = PS->YasuoMoveDataMap[Level];
-	YasuoMoveInfo.ID = StatData.ID;
-	YasuoMoveInfo.RangeFrom = StatData.RangeFrom;
-	YasuoMoveInfo.RangeTo = StatData.RangeTo;
-	YasuoMoveInfo.StackDistance = StatData.StackDistance;
-}
-
 void ACYasuo::ChargePassiveEnergy()
 {
 	// 4의 기류를 획득
@@ -225,7 +186,7 @@ void ACYasuo::ChargePassiveEnergy()
 void ACYasuo::CheckMoveData()
 {
 	if (GS->GetCurLevel() > YasuoMoveInfo.RangeTo)
-		UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
+		PC->UpdateYasuoMoveStat(GS->GetCurLevel() + 1);
 }
 
 void ACYasuo::RotateArrow()
@@ -234,7 +195,7 @@ void ACYasuo::RotateArrow()
 
 void ACYasuo::ESkill(const bool bAnimStart)
 {
-	LOG_S(Warning, TEXT("ESkill"));
+	// LOG_S(Warning, TEXT("ESkill"));
 	Anim->PlayESkillMontage(bAnimStart);
 	GetCharacterMovement()->GravityScale = bAnimStart ? 0.f : 1.f;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, bAnimStart ? ECR_Ignore : ECR_Block);
@@ -260,27 +221,10 @@ void ACYasuo::ActivateSkillMovement(bool bActivate)
 	MoveComp->bCanMove = !bActivate;
 }
 
-void ACYasuo::UpgradeWeapon(const int32 Level)
-{
-	if (!PS->YasuoAttackDataMap.Contains(Level)) return;
-
-	const auto& StatData = PS->YasuoAttackDataMap[Level];
-	YasuoStat.ID = StatData.ID;
-	YasuoStat.ProjectileCount = StatData.ProjectileCount;
-	YasuoStat.ProjectileRange = StatData.ProjectileRange;
-	YasuoStat.Damage = StatData.Damage;
-	YasuoStat.UseAOE = StatData.UseAOE;
-	YasuoStat.AOELifeTime = StatData.AOELifeTime;
-	YasuoStat.AOEDamage = StatData.AOEDamage;
-	YasuoStat.AOEDamageCoolTime = StatData.AOEDamageCoolTime;
-}
-
 void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)
 {
 	// 레벨업 후 정보 갱신 처리
 	// MoveData는 키값 체크 후 넘기기
 	if (PS->YasuoMoveDataMap.Contains(PlayerLevel))
-		UpdateYasuoMoveStat(PlayerLevel);
-
-	Super::UpdatePlayerData(PlayerLevel);
+		PC->UpdateYasuoMoveStat(PlayerLevel);
 }

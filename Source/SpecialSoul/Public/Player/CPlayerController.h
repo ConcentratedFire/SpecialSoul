@@ -20,10 +20,22 @@ public:
 
 	UPROPERTY()
 	class UCSelectUpgradeWidget* SelectUpgradeWidget;
+
 private:
 	ACPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void OnPossess(APawn* InPawn) override;
 
-	
+private:
+	UPROPERTY()
+	class ACGameState* GS;
+	UPROPERTY()
+	class ACPlayerState* MyPlayerState;
+	UPROPERTY()
+	class ACBasePlayer* MyPlayer;
+
+public:
+	void UpgradeWeapon(int32 Level);
+	void UpdateYasuoMoveStat(int32 Level);
 };

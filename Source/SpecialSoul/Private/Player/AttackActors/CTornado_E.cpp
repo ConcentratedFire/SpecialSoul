@@ -66,7 +66,7 @@ void ACTornado_E::SetActorHiddenInGame(bool bNewHidden)
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
 		SetActorLocation(UpLocation);
-		LOG_S(Warning, TEXT("Tornado E Hidden"));
+		// LOG_S(Warning, TEXT("Tornado E Hidden"));
 		Damage = OwnerYasuo->GetDamage(IsCri);
 	}
 }

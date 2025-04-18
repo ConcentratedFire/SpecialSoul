@@ -23,6 +23,8 @@
 #include "Utility/CDataSheetUtility.h"
 #include "Data/JinxData.h"
 #include "Data/CYasuoData.h"
+#include "Player/CYasuo.h"
+#include "Player/Jinx.h"
 #include "Player/Components/SkillComponent.h"
 
 struct FJinxAttackData;
@@ -91,33 +93,60 @@ void ACBasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
+	PC = Cast<ACPlayerController>(GetController());
+
 	// TODO Init Data Settings
 	// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
 	// PlayerState의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
-	// if (HasAuthority())
-	// {
-	// 	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
-	// 	GS = GM->GetGameState<ACGameState>();
-	// 	PS = Cast<ACPlayerState>(GetPlayerState());
-	//
-	// 	DataSheetUtility = GM->DataSheetUtility;
-	// }
-	//
+	if (HasAuthority())
+	{
+		GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+		GS = GM->GetGameState<ACGameState>();
+		DataSheetUtility = GM->DataSheetUtility;
+	}
+
 	// // 오브젝트 풀 매니저 가져오기
 	// for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
 	// {
 	// 	ObjectPoolManager = *It;
 	// }
-	//
-	// GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
-	//
+
 	// InitUpgradeUI(); // 업그레이드 UI 생성 (추가는 안함)
+}
+
+void ACBasePlayer::PrintNetLog()
+{
+	FString logStr = TEXT("Data Count : 0"); // 기본값 설정
+
+	if (PS != nullptr)
+	{
+		int32 dataCount =0;
+		if (this->IsA(ACYasuo::StaticClass()))
+			dataCount = PS->YasuoAttackDataMap.Num();
+		else if (this->IsA(AJinx::StaticClass()))
+			dataCount = PS->JinxAttackDataMap.Num();
+		
+		logStr = FString::Printf(TEXT("Data Count : %d"), dataCount);
+	}
+	else
+	{
+		logStr = TEXT("Data Count : Error (PlayerState is null)");
+	}
+
+	DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100.0f, logStr, nullptr, FColor::Red, 0, true,
+					1);
 }
 
 // Called every frame
 void ACBasePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	PrintNetLog();
+	if (!PS)
+	{
+		PS = Cast<ACPlayerState>(GetPlayerState());
+	}
 }
 
 // Called to bind functionality to input
@@ -126,7 +155,7 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (!IsLocallyControlled()) return;
-	
+
 	if (auto pc = GetWorld()->GetFirstPlayerController())
 	{
 		auto LocalPlayer = pc->GetLocalPlayer();

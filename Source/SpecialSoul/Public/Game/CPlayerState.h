@@ -59,7 +59,6 @@ public: // 캐릭터 데이터
 	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoMoveData> YasuoMoveDataMap;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FJinxAttackData> JinxAttackDataMap;
 
@@ -69,7 +68,8 @@ public: // 스텟 계산 및 반환
 	int32 CalcProjectile(int32 CurProjectile);
 
 public:
-	void SetInitialData();
+	UFUNCTION(Server, Reliable)
+	void SRPC_SetInitialData();
 
 	UFUNCTION()
 	void UpdateGradeInfo(); // 초기 데이터 세팅용

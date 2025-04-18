@@ -36,10 +36,7 @@ public:
 	void WindWall();
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
-	FYasuoAttackData YasuoStat;
-	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
-	FYasuoMoveData YasuoMoveInfo;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	int32 PassiveEnergy = 0;
 
@@ -63,15 +60,7 @@ public:
 private: // Anim
 	UPROPERTY()
 	class UCYasuoAnim* Anim;
-
-public: // Spec
-	UFUNCTION()
-	virtual void PrintAttackDataMap() override; // 임시
-
-private:
-	virtual void UpgradeWeapon(const int32 Level) override;
-	void UpdateYasuoMoveStat(const int32 Level);
-
+ 
 private: // Passive Energy
 	const int32 PassiveEnergyMax = 100;
 	const int32 PassiveEnergyRegen = 4;

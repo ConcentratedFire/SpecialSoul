@@ -24,21 +24,22 @@ void ACGameState::BeginPlay()
 
 	HUD = Cast<AGameHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
-	// if (HasAuthority())
-	// {
-	// 	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
-	// 	if (GM->DataSheetUtility)
-	// 	{
-	// 		GM->ReadExcelData();
-	// 		ReadExcelData(GM->DataSheetUtility);
-	// 	}
-	//
-	// 	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
-	// 	{
-	// 		ObjectPoolManager = *It;
-	// 		//ObjectPoolManager->InitSettings();
-	// 	}
-	// }	
+	// 서버일때만 데이터 읽어오기
+	if (HasAuthority())
+	{
+		GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM->DataSheetUtility)
+		{
+			GM->ReadExcelData();
+			ReadExcelData(GM->DataSheetUtility);
+		}
+	
+		// for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+		// {
+		// 	ObjectPoolManager = *It;
+		// 	ObjectPoolManager->InitSettings();
+		// }
+	}	
 }
 
 void ACGameState::Tick(float DeltaSeconds)

@@ -25,11 +25,11 @@ void UCMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	LOG_S(Warning, TEXT("GetOwner : %s"), GetOwner()?TEXT("true"):TEXT("false"));
+	// LOG_S(Warning, TEXT("GetOwner : %s"), GetOwner()?TEXT("true"):TEXT("false"));
 	if (GetOwner())
 	{
 		BaseOwnerCharacter = Cast<ACBasePlayer>(GetOwner());
-		LOG_S(Warning, TEXT("BaseOwnerCharacter : %s"), BaseOwnerCharacter?TEXT("true"):TEXT("false"));
+		// LOG_S(Warning, TEXT("BaseOwnerCharacter : %s"), BaseOwnerCharacter?TEXT("true"):TEXT("false"));
 		if (BaseOwnerCharacter)
 		{
 			BaseOwnerCharacter->OnInputBindingDel.AddUObject(this, &UCMovementComponent::SetInputBinding);

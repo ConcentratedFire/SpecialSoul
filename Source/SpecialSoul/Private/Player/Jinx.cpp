@@ -49,15 +49,11 @@ void AJinx::BeginPlay()
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	SkillComponent->BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
 
-	if (HasAuthority() && DataSheetUtility)
-	{
-		DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::InitAllData);
-	}
-
-	PC = Cast<ACPlayerController>(GetController());
-
+	// if (HasAuthority() && DataSheetUtility)
+	// {
+	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::InitAllData);
+	// }
 }
-
 
 void AJinx::Attack()
 {
@@ -81,20 +77,11 @@ void AJinx::UpdatePlayerData(const int32 PlayerLevel)
 
 void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
 {
-	AttackData = PS->JinxAttackDataMap.FindRef(PlayerLevel);
-
+	// AttackData = PS->JinxAttackDataMap.FindRef(PlayerLevel);
+	PC->UpgradeWeapon(PlayerLevel);
 	 // 업데이트된 데이터로 공격 시작
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
 	StartAttack();
-}
-
-void AJinx::PrintAttackDataMap() // CBasePlayer.cpp에서 바인딩됨
-{
-	for (const auto& Pair : PS->JinxAttackDataMap)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Jinx's AttackDataMap || ID: %d) ProjectileCount: %d, ProjectileRange: %f, Damage: %f, Cooltime: %f, UseAP: %s, APDamage: %f"),
-			Pair.Key, Pair.Value.ProjectileCount, Pair.Value.ProjectileRange, Pair.Value.Damage, Pair.Value.Cooltime, *Pair.Value.UseAP, Pair.Value.APDamage);
-	}
 }
 
 void AJinx::ActivateSkillMovement(bool bActive)
@@ -119,7 +106,7 @@ void AJinx::StartAttack()
 	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
 	{
 		PlayAnimMontage(AttackMontage); // AttackMontage의 AnimNotify에서 애니메이션의 특정 프레임에 Attack 호출
-	}), AttackData.Cooltime, true, AttackData.Cooltime);
+	}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime);
 }
 
 void AJinx::RotateToMouseCursor()

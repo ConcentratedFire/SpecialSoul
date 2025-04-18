@@ -27,6 +27,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void PrintNetLog();
 
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;
@@ -34,6 +35,8 @@ protected:
 	class ACGameState* GS;
 	UPROPERTY()
 	class ACPlayerState* PS;
+	UPROPERTY()
+	class ACPlayerController* PC;
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
@@ -75,14 +78,6 @@ protected: // Actor Component
 protected: // Get Player Data
 	UPROPERTY()
 	class UCDataSheetUtility* DataSheetUtility;
-
-public:
-	// Base는 virtual로만 만들고, Child에서 구현
-	// Child의 BeginPlay에서 델리게이트 바인딩
-	// Child에서는 override할때 UFUNCTION 붙여줘야 함.
-	virtual void PrintAttackDataMap()
-	{
-	};
 
 protected: // MoveSpeed
 	UPROPERTY(EditDefaultsOnly, Category = "MoveSpeed")
@@ -168,4 +163,12 @@ public:
 
 public:
 	bool bAttacking = false;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
+	FYasuoAttackData YasuoStat;
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
+	FYasuoMoveData YasuoMoveInfo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	FJinxAttackData JinxAttackData; // 기본공격 데이터
 };

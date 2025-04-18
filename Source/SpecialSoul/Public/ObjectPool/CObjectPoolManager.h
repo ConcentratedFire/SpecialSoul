@@ -290,7 +290,7 @@ void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32&
 		PlaceActorSetPlace(PoolArray, AddPoolSize, Class, SpawnTransform);
 
 	T* PoolObj = PoolArray.Pop();
-	LOG_S(Warning, TEXT("%s"), PoolObj?*PoolObj->GetName():TEXT("Nullptr"));
+	// LOG_S(Warning, TEXT("%s"), PoolObj?*PoolObj->GetName():TEXT("Nullptr"));
 	PoolObj->SetActorTransform(SpawnTransform);
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);

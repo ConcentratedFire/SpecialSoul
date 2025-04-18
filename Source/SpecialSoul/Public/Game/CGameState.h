@@ -94,4 +94,10 @@ private:
 	FEXPData ExpInfo;
 
 	void UpdateExpInfo(int32 Level);
+
+private:
+	UPROPERTY()
+	class AGameHUD* HUD;
+	float GamePlayTime = 0;
+	void SetTime();
 };

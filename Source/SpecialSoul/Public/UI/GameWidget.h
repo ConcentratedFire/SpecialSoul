@@ -16,8 +16,11 @@ class SPECIALSOUL_API UGameWidget : public UUserWidget
 
 public:
 	void SetKillScore(int32 KillScore);
+	void SetTime(float Time);
 	
 private:
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCKillScoreWidget* WBP_KillScore;
+	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
+	class UCTimeWidget* WBP_Timer;
 };

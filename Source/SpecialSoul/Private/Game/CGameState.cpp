@@ -79,8 +79,7 @@ void ACGameState::Tick(float DeltaSeconds)
 				
 			if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
 			{
-			}
-			
+			}			
 
 			if (CurStageTime >= StageTime)
 			{

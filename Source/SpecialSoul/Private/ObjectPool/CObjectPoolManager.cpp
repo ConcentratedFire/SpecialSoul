@@ -50,8 +50,8 @@ void ACObjectPoolManager::InitSettings()
 	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	InitPool(RangePool, AppendEnemyPoolSize, RangedEnemy);
 
-	InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
-	InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
+	// InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
+	// InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
 
 	InitPool(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor);
 }
@@ -253,9 +253,9 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 		PoolObj->SetManager(this);
 		PoolObj->SetActorEnableCollision(false);
 		PoolObj->SetActorHiddenInGame(true);
+		PoolObj->SetActorTickEnabled(false);
 		UGameplayStatics::FinishSpawningActor(PoolObj, Transform);
 
-		PoolObj->SetActorTickEnabled(false);
 		// LOG_S(Warning, TEXT("Enemy Add : %p\tName : %s"), PoolObj, PoolObj==nullptr?TEXT("nullptr"):*PoolObj->GetName());
 		PoolArray.Push(PoolObj);
 	}
@@ -263,11 +263,10 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 
 void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
 {
-	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	// if (bIsMelee)
-	// 	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	// else
-	// 	PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangedEnemy);
+	if (bIsMelee)
+		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	else
+		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangedEnemy);
 }
 
 void ACObjectPoolManager::MiddleBossSpawn()

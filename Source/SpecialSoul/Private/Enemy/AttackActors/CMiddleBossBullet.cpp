@@ -2,8 +2,6 @@
 
 
 #include "Enemy/AttackActors/CMiddleBossBullet.h"
-
-#include "EngineUtils.h"
 #include "ObjectPool/CObjectPoolManager.h"
 
 // Sets default values
@@ -40,6 +38,12 @@ void ACMiddleBossBullet::SetActorHiddenInGame(bool bNewHidden)
 		TargetLocation = GetActorLocation() + GetActorForwardVector() * 500;
 		CurrentTime = 0.f;
 	}
+}
+
+void ACMiddleBossBullet::SetOwner(AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+	OwnerMiddleBoss = Cast<ACMiddleBoss>(NewOwner);
 }
 
 float ACMiddleBossBullet::easeInOutExpo(float x)

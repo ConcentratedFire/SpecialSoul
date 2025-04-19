@@ -46,8 +46,8 @@ private:
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;
 	UPROPERTY()
-	class ACObjectPoolManager* ObjectPoolManager;
-
+	TObjectPtr<class ACObjectPoolManager> ObjectPoolManager;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Game")
 	float StageTime = 20.f;
 	float CurStageTime = 0.f;

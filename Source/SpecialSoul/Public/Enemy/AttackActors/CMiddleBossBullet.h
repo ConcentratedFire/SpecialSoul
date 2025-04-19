@@ -28,6 +28,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	virtual void SetOwner(AActor* NewOwner) override;
 
 	UPROPERTY()
 	class ACMiddleBoss* OwnerMiddleBoss;

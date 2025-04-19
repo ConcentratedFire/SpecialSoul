@@ -162,12 +162,12 @@ void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 
 void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlacePlayerAttackSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform, NewOwner);
+	PlaceActorSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform, NewOwner);
 }
 
 void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlacePlayerAttackSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform, NewOwner);
+	PlaceActorSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform, NewOwner);
 }
 
 void ACObjectPoolManager::WindWallSpawn(FTransform SpawnTransform)

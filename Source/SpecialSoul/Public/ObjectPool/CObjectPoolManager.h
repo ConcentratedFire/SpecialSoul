@@ -207,11 +207,7 @@ private: // Place
 
 	template <typename T>
 	void PlaceActorSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
-	                        const FTransform SpawnTransform);
-
-	template <typename T>
-	void PlacePlayerAttackSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
-	                               const FTransform SpawnTransform, AActor* NewOwner = nullptr);
+	                        const FTransform SpawnTransform, AActor* NewOwner = nullptr);
 };
 
 template <typename T>
@@ -291,7 +287,7 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 
 template <typename T>
 void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize,
-                                             const TSubclassOf<T>& Class, const FTransform SpawnTransform)
+                                             const TSubclassOf<T>& Class, const FTransform SpawnTransform, AActor* NewOwner)
 {
 	if (PoolArray.Num() == 0)
 		InitPool(PoolArray, AddPoolSize, Class);
@@ -307,34 +303,6 @@ void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32&
 
 	if (bIsNullActor)
 		PlaceActorSetPlace(PoolArray, AddPoolSize, Class, SpawnTransform);
-
-	T* PoolObj = PoolArray.Pop();
-	// LOG_S(Warning, TEXT("%s"), PoolObj?*PoolObj->GetName():TEXT("Nullptr"));
-	PoolObj->SetActorTransform(SpawnTransform);
-	PoolObj->SetActorEnableCollision(true);
-	PoolObj->SetActorHiddenInGame(false);
-	PoolObj->SetActorTickEnabled(true);
-}
-
-template <typename T>
-void ACObjectPoolManager::PlacePlayerAttackSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize,
-                                                    const TSubclassOf<T>& Class, const FTransform SpawnTransform,
-                                                    AActor* NewOwner)
-{
-	if (PoolArray.Num() == 0)
-		InitPool(PoolArray, AddPoolSize, Class);
-
-	// Pool에 들어가는 시점과 추가되는 시점이 겹치면 Null값이 배열에 들어가는 경우 발생
-	// 만약 Top이 Null이라면 요소를 제거하고 다시 수행하도록 재귀 호출
-	bool bIsNullActor = false;
-	while (!PoolArray.Top())
-	{
-		bIsNullActor = true;
-		PoolArray.Pop();
-	}
-
-	if (bIsNullActor)
-		PlacePlayerAttackSetPlace(PoolArray, AddPoolSize, Class, SpawnTransform, NewOwner);
 
 	T* PoolObj = PoolArray.Pop();
 	// LOG_S(Warning, TEXT("%s"), PoolObj?*PoolObj->GetName():TEXT("Nullptr"));

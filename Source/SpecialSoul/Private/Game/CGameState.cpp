@@ -165,8 +165,3 @@ void ACGameState::OnRep_PlayTime()
 {
 	HUD->SetTime(GamePlayTime);
 }
-
-void ACGameState::SRPC_SpawnEnemy_Implementation()
-{
-	
-}

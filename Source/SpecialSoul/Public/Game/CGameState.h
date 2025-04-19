@@ -100,13 +100,10 @@ private:
 	class AGameHUD* HUD;
 	UPROPERTY(ReplicatedUsing=OnRep_PlayTime)
 	float GamePlayTime = 0;
-	void SetTime();
 
 private:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	UFUNCTION(Server, Reliable)
-	void SRPC_SpawnEnemy();
 	UFUNCTION()
 	void OnRep_PlayTime();
 };

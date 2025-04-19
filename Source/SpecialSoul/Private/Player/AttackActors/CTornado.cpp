@@ -13,6 +13,8 @@ ACTornado::ACTornado()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	SetReplicateMovement(true);
 
 	TornadoBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TornadoBox"));
 	RootComponent = TornadoBox;
@@ -58,7 +60,7 @@ void ACTornado::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
 
-	if (!bNewHidden)
+	if (HasAuthority() &&!bNewHidden)
 	{
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
@@ -75,6 +77,36 @@ void ACTornado::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!OwnerYasuo->IsLocallyControlled()) return;
+	SRPC_MoveTornado(DeltaTime);	
+}
+
+void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                   const FHitResult& SweepResult)
+{
+	if (!HasAuthority()) return;
+	
+	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
+	{
+		// Enemy->MyDamage(Damage);
+		OwnerYasuo->MyApplyDamage(Damage, Enemy);
+	}
+	else if (auto Item = Cast<ACBaseItem>(OtherActor))
+	{
+		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
+			Item->ActiveItem();
+	}
+}
+
+void ACTornado::SetOwner(AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+	OwnerYasuo = Cast<ACYasuo>(NewOwner);
+}
+
+void ACTornado::SRPC_MoveTornado_Implementation(const float DeltaTime)
+{
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
 
 	FRotator meshRot1 = TornadoMesh1->GetRelativeRotation();
@@ -88,21 +120,5 @@ void ACTornado::Tick(float DeltaTime)
 	if (FVector::Dist(TornadoStartLocation, TornadoCurLocation) >= Range)
 	{
 		ObjectPoolManager->ReturnTornado(this);
-	}
-}
-
-void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                   const FHitResult& SweepResult)
-{
-	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
-	{
-		// Enemy->MyDamage(Damage);
-		OwnerYasuo->MyApplyDamage(Damage, Enemy);
-	}
-	else if (auto Item = Cast<ACBaseItem>(OtherActor))
-	{
-		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
-			Item->ActiveItem();
 	}
 }

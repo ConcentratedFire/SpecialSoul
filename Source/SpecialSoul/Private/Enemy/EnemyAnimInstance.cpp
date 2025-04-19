@@ -4,6 +4,7 @@
 #include "Enemy/EnemyAnimInstance.h"
 
 #include "Enemy/BaseEnemy.h"
+#include "Enemy/CMiddleBoss.h"
 
 void UEnemyAnimInstance::NativeInitializeAnimation()
 {
@@ -15,7 +16,7 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	Super::NativeUpdateAnimation(DeltaTime);
 
 	auto OwnerPawn = TryGetPawnOwner();
-	if (!OwnerPawn)  return;
+	if (!OwnerPawn) return;
 	OwnerEnemy = Cast<ABaseEnemy>(OwnerPawn);
 	if (!OwnerEnemy) return;
 
@@ -24,17 +25,14 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 void UEnemyAnimInstance::AnimNotify_EnemyAttack()
 {
-	auto OwnerPawn = TryGetPawnOwner();
-	if (!OwnerPawn)  return;
-	OwnerEnemy = Cast<ABaseEnemy>(OwnerPawn);
-
-	if (!OwnerEnemy || !ProjectileActor) return;
-
+	ACMiddleBoss* OwnerPawn = Cast<ACMiddleBoss>(TryGetPawnOwner());
+	if (OwnerPawn && OwnerPawn->HasAuthority())
+		OwnerPawn->SRPC_Attack();
 }
 
 void UEnemyAnimInstance::AnimNotify_DieEnd()
 {
 	ABaseEnemy* OwnerPawn = Cast<ABaseEnemy>(TryGetPawnOwner());
-	if (!OwnerPawn) return;
-	OwnerPawn->DieEndAction();
+	if (OwnerPawn && OwnerPawn->HasAuthority())
+		OwnerPawn->DieEndAction();
 }

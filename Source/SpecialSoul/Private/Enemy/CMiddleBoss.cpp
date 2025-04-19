@@ -29,14 +29,14 @@ ACMiddleBoss::ACMiddleBoss()
 		DieMontage = tmpDieMontage.Object;
 }
 
-void ACMiddleBoss::Attack()
+void ACMiddleBoss::SRPC_Attack_Implementation()
 {
 	FTransform transform;
 	transform.SetLocation(GetActorLocation() + GetActorForwardVector() * 300);
 	transform.SetRotation(GetActorRotation().Quaternion());
 	transform.SetScale3D(FVector(1));
 	
-	ObjectPoolManager->MiddleBossBulletSpawn(transform);
+	ObjectPoolManager->MiddleBossBulletSpawn(transform, this);
 }
 
 void ACMiddleBoss::DieEndAction()

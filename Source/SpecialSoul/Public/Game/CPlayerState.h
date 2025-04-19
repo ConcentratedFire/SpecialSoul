@@ -59,7 +59,6 @@ public: // 캐릭터 데이터
 	TMap<int32, FYasuoAttackData> YasuoAttackDataMap;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FYasuoMoveData> YasuoMoveDataMap;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TMap<int32, FJinxAttackData> JinxAttackDataMap;
 
@@ -69,10 +68,8 @@ public: // 스텟 계산 및 반환
 	int32 CalcProjectile(int32 CurProjectile);
 
 public:
-	void SetInitialData();
-
-	UFUNCTION()
-	void UpdateGradeInfo(); // 초기 데이터 세팅용
+	UFUNCTION(Server, Reliable)
+	void SRPC_SetInitialData();
 
 	TArray<FString> ChooseUpgradeCardList(); // 업그레이드 카드 리스트 선택
 	void UpgradeStat(const FString statName);
@@ -215,9 +212,14 @@ private:
 	void RemoveArrayElement(const FString Element);
 
 private:
-	UPROPERTY(visibleAnywhere, Category = "Data")
+	UPROPERTY(visibleAnywhere, Category = "Data", ReplicatedUsing=OnRep_KillScore)
 	int32 KillScore{0};
+	UFUNCTION()
+	void OnRep_KillScore();
 
 public:
 	void AddKillScore();
+
+private:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

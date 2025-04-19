@@ -20,8 +20,6 @@
 
 class ARangedEnemyProjectile;
 class AMinigunBullet;
-DECLARE_MULTICAST_DELEGATE(FEnemyGotoPool);
-DECLARE_MULTICAST_DELEGATE(FEnemyOutFromPool);
 
 UCLASS()
 class SPECIALSOUL_API ACObjectPoolManager : public AActor
@@ -40,9 +38,6 @@ public:
 	void InitSettings();
 
 public:
-	FEnemyOutFromPool EnemyOutFromPool_Dele;
-	FEnemyGotoPool EnemyGotoPool_Dele;
-
 	// Return To ObjectPool
 	void ReturnEnemy(ACMeleeEnemy* Enemy);
 	void ReturnEnemy(ARangedEnemy* Enemy);
@@ -57,8 +52,8 @@ public:
 
 	// Tornado
 	void MakeTornadoPool(AActor* NewOwner);
-	void TornadoSpawn(FTransform SpawnTransform);
-	void TornadoESpawn(FTransform SpawnTransform);
+	void TornadoSpawn(FTransform SpawnTransform, AActor* NewOwner);
+	void TornadoESpawn(FTransform SpawnTransform, AActor* NewOwner);
 
 	// Wind Wall
 	void WindWallSpawn(FTransform SpawnTransform);
@@ -70,8 +65,8 @@ public:
 	// Enemy Setting
 	void EnemySpawn(bool bIsMelee);
 	void MiddleBossSpawn();
-	void MiddleBossBulletSpawn(FTransform SpawnTransform);
-	
+	void MiddleBossBulletSpawn(FTransform SpawnTransform, AActor* NewOwner);
+
 	// Enemy Projectile
 	void RangedEnemyProjectileSpawn(FTransform SpawnTransform);
 
@@ -135,7 +130,7 @@ private: // Object Pool
 	// 한번에 스폰시킬 중간보스 투사체 개수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendMiddleBossBulletSize = 10;
-	
+
 	// 근거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ABaseEnemy*> MeleePool;
@@ -207,7 +202,7 @@ private: // Place
 
 	template <typename T>
 	void PlaceActorSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
-	                        const FTransform SpawnTransform);
+	                        const FTransform SpawnTransform, AActor* NewOwner = nullptr);
 };
 
 template <typename T>
@@ -277,17 +272,12 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);
 	PoolObj->SetActorTickEnabled(true);
-	// PoolObj->SetActorLocation(GetActorLocation());
 	PoolObj->SetActorLocation(SpawnLocation);
-
-	//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation()+(SpawnLocation-GetActorLocation()), FColor::Red, false, 1.f, 0, 2.f);
-	// LOG_S(Warning, TEXT("-------Succeed-------"));
-	EnemyOutFromPool_Dele.Broadcast();
 }
 
 template <typename T>
 void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize,
-                                             const TSubclassOf<T>& Class, const FTransform SpawnTransform)
+                                             const TSubclassOf<T>& Class, const FTransform SpawnTransform, AActor* NewOwner)
 {
 	if (PoolArray.Num() == 0)
 		InitPool(PoolArray, AddPoolSize, Class);
@@ -305,6 +295,9 @@ void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32&
 		PlaceActorSetPlace(PoolArray, AddPoolSize, Class, SpawnTransform);
 
 	T* PoolObj = PoolArray.Pop();
+	// LOG_S(Warning, TEXT("%s"), PoolObj?*PoolObj->GetName():TEXT("Nullptr"));
+	if (NewOwner)
+		PoolObj->SetOwner(NewOwner);
 	PoolObj->SetActorTransform(SpawnTransform);
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);

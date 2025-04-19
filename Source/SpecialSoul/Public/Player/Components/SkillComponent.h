@@ -52,7 +52,7 @@ public:
 	bool bUsingSkill {false};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
-	bool bUseESkill {false}; 
+	bool bUseESkill {false};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	bool bUseRSkill {false};
@@ -75,6 +75,9 @@ public:
 private:
 	UFUNCTION()
 	void SetInputBinding(class UEnhancedInputComponent* Input);
+	
+	UFUNCTION(Server, Reliable)
+	void SRPC_CastSkill(ESkillKey Key);
 	
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<UInputAction> IA_ESkill;

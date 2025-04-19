@@ -24,6 +24,7 @@ private:
 	class ACYasuo* Yasuo;
 	
 	void StartUseSkill();
+	void Dash(FVector EndPos);
 	void EndUseSkill();
 
 	UPROPERTY(EditAnywhere, Category = "Skill")

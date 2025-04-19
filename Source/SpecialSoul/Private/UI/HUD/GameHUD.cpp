@@ -14,6 +14,7 @@ void AGameHUD::BeginPlay()
 		{
 			GameWidget->AddToViewport();
 			GameWidget->SetKillScore(0);
+			GameWidget->SetTime(0);
 		}
 	}
 }

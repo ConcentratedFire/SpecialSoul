@@ -7,6 +7,7 @@
 #include "SpecialSoul.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
@@ -22,25 +23,32 @@ void ACGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
 	HUD = Cast<AGameHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	if (GM->DataSheetUtility)
-	{
-		GM->ReadExcelData();
-		ReadExcelData(GM->DataSheetUtility);
-	}
 
-	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+	// 서버일때만 데이터 읽어오기
+	if (HasAuthority())
 	{
-		ObjectPoolManager = *It;
-		//ObjectPoolManager->InitSettings();
-	}
+		GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM->DataSheetUtility)
+		{
+			GM->ReadExcelData();
+			ReadExcelData(GM->DataSheetUtility);
+		}
+	
+		for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+		{
+			ObjectPoolManager = *It;
+			ObjectPoolManager->InitSettings();
+		}
+	}	
 }
 
 void ACGameState::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (!HasAuthority()) return;
+	
 	if (GM && GM->bIsStartRegen)
 	{
 		if (ObjectPoolManager)
@@ -48,7 +56,9 @@ void ACGameState::Tick(float DeltaSeconds)
 			GamePlayTime += DeltaSeconds;
 			CurStageTime += DeltaSeconds;
 			CurRegenTime += DeltaSeconds;
-			LOG_SCREEN_IDX(0, FColor::Blue, "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f", curStage, CurStageTime, RegenTime);
+
+			OnRep_PlayTime();
+			LOG_SCREEN_IDX(0, FColor::Blue, "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f", curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
 			LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
 			LOG_SCREEN_IDX(2, FColor::Red, "RegenCount : %d, CurRegenCount : %d", RegenCount, CurRegenCount);
 			if (CurRegenTime >= RegenTime)
@@ -59,18 +69,17 @@ void ACGameState::Tick(float DeltaSeconds)
 					ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
 				}
 				
-				if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
-				{
-					ObjectPoolManager->MiddleBossSpawn();
-					++MiddleBossCount;
-				}
-				
-				if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
-				{
-				}
-
 				CurRegenTime -= RegenTime;
 			}
+			if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
+			{
+				ObjectPoolManager->MiddleBossSpawn();
+				++MiddleBossCount;
+			}
+				
+			if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
+			{
+			}			
 
 			if (CurStageTime >= StageTime)
 			{
@@ -79,28 +88,19 @@ void ACGameState::Tick(float DeltaSeconds)
 			}
 		}
 	}
-
-	if (EXPDataMap.Num() > 0 && curExp >= ExpInfo.XP)
-	{
-		++curLevel;
-		curExp -= ExpInfo.XP;
-		UpdateExpInfo(ExpInfo.ID + 1);
-	}
-
-	SetTime();
+	
+	// if (EXPDataMap.Num() > 0 && curExp >= ExpInfo.XP)
+	// {
+	// 	++curLevel;
+	// 	curExp -= ExpInfo.XP;
+	// 	UpdateExpInfo(ExpInfo.ID + 1);
+	// }
+	//
+	
 }
 
 void ACGameState::PrintExpDataMap()
 {
-	// for (const auto& Pair : EXPDataMap)
-	// {
-	// 	UE_LOG(LogTemp, Log,
-	// 		   TEXT(
-	// 			   "EXPDataMap || ID: %d) Exp: %d"
-	// 		   ),
-	// 		   Pair.Key, Pair.Value.XP);
-	// }
-
 	// 초기 데이터 세팅
 	if (EXPDataMap.Num() > 0)
 		UpdateExpInfo(1);
@@ -154,7 +154,13 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 	}
 }
 
-void ACGameState::SetTime()
+void ACGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACGameState, GamePlayTime);
+}
+
+void ACGameState::OnRep_PlayTime()
 {
 	HUD->SetTime(GamePlayTime);
 }

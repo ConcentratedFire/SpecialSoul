@@ -18,7 +18,8 @@ private:
 	ACMiddleBoss();
 
 public:
-	void Attack();
+	UFUNCTION(Server, Reliable)
+	void SRPC_Attack();
 
 	virtual void DieEndAction() override;
 };

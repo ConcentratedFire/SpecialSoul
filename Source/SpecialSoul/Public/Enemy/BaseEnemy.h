@@ -19,6 +19,7 @@ public:
 	ABaseEnemy();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	UPROPERTY()
@@ -55,7 +56,10 @@ public: // Speed
 	float GetMoveSpeed() const { return MoveSpeed; }
 
 protected:
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override;\
+
+public:
+	virtual void SetActorTickEnabled(bool bEnabled) override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
@@ -84,26 +88,31 @@ protected:
 	UPROPERTY(EditDefaultsOnly, category = "HP")
 	int32 MaxHP{200};
 
+	UPROPERTY(VisibleAnywhere, Category=HP, Replicated)
 	int32 HP;
 
 private: // Montage CallBack
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
-	UFUNCTION()
-	void OnMyControllerTickOn();
-
-	UFUNCTION()
-	void OnMyControllerTickOff();
-
 public:
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Enemy")
+	UPROPERTY(BlueprintReadOnly, Category = "Enemy", Replicated)
 	bool bIsDead{false};
 
 public:
 	bool GetIsPlayerInRange(const float Range) const;
+
+private:
+	UFUNCTION(Server, Reliable)
+	void SRPC_PlayAttackAnim();
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_PlayAttackAnim();
+	UFUNCTION(Server, Reliable)
+	void SRPC_Damage(int32 DamageAmount);
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_Die();
 };

@@ -35,19 +35,14 @@ void ACExp::SetActorHiddenInGame(bool bNewHidden)
 
 void ACExp::ActiveItem()
 {
-	if (!GS) return;
-	GS->AddExp(ExpCount);
-
-	if (ObjectPoolManager)
-	{
-		ObjectPoolManager->ReturnExp(this);
-	}
+	SRPC_DropItem();
 }
 
 void ACExp::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (!HasAuthority()) return;
 	if (!bCanDrop || !DropPlayer) return;
 
 	FVector Pos = GetActorLocation();
@@ -73,8 +68,20 @@ void ACExp::OnItemOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                const FHitResult& SweepResult)
 {
+	if (!HasAuthority()) return;
 	if (DropPlayer) return;
 
 	DropPlayer = Cast<ACBasePlayer>(OtherActor);
 	bCanDrop = true;
+}
+
+void ACExp::SRPC_DropItem_Implementation()
+{
+	if (!GS) return;
+	GS->AddExp(ExpCount);
+
+	if (ObjectPoolManager)
+	{
+		ObjectPoolManager->ReturnExp(this);
+	}
 }

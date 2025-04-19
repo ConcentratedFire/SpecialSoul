@@ -15,14 +15,15 @@
 #include "Game/SpecialSoulGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Item/CBaseItem.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CPlayerController.h"
 #include "Player/Components/CMovementComponent.h"
 #include "UI/CSelectUpgradeWidget.h"
-#include "Utility/CDataSheetUtility.h"
 #include "Data/JinxData.h"
 #include "Data/CYasuoData.h"
+#include "Net/UnrealNetwork.h"
+#include "Player/CYasuo.h"
+#include "Player/Jinx.h"
 #include "Player/Components/SkillComponent.h"
 
 struct FJinxAttackData;
@@ -91,6 +92,9 @@ void ACBasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
+	PC = Cast<ACPlayerController>(GetController());
+
 	// TODO Init Data Settings
 	// 캐릭터를 선택하면 GameMode에서 해당 캐릭터의 정보를 읽고
 	// PlayerState의 BeginPlay에서 초기 데이터를 세팅해주도록 변경
@@ -98,32 +102,64 @@ void ACBasePlayer::BeginPlay()
 	{
 		GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
 		GS = GM->GetGameState<ACGameState>();
-		PS = Cast<ACPlayerState>(GetPlayerState());
-
 		DataSheetUtility = GM->DataSheetUtility;
 	}
 
 	// 오브젝트 풀 매니저 가져오기
-	for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+	if (HasAuthority())
 	{
-		ObjectPoolManager = *It;
+		for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
+		{
+			ObjectPoolManager = *It;
+		}
 	}
 
-	GetCharacterMovement()->MaxWalkSpeed = PlayerMoveSpeed;
+	// if (IsLocallyControlled())
+	// 	InitUpgradeUI(); // 업그레이드 UI 생성
+}
 
-	InitUpgradeUI(); // 업그레이드 UI 생성 (추가는 안함)
+void ACBasePlayer::PrintNetLog()
+{
+	FString logStr = TEXT("Damage : 0"); // 기본값 설정
+
+	if (PS != nullptr)
+	{
+		int32 dataCount = 0;
+		if (this->IsA(ACYasuo::StaticClass()))
+			dataCount = YasuoStat.Damage;
+		else if (this->IsA(AJinx::StaticClass()))
+			dataCount = JinxAttackData.Damage;
+
+		logStr = FString::Printf(TEXT("Damage : %d"), dataCount);
+	}
+	else
+	{
+		logStr = TEXT("Data Count : Error (PlayerState is null)");
+	}
+
+	DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100.0f, logStr, nullptr, FColor::Red, 0, true,
+	                1);
 }
 
 // Called every frame
 void ACBasePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	PrintNetLog();
+	if (!PS)
+	{
+		PS = Cast<ACPlayerState>(GetPlayerState());
+	}
+	if (!PC)
+		PC = Cast<ACPlayerController>(GetController());
 }
 
 // Called to bind functionality to input
 void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (!IsLocallyControlled()) return;
 
 	if (auto pc = GetWorld()->GetFirstPlayerController())
 	{
@@ -151,6 +187,11 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+	if (this->IsA(ACYasuo::StaticClass()))
+	{
+		PC->GetNextLevelYasuoMoveStat();
+	}
 }
 
 void ACBasePlayer::InitUpgradeUI()
@@ -183,6 +224,27 @@ void ACBasePlayer::MyApplyDamage(float Damage, ABaseEnemy* DamagedActor)
 {
 	DamagedActor->MyDamage(Damage);
 	PS->AddKillScore();
+	// MRPC_AddKillScore();
+}
+
+void ACBasePlayer::MRPC_AddKillScore_Implementation()
+{
+	CRPC_AddKillScore();
+}
+
+void ACBasePlayer::CRPC_AddKillScore_Implementation()
+{
+	if (IsLocallyControlled())
+		PS->AddKillScore();
+}
+
+void ACBasePlayer::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACBasePlayer, YasuoStat);
+	DOREPLIFETIME(ACBasePlayer, YasuoMoveInfo);
+	DOREPLIFETIME(ACBasePlayer, JinxAttackData);
+	DOREPLIFETIME(ACBasePlayer, bAttacking);
 }
 
 void ACBasePlayer::EndUpgrade()

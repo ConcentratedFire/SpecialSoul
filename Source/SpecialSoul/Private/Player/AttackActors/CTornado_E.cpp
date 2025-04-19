@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Enemy/BaseEnemy.h"
 #include "Item/CBaseItem.h"
+#include "Net/UnrealNetwork.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CYasuo.h"
 
@@ -14,6 +15,8 @@ ACTornado_E::ACTornado_E()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	SetReplicateMovement(true);
 
 	TornadoBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TornadoBox"));
 	TornadoBox->SetBoxExtent(FVector(80, 80, 32));
@@ -49,23 +52,20 @@ void ACTornado_E::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetActorRotation(GetActorRotation() + Rot);
-	AppendYaw += Rot.Yaw;
-	if (AppendYaw >= 360)
-		ObjectPoolManager->ReturnTornadoE(this);
+	if (!OwnerYasuo->IsLocallyControlled()) return;
+	SRPC_MoveTornado();
 }
 
 void ACTornado_E::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
-	if (!bNewHidden)
+	if (HasAuthority() && !bNewHidden)
 	{
 		AppendYaw = 0.f;
 
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
 		SetActorLocation(UpLocation);
-
 		Damage = OwnerYasuo->GetDamage(IsCri);
 	}
 }
@@ -74,6 +74,8 @@ void ACTornado_E::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                      const FHitResult& SweepResult)
 {
+	if (!HasAuthority()) return;
+
 	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
 	{
 		// Enemy->MyDamage(Damage);
@@ -84,4 +86,25 @@ void ACTornado_E::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
 			Item->ActiveItem();
 	}
+}
+
+void ACTornado_E::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACTornado_E, Damage);
+}
+
+void ACTornado_E::SetOwner(AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+	OwnerYasuo = Cast<ACYasuo>(NewOwner);
+}
+
+void ACTornado_E::SRPC_MoveTornado_Implementation()
+{
+	SetActorRotation(GetActorRotation() + Rot);
+	AppendYaw += Rot.Yaw;
+	if (AppendYaw >= 360)
+		ObjectPoolManager->ReturnTornadoE(this);
 }

@@ -37,19 +37,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	TObjectPtr<UJinxAnim> Anim;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	TObjectPtr<ACPlayerController> PC;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
+	// TObjectPtr<ACPlayerController> PC;
 
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	// TObjectPtr<USkillComponent> SkillComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	FJinxAttackData AttackData; // 기본공격 데이터
-
 	TSharedPtr<TMap<int32, FJinxAttackData>> SafeMap = MakeShared<TMap<int32, FJinxAttackData>>();
-
-	UFUNCTION()
-	virtual void PrintAttackDataMap() override;
 
 	void ActivateSkillMovement(bool bActive); // 스킬 사용 중 캐릭터 회전 관련
 

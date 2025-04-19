@@ -107,6 +107,24 @@ void USkillComponent::CastSkill(ESkillKey Key)
 	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
 }
 
+void USkillComponent::SRPC_CastSkill_Implementation(ESkillKey Key)
+{
+	if (!SkillMap.Contains(Key))
+	{
+		UE_LOG(LogTemp, Error, TEXT("!SkillMap.Contains(Key) "));
+		return;
+	}
+	if (!OwnerCharacter)
+	{
+		UE_LOG(LogTemp, Error, TEXT("!OwnerCharacter"));
+		return;
+	}
+
+	if ((Key == ESkillKey::E || Key == ESkillKey::R) && (bUseESkill || bUseRSkill)) return; // 스킬 사용중에는 다른 스킬 사용 방지
+
+	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
+}
+
 void USkillComponent::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill)
 {
 	SkillMap.Add(Key, Skill);
@@ -132,10 +150,12 @@ void USkillComponent::Passive()
 
 void USkillComponent::OnESkillPressed()
 {
-	CastSkill(ESkillKey::E);
+	// CastSkill(ESkillKey::E);
+	SRPC_CastSkill(ESkillKey::E);
 }
 
 void USkillComponent::OnRSkillPressed()
 {
-	CastSkill(ESkillKey::R);
+	// CastSkill(ESkillKey::R);
+	SRPC_CastSkill(ESkillKey::R);
 }

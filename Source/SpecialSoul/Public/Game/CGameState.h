@@ -46,8 +46,8 @@ private:
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;
 	UPROPERTY()
-	class ACObjectPoolManager* ObjectPoolManager;
-
+	TObjectPtr<class ACObjectPoolManager> ObjectPoolManager;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Game")
 	float StageTime = 20.f;
 	float CurStageTime = 0.f;
@@ -98,6 +98,12 @@ private:
 private:
 	UPROPERTY()
 	class AGameHUD* HUD;
+	UPROPERTY(ReplicatedUsing=OnRep_PlayTime)
 	float GamePlayTime = 0;
-	void SetTime();
+
+private:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UFUNCTION()
+	void OnRep_PlayTime();
 };

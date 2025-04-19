@@ -28,9 +28,6 @@ public:
 	float Speed { 0.f };
 
 protected:
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> ProjectileActor;
-
 	UFUNCTION()
 	virtual void AnimNotify_EnemyAttack();
 

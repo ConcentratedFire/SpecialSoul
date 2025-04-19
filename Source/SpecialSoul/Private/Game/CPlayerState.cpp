@@ -5,7 +5,10 @@
 
 #include "SpecialSoul.h"
 #include "Game/SpecialSoulGameMode.h"
+#include "Net/UnrealNetwork.h"
+#include "Player/CPlayerController.h"
 #include "Player/CYasuo.h"
+#include "Player/Jinx.h"
 #include "UI/HUD/GameHUD.h"
 #include "Utility/CDataSheetUtility.h"
 
@@ -13,13 +16,18 @@ void ACPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+	if (HasAuthority())
+		GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+
 	HUD = Cast<AGameHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	Player = Cast<ACBasePlayer>(GetPawn());
 }
 
-void ACPlayerState::SetInitialData()
+void ACPlayerState::SRPC_SetInitialData_Implementation()
 {
+	if (!Player)
+		Player = Cast<ACBasePlayer>(GetPawn());
+
 	if (Player->IsA(ACYasuo::StaticClass()))
 	{
 		YasuoAttackDataMap = GM->YasuoAttackDataMap;
@@ -29,14 +37,30 @@ void ACPlayerState::SetInitialData()
 	{
 		JinxAttackDataMap = GM->JinxAttackDataMap;
 	}
-	Player->PrintAttackDataMap();
+
+	// 초기 데이터 세팅
+	auto pc = Cast<ACPlayerController>(GetPlayerController());
+	if (pc && Player->IsA(ACYasuo::StaticClass()))
+	{
+		if (YasuoAttackDataMap.Num() > 0)
+			pc->UpgradeWeapon(1);
+
+		if (YasuoMoveDataMap.Num() > 0)
+			pc->UpdateYasuoMoveStat(1);
+	}
+	else if (pc && Player->IsA(AJinx::StaticClass()))
+	{
+		if (JinxAttackDataMap.Num() > 0)
+			pc->UpgradeWeapon(1);
+	}
 
 	UpgradeDataMap = GM->UpgradeDataMap;
 }
 
 float ACPlayerState::CalcDamage(float CurDamage, bool& OutbIsCri)
 {
-	OutbIsCri = false;
+	// LOG_S(Warning, TEXT("CalcDamage : %f"), CurDamage);
+
 	if (UpgradeDataMap.Num() == 0) return CurDamage;
 
 	// 추가해야되는 퍼센트
@@ -84,15 +108,6 @@ int32 ACPlayerState::CalcProjectile(int32 CurProjectile)
 
 	int32 CalcValue = UpgradeDataMap["Projectiles"].AppendValue * CurProjectilesGrade;
 	return CurProjectile + CalcValue;
-}
-
-void ACPlayerState::UpdateGradeInfo()
-{
-	// 초기 데이터 세팅
-	// if (UpgradeDataMap.Num() > 0)
-	// {
-	// 	CurDamageGrade = 1, CurAbilityHasteGrade = 1, CurProjectilesGrade = 1, CurCritChanceGrade = 1;
-	// }
 }
 
 TArray<FString> ACPlayerState::ChooseUpgradeCardList()
@@ -182,8 +197,21 @@ void ACPlayerState::RemoveArrayElement(const FString Element)
 	UpgradeData.Remove(Element);
 }
 
-void ACPlayerState::AddKillScore()
+void ACPlayerState::OnRep_KillScore()
+{
+	if (HUD)
+		HUD->SetKillScore(KillScore);
+}
+
+void ACPlayerState::AddKillScore() // 서버함수에서 호출됌
 {
 	++KillScore;
-	HUD->SetKillScore(KillScore);
+	if (GetOwner() && GetOwner()->HasLocalNetOwner())
+		HUD->SetKillScore(KillScore);
+}
+
+void ACPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ACPlayerState, KillScore, COND_OwnerOnly);
 }

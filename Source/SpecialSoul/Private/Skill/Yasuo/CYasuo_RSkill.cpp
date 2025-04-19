@@ -5,12 +5,15 @@
 
 #include "Player/CYasuo.h"
 
+UCYasuo_RSkill::UCYasuo_RSkill()
+{
+	Yasuo = Cast<ACYasuo>(GetOuter());
+}
+
 void UCYasuo_RSkill::UseSkill(ACharacter* Caster)
 {
-	if (!bCanSkillActive) return;
-
-	// E 키를 눌렀을때 들어오는 부분
-	Yasuo = Cast<ACYasuo>(Caster);
+	// R 키를 눌렀을때 들어오는 부분
+	if (!bCanSkillActive) return;	
 
 	if (Yasuo)
 	{

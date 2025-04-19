@@ -27,6 +27,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void PrintNetLog();
 
 	UPROPERTY()
 	class ASpecialSoulGameMode* GM;
@@ -37,6 +38,10 @@ protected:
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
+public:
+	UPROPERTY()
+	class ACPlayerController* PC;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -75,14 +80,6 @@ protected: // Actor Component
 protected: // Get Player Data
 	UPROPERTY()
 	class UCDataSheetUtility* DataSheetUtility;
-
-public:
-	// Base는 virtual로만 만들고, Child에서 구현
-	// Child의 BeginPlay에서 델리게이트 바인딩
-	// Child에서는 override할때 UFUNCTION 붙여줘야 함.
-	virtual void PrintAttackDataMap()
-	{
-	};
 
 protected: // MoveSpeed
 	UPROPERTY(EditDefaultsOnly, Category = "MoveSpeed")
@@ -161,11 +158,24 @@ public:
 	void SetSkillUsing(ESkillKey Key, bool bUseSkill);
 
 public:
-	float CalcHaste(float CurHaste) { return PS->CalcAbilityHaste(CurHaste); }
-
-public:
 	void MyApplyDamage(float Damage, class ABaseEnemy* DamagedActor);
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_AddKillScore();
+	UFUNCTION(Client, Reliable)
+	void CRPC_AddKillScore();
 
 public:
+	UPROPERTY(Replicated)
 	bool bAttacking = false;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat", Replicated)
+	FYasuoAttackData YasuoStat;
+	UPROPERTY(VisibleAnywhere, Category = "Data|Stat", Replicated)
+	FYasuoMoveData YasuoMoveInfo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data", Replicated)
+	FJinxAttackData JinxAttackData; // 기본공격 데이터
+
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ObjectPool/CObjectPoolManager.h"
 
 #include "SpecialSoul.h"
@@ -8,28 +5,14 @@
 #include "Game/SpecialSoulGameMode.h"
 #include "Projectile/Enemy/RangedEnemyProjectile.h"
 
-// Sets default values
 ACObjectPoolManager::ACObjectPoolManager()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-// Called when the game starts or when spawned
 void ACObjectPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-	// 오브젝트 풀링 테스트
-	// FTimerHandle TimerHandle;
-	// GetWorldTimerManager().SetTimer(TimerHandle, [&]()
-	// {
-	// 	for (int i = 0; i < 3; ++i)
-	// 		PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
-	// }, 1.5f, true);
-	// PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	// PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
 
 	if (auto GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode()))
 	{
@@ -50,9 +33,9 @@ void ACObjectPoolManager::InitSettings()
 	InitPool(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
 	InitPool(RangePool, AppendEnemyPoolSize, RangedEnemy);
 
-	InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
-	InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
-	
+	// InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
+	// InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
+
 	InitPool(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor);
 }
 
@@ -61,8 +44,6 @@ void ACObjectPoolManager::ReturnEnemy(ACMeleeEnemy* Enemy)
 	Enemy->SetActorEnableCollision(false);
 	Enemy->SetActorHiddenInGame(true);
 	Enemy->SetActorTickEnabled(false);
-
-	EnemyGotoPool_Dele.Broadcast();
 	// LOG_S(Warning, TEXT("Enemy Add : %p\tName : %s"), Enemy, Enemy==nullptr?TEXT("nullptr"):*Enemy->GetName());
 	MeleePool.Push(Enemy);
 }
@@ -72,9 +53,6 @@ void ACObjectPoolManager::ReturnEnemy(ARangedEnemy* Enemy)
 	Enemy->SetActorEnableCollision(false);
 	Enemy->SetActorHiddenInGame(true);
 	Enemy->SetActorTickEnabled(false);
-
-	EnemyGotoPool_Dele.Broadcast();
-	RangePool.Push(Enemy);
 }
 
 void ACObjectPoolManager::ReturnTornado(ACTornado* Tornado)
@@ -160,14 +138,14 @@ void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 	InitPool(WindWallPool, AppendWindWallPoolSize, WindWallActor, NewOwner);
 }
 
-void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform)
+void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlaceActorSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform);
+	PlaceActorSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform, NewOwner);
 }
 
-void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform)
+void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlaceActorSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform);
+	PlaceActorSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform, NewOwner);
 }
 
 void ACObjectPoolManager::WindWallSpawn(FTransform SpawnTransform)
@@ -188,7 +166,8 @@ void ACObjectPoolManager::MagnetSpawn(FTransform SpawnTransform)
 
 void ACObjectPoolManager::RangedEnemyProjectileSpawn(FTransform SpawnTransform)
 {
-	PlaceActorSetPlace(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor, SpawnTransform);
+	PlaceActorSetPlace(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor,
+	                   SpawnTransform);
 }
 
 void ACObjectPoolManager::PlaceItemBox()
@@ -258,13 +237,11 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 		PoolObj->SetActorEnableCollision(false);
 		PoolObj->SetActorHiddenInGame(true);
 		PoolObj->SetActorTickEnabled(false);
-
 		UGameplayStatics::FinishSpawningActor(PoolObj, Transform);
+
 		// LOG_S(Warning, TEXT("Enemy Add : %p\tName : %s"), PoolObj, PoolObj==nullptr?TEXT("nullptr"):*PoolObj->GetName());
 		PoolArray.Push(PoolObj);
 	}
-
-	EnemyGotoPool_Dele.Broadcast(); // 특수화 목적
 }
 
 void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
@@ -280,7 +257,8 @@ void ACObjectPoolManager::MiddleBossSpawn()
 	PlaceEnemyRandomPlace(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
 }
 
-void ACObjectPoolManager::MiddleBossBulletSpawn(FTransform SpawnTransform)
+void ACObjectPoolManager::MiddleBossBulletSpawn(FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlaceActorSetPlace(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor, SpawnTransform);
+	PlaceActorSetPlace(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor, SpawnTransform,
+	                   NewOwner);
 }

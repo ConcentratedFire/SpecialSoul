@@ -52,7 +52,7 @@ void ASpecialSoulGameMode::SetData()
 {
 	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
 	{
-		Cast<ACPlayerState>((*It)->GetPlayerState())->SetInitialData();
+		Cast<ACPlayerState>((*It)->GetPlayerState())->SRPC_SetInitialData();
 	}
 
 	// 초기 데이터 세팅

@@ -15,7 +15,7 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	Super::NativeUpdateAnimation(DeltaTime);
 
 	auto OwnerPawn = TryGetPawnOwner();
-	if (!OwnerPawn)  return;
+	if (!OwnerPawn) return;
 	OwnerEnemy = Cast<ABaseEnemy>(OwnerPawn);
 	if (!OwnerEnemy) return;
 
@@ -25,16 +25,15 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 void UEnemyAnimInstance::AnimNotify_EnemyAttack()
 {
 	auto OwnerPawn = TryGetPawnOwner();
-	if (!OwnerPawn)  return;
+	if (!OwnerPawn) return;
 	OwnerEnemy = Cast<ABaseEnemy>(OwnerPawn);
 
 	if (!OwnerEnemy || !ProjectileActor) return;
-
 }
 
 void UEnemyAnimInstance::AnimNotify_DieEnd()
 {
 	ABaseEnemy* OwnerPawn = Cast<ABaseEnemy>(TryGetPawnOwner());
-	if (!OwnerPawn) return;
+	if (!OwnerPawn || !OwnerPawn->HasAuthority())return;
 	OwnerPawn->DieEndAction();
 }

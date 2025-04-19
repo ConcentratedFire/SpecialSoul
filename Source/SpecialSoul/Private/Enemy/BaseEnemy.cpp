@@ -10,6 +10,7 @@
 #include "Enemy/AI/CEnemyController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CBasePlayer.h"
 
@@ -80,6 +81,13 @@ void ABaseEnemy::SetActorHiddenInGame(bool bNewHidden)
 		GetCharacterMovement()->GravityScale = 0;
 }
 
+void ABaseEnemy::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABaseEnemy, HP);
+	DOREPLIFETIME(ABaseEnemy, bIsDead);
+}
+
 
 void ABaseEnemy::Tick(float DeltaTime)
 {
@@ -127,7 +135,7 @@ void ABaseEnemy::FindTarget()
 
 void ABaseEnemy::HandleAttack()
 {
-	PlayAnimMontage(AttackMontage);
+	SRPC_PlayAttackAnim();
 }
 
 void ABaseEnemy::HandleDie()
@@ -143,6 +151,7 @@ void ABaseEnemy::ResetEnemy()
 
 void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	if (!HasAuthority()) return;
 	// 공격 몽타주가 끝났다면
 	if (Montage == AttackMontage)
 	{
@@ -175,16 +184,22 @@ bool ABaseEnemy::GetIsPlayerInRange(const float Range) const
 	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 	TArray<AActor*> ActorsToIgnore;
 
-	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, MoveDistance, objectTypes, false,
-																 ActorsToIgnore,
-																 EDrawDebugTrace::None,
-																 HitResults,
-																 true);
-	
+	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, MoveDistance, objectTypes,
+	                                                             false,
+	                                                             ActorsToIgnore,
+	                                                             EDrawDebugTrace::None,
+	                                                             HitResults,
+	                                                             true);
+
 	return bHit;
 }
 
 void ABaseEnemy::MyDamage(int32 DamageAmount)
+{
+	SRPC_Damage(DamageAmount);
+}
+
+void ABaseEnemy::SRPC_Damage_Implementation(int32 DamageAmount)
 {
 	HP -= DamageAmount;
 	// LOG_S(Warning, TEXT("Name:%s, HP : %d"), *GetName(), HP);
@@ -195,10 +210,8 @@ void ABaseEnemy::MyDamage(int32 DamageAmount)
 		if (EC)
 			EC->StopMovement();
 
-		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-
-		HandleDie();
-
+		MRPC_Die();
+		
 		// 80% 확률 계산
 		if (FMath::RandRange(1, 100) >= 20)
 		{
@@ -212,4 +225,20 @@ void ABaseEnemy::MyDamage(int32 DamageAmount)
 			ObjectPoolManager->ExpSpawn(SpawnTransform);
 		}
 	}
+}
+
+void ABaseEnemy::MRPC_Die_Implementation()
+{
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	HandleDie();
+}
+
+void ABaseEnemy::SRPC_PlayAttackAnim_Implementation()
+{
+	MRPC_PlayAttackAnim();
+}
+
+void ABaseEnemy::MRPC_PlayAttackAnim_Implementation()
+{
+	PlayAnimMontage(AttackMontage);
 }

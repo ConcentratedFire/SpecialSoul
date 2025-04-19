@@ -17,11 +17,12 @@ class SPECIALSOUL_API ACEnemyController : public AAIController
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class AActor* TargetPlayer;
-	
+	UPROPERTY(Replicated)
 	bool bEndAttack;
 	
 private:	// Behavior Tree, For Melee Enemy & Middle Boss

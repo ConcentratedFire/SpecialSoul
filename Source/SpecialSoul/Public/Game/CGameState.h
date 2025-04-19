@@ -100,4 +100,8 @@ private:
 	class AGameHUD* HUD;
 	float GamePlayTime = 0;
 	void SetTime();
+
+private:
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnEnemy();
 };

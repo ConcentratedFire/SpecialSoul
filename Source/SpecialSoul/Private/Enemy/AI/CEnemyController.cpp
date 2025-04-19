@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Enemy/CMiddleBoss.h"
 #include "Enemy/MainBoss.h"
+#include "Net/UnrealNetwork.h"
 #include "PathFinding/FlowFieldActor.h"
 #include "PathFinding/FlowFieldPFStrategy.h"
 
@@ -60,6 +61,12 @@ void ACEnemyController::Tick(float DeltaSeconds)
 			BB_Enemy->SetValueAsVector(FName("MoveDir"), FVector(MoveDir.X, MoveDir.Y, 0));
 		}
 	}
+}
+
+void ACEnemyController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACEnemyController, bEndAttack);
 }
 
 bool ACEnemyController::FindFlowField()

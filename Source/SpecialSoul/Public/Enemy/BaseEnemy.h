@@ -45,7 +45,7 @@ public:
 
 public: // Damage
 	UFUNCTION(BlueprintCallable)
-	void MyDamage(int32 DamageAmount);
+	virtual void MyDamage(int32 DamageAmount);
 
 	virtual void DieEndAction()
 	{

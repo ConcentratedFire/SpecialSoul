@@ -4,6 +4,7 @@
 #include "Player/Anim/JinxAnim.h"
 
 #include "Player/Jinx.h"
+#include "Player/Components/SkillComponent.h"
 
 void UJinxAnim::NativeBeginPlay()
 {
@@ -25,4 +26,6 @@ void UJinxAnim::NativeUpdateAnimation(float DeltaSeconds)
 void UJinxAnim::AnimNotify_Attack()
 {
 	Jinx->Attack();
+	
+	// TODO : Jinx->SkillComponent->CastSkill(ESkillKey::Attack);
 }

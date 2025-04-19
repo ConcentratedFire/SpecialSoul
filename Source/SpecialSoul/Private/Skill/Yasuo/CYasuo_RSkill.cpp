@@ -5,7 +5,7 @@
 
 #include "Player/CYasuo.h"
 
-void UCYasuo_RSkill::UseSkill(ACBasePlayer* Caster)
+void UCYasuo_RSkill::UseSkill(ACharacter* Caster)
 {
 	if (!bCanSkillActive) return;
 

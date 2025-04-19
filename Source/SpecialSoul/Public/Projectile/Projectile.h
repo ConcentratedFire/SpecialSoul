@@ -29,8 +29,7 @@ public:
 	virtual void Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
-	 // TODO: BasePlayer의 공통 스탯 적용하기!!
-	void ApplyCasterStat(ACBasePlayer* Caster);
+	void ApplyCasterStat(ACharacter* Caster);
 
 	virtual void InitMoveComp(); // Pool에서 꺼낸 후 사용	
 

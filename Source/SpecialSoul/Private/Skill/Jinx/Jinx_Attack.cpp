@@ -15,7 +15,7 @@ UJinx_Attack::UJinx_Attack()
 }
 
 
-void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
+void UJinx_Attack::UseSkill(ACharacter* Caster)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UJinx_Attack::UseSkill"));
 
@@ -43,7 +43,7 @@ void UJinx_Attack::UseSkill(ACBasePlayer* Caster)
 		ShotDelay, true, 0.f);
 }
 
-void UJinx_Attack::HandleShot(ACBasePlayer* Caster, AJinx* Jinx)
+void UJinx_Attack::HandleShot(ACharacter* Caster, AJinx* Jinx)
 {
 	if (ShotCount >= TotalShot)
 	{
@@ -68,7 +68,7 @@ void UJinx_Attack::HandleShot(ACBasePlayer* Caster, AJinx* Jinx)
 }
 
 // 한번에 3개씩 쏘기
-void UJinx_Attack::HandleOneShot(ACBasePlayer* Caster, FRotator SpawnRot)
+void UJinx_Attack::HandleOneShot(ACharacter* Caster, FRotator SpawnRot)
 {
 	if (ShotBulletCount >= OneShotBullet)
 	{

@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Interface/SkillStrategy.h"
-#include "UObject/NoExportTypes.h"
-#include "Jinx_Passive.generated.h"
+#include "MainBoss_Attack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SPECIALSOUL_API UJinx_Passive : public UObject, public ISkillStrategy
+class SPECIALSOUL_API UMainBoss_Attack : public UObject, public ISkillStrategy
 {
 	GENERATED_BODY()
 

@@ -22,5 +22,5 @@ class SPECIALSOUL_API ISkillStrategy
 	GENERATED_BODY()
 
 public:
-	virtual void UseSkill(ACBasePlayer* Caster) = 0;
+	virtual void UseSkill(ACharacter* Caster) = 0;
 };

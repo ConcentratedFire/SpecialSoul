@@ -11,7 +11,7 @@ UCYasuo_ESkill::UCYasuo_ESkill()
 {
 }
 
-void UCYasuo_ESkill::UseSkill(ACBasePlayer* Caster)
+void UCYasuo_ESkill::UseSkill(ACharacter* Caster)
 {
 	if (SkillChargeCount == 0 || bIsESkillActive) return;
 

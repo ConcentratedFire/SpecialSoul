@@ -15,7 +15,7 @@ UJinx_RSkill::UJinx_RSkill()
 	}
 }
 
-void UJinx_RSkill::UseSkill(ACBasePlayer* Caster)
+void UJinx_RSkill::UseSkill(ACharacter* Caster)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Jinx_RSkill"));
 

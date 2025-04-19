@@ -101,12 +101,14 @@ void AJinx::ActivateSkillMovement(bool bActive)
 {
 	if (bActive)
 	{
+		SkillComponent->UseSkillCount++;
 		GetCharacterMovement()->bOrientRotationToMovement = false; 
 		MoveComp->SetActive(true);
 		RotateToMouseCursor();
 		return;
 	}
 
+	SkillComponent->UseSkillCount--;
 	if (SkillComponent->UseSkillCount == 0)
 	{
 		GetCharacterMovement()->bOrientRotationToMovement = true; 

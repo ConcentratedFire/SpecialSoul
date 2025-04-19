@@ -13,5 +13,10 @@ UCLASS()
 class SPECIALSOUL_API AMainBossController : public ACEnemyController
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void Tick(float DeltaSeconds) override;
+
 	
 };

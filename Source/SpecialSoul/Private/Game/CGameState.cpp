@@ -7,6 +7,7 @@
 #include "SpecialSoul.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
@@ -46,7 +47,7 @@ void ACGameState::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	Server_SpawnEnemy();
+	SRPC_SpawnEnemy();
 	
 	// if (EXPDataMap.Num() > 0 && curExp >= ExpInfo.XP)
 	// {
@@ -55,7 +56,7 @@ void ACGameState::Tick(float DeltaSeconds)
 	// 	UpdateExpInfo(ExpInfo.ID + 1);
 	// }
 	//
-	// SetTime();
+	
 }
 
 void ACGameState::PrintExpDataMap()
@@ -113,12 +114,18 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 	}
 }
 
-void ACGameState::SetTime()
+void ACGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACGameState, GamePlayTime);
+}
+
+void ACGameState::OnRep_PlayTime()
 {
 	HUD->SetTime(GamePlayTime);
 }
 
-void ACGameState::Server_SpawnEnemy_Implementation()
+void ACGameState::SRPC_SpawnEnemy_Implementation()
 {
 	if (GM && GM->bIsStartRegen)
 	{
@@ -128,6 +135,8 @@ void ACGameState::Server_SpawnEnemy_Implementation()
 			GamePlayTime += DeltaSeconds;
 			CurStageTime += DeltaSeconds;
 			CurRegenTime += DeltaSeconds;
+
+			OnRep_PlayTime();
 			LOG_SCREEN_IDX(0, FColor::Blue, "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f", curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
 			LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
 			LOG_SCREEN_IDX(2, FColor::Red, "RegenCount : %d, CurRegenCount : %d", RegenCount, CurRegenCount);

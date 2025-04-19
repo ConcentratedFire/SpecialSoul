@@ -20,6 +20,11 @@ void ACItemBox::ActiveItem()
 
 void ACItemBox::SelectItem()
 {
+	SRPC_PlaceItem();
+}
+
+void ACItemBox::SRPC_PlaceItem_Implementation()
+{
 	FTransform Transform(FRotator::ZeroRotator, GetActorLocation(), FVector(1));
 	ObjectPoolManager->MagnetSpawn(Transform);
 	// 20% 확률로 꽝

@@ -18,4 +18,7 @@ private:
 	ACItemBox();
 	virtual void ActiveItem() override;
 	void SelectItem();
+
+	UFUNCTION(Server, Reliable)
+	void SRPC_PlaceItem();
 };

@@ -43,4 +43,8 @@ private:
 	class ACBasePlayer* DropPlayer = nullptr;
 
 	bool bCanDrop = false;
+
+private:
+	UFUNCTION(Server, Reliable)
+	void SRPC_DropItem();
 };

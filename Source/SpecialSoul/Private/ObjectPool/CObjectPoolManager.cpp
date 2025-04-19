@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ObjectPool/CObjectPoolManager.h"
 
 #include "SpecialSoul.h"
@@ -8,28 +5,14 @@
 #include "Game/SpecialSoulGameMode.h"
 #include "Projectile/Enemy/RangedEnemyProjectile.h"
 
-// Sets default values
 ACObjectPoolManager::ACObjectPoolManager()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-// Called when the game starts or when spawned
 void ACObjectPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-	// 오브젝트 풀링 테스트
-	// FTimerHandle TimerHandle;
-	// GetWorldTimerManager().SetTimer(TimerHandle, [&]()
-	// {
-	// 	for (int i = 0; i < 3; ++i)
-	// 		PlaceEnemyRandomPlace(MeleePool, AppendMeleePoolSize, MeleeEnemy);
-	// }, 1.5f, true);
-	// PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	// PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangeEnemy);
 
 	if (auto GM = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode()))
 	{
@@ -276,5 +259,6 @@ void ACObjectPoolManager::MiddleBossSpawn()
 
 void ACObjectPoolManager::MiddleBossBulletSpawn(FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlaceActorSetPlace(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor, SpawnTransform, NewOwner);
+	PlaceActorSetPlace(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor, SpawnTransform,
+	                   NewOwner);
 }

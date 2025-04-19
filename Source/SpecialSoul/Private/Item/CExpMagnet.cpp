@@ -16,6 +16,8 @@ ACExpMagnet::ACExpMagnet()
 void ACExpMagnet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!HasAuthority()) return;
+	
 	if (auto Player = Cast<ACBasePlayer>(OtherActor))
 	{
 		for (TActorIterator<ACExp> It(GetWorld(), ACExp::StaticClass()); It; ++It)

@@ -29,7 +29,7 @@ ACMiddleBoss::ACMiddleBoss()
 		DieMontage = tmpDieMontage.Object;
 }
 
-void ACMiddleBoss::Attack()
+void ACMiddleBoss::SRPC_Attack_Implementation()
 {
 	FTransform transform;
 	transform.SetLocation(GetActorLocation() + GetActorForwardVector() * 300);

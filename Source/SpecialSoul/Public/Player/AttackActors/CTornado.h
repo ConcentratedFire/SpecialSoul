@@ -63,4 +63,7 @@ private:
 private:
 	UFUNCTION(server, Unreliable)
 	void SRPC_MoveTornado(const float DeltaTime);
+
+public:
+	virtual void SetOwner(AActor* NewOwner) override;
 };

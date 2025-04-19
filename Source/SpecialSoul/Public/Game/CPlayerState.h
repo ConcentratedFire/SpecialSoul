@@ -71,9 +71,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SRPC_SetInitialData();
 
-	UFUNCTION()
-	void UpdateGradeInfo(); // 초기 데이터 세팅용
-
 	TArray<FString> ChooseUpgradeCardList(); // 업그레이드 카드 리스트 선택
 	void UpgradeStat(const FString statName);
 
@@ -215,9 +212,14 @@ private:
 	void RemoveArrayElement(const FString Element);
 
 private:
-	UPROPERTY(visibleAnywhere, Category = "Data")
+	UPROPERTY(visibleAnywhere, Category = "Data", ReplicatedUsing=OnRep_KillScore)
 	int32 KillScore{0};
+	UFUNCTION()
+	void OnRep_KillScore();
 
 public:
 	void AddKillScore();
+
+private:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

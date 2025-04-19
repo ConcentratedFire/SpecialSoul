@@ -5,6 +5,7 @@
 
 #include "SpecialSoul.h"
 #include "Game/SpecialSoulGameMode.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/CPlayerController.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
@@ -61,7 +62,7 @@ float ACPlayerState::CalcDamage(float CurDamage, bool& OutbIsCri)
 	// LOG_S(Warning, TEXT("CalcDamage : %f"), CurDamage);
 
 	if (UpgradeDataMap.Num() == 0) return CurDamage;
-	
+
 	// 추가해야되는 퍼센트
 	int32 CalcDamagePercent = UpgradeDataMap["Damage"].DefaultValue + UpgradeDataMap["Damage"].AppendValue *
 		CurDamageGrade;
@@ -70,7 +71,7 @@ float ACPlayerState::CalcDamage(float CurDamage, bool& OutbIsCri)
 	float quotient = CalcDamagePercent / 100;
 	float remainder = CalcDamagePercent % 100;
 	float ResultDamage = CurDamage + (CurDamage * quotient) + (CurDamage * remainder / 100);
-	
+
 	// 치명타 퍼센트
 	int32 CriPercent = UpgradeDataMap["CritChance"].DefaultValue + UpgradeDataMap["CritChance"].AppendValue *
 		CurCritChanceGrade;
@@ -107,15 +108,6 @@ int32 ACPlayerState::CalcProjectile(int32 CurProjectile)
 
 	int32 CalcValue = UpgradeDataMap["Projectiles"].AppendValue * CurProjectilesGrade;
 	return CurProjectile + CalcValue;
-}
-
-void ACPlayerState::UpdateGradeInfo()
-{
-	// 초기 데이터 세팅
-	// if (UpgradeDataMap.Num() > 0)
-	// {
-	// 	CurDamageGrade = 1, CurAbilityHasteGrade = 1, CurProjectilesGrade = 1, CurCritChanceGrade = 1;
-	// }
 }
 
 TArray<FString> ACPlayerState::ChooseUpgradeCardList()
@@ -205,8 +197,21 @@ void ACPlayerState::RemoveArrayElement(const FString Element)
 	UpgradeData.Remove(Element);
 }
 
-void ACPlayerState::AddKillScore()
+void ACPlayerState::OnRep_KillScore()
+{
+	if (HUD)
+		HUD->SetKillScore(KillScore);
+}
+
+void ACPlayerState::AddKillScore() // 서버함수에서 호출됌
 {
 	++KillScore;
-	HUD->SetKillScore(KillScore);
+	if (GetOwner() && GetOwner()->HasLocalNetOwner())
+		HUD->SetKillScore(KillScore);
+}
+
+void ACPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ACPlayerState, KillScore, COND_OwnerOnly);
 }

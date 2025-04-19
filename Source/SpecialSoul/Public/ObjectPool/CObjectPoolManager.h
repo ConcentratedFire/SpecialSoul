@@ -57,8 +57,8 @@ public:
 
 	// Tornado
 	void MakeTornadoPool(AActor* NewOwner);
-	void TornadoSpawn(FTransform SpawnTransform);
-	void TornadoESpawn(FTransform SpawnTransform);
+	void TornadoSpawn(FTransform SpawnTransform, AActor* NewOwner);
+	void TornadoESpawn(FTransform SpawnTransform, AActor* NewOwner);
 
 	// Wind Wall
 	void WindWallSpawn(FTransform SpawnTransform);
@@ -71,7 +71,7 @@ public:
 	void EnemySpawn(bool bIsMelee);
 	void MiddleBossSpawn();
 	void MiddleBossBulletSpawn(FTransform SpawnTransform);
-	
+
 	// Enemy Projectile
 	void RangedEnemyProjectileSpawn(FTransform SpawnTransform);
 
@@ -135,7 +135,7 @@ private: // Object Pool
 	// 한번에 스폰시킬 중간보스 투사체 개수
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectPool")
 	int32 AppendMiddleBossBulletSize = 10;
-	
+
 	// 근거리 미니언 풀
 	UPROPERTY(VisibleAnywhere, Category = "ObjectPool")
 	TArray<ABaseEnemy*> MeleePool;
@@ -208,6 +208,10 @@ private: // Place
 	template <typename T>
 	void PlaceActorSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
 	                        const FTransform SpawnTransform);
+
+	template <typename T>
+	void PlacePlayerAttackSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize, const TSubclassOf<T>& Class,
+	                               const FTransform SpawnTransform, AActor* NewOwner = nullptr);
 };
 
 template <typename T>
@@ -306,6 +310,36 @@ void ACObjectPoolManager::PlaceActorSetPlace(TArray<T*>& PoolArray, const int32&
 
 	T* PoolObj = PoolArray.Pop();
 	// LOG_S(Warning, TEXT("%s"), PoolObj?*PoolObj->GetName():TEXT("Nullptr"));
+	PoolObj->SetActorTransform(SpawnTransform);
+	PoolObj->SetActorEnableCollision(true);
+	PoolObj->SetActorHiddenInGame(false);
+	PoolObj->SetActorTickEnabled(true);
+}
+
+template <typename T>
+void ACObjectPoolManager::PlacePlayerAttackSetPlace(TArray<T*>& PoolArray, const int32& AddPoolSize,
+                                                    const TSubclassOf<T>& Class, const FTransform SpawnTransform,
+                                                    AActor* NewOwner)
+{
+	if (PoolArray.Num() == 0)
+		InitPool(PoolArray, AddPoolSize, Class);
+
+	// Pool에 들어가는 시점과 추가되는 시점이 겹치면 Null값이 배열에 들어가는 경우 발생
+	// 만약 Top이 Null이라면 요소를 제거하고 다시 수행하도록 재귀 호출
+	bool bIsNullActor = false;
+	while (!PoolArray.Top())
+	{
+		bIsNullActor = true;
+		PoolArray.Pop();
+	}
+
+	if (bIsNullActor)
+		PlacePlayerAttackSetPlace(PoolArray, AddPoolSize, Class, SpawnTransform, NewOwner);
+
+	T* PoolObj = PoolArray.Pop();
+	// LOG_S(Warning, TEXT("%s"), PoolObj?*PoolObj->GetName():TEXT("Nullptr"));
+	if (NewOwner)
+		PoolObj->SetOwner(NewOwner);
 	PoolObj->SetActorTransform(SpawnTransform);
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);

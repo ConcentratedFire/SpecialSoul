@@ -99,6 +99,12 @@ void ACTornado::OnCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	}
 }
 
+void ACTornado::SetOwner(AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+	OwnerYasuo = Cast<ACYasuo>(NewOwner);
+}
+
 void ACTornado::SRPC_MoveTornado_Implementation(const float DeltaTime)
 {
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);

@@ -195,7 +195,7 @@ void ACYasuo::SRPC_TryDefaultAttack_Implementation(const TArray<FVector>& Attack
 		Transform.SetLocation(curLocation);
 		Transform.SetRotation(Vector.Rotation().Quaternion());
 		Transform.SetScale3D(FVector(1.f));
-		ObjectPoolManager->TornadoSpawn(Transform);
+		ObjectPoolManager->TornadoSpawn(Transform, this);
 	}
 
 	MRPC_EndDefaultAttack();
@@ -247,7 +247,7 @@ void ACYasuo::ESkill(const bool bAnimStart)
 	Transform.SetLocation(curLocation);
 	Transform.SetRotation(FQuat::Identity);
 	Transform.SetScale3D(FVector(1, 1, 1));
-	ObjectPoolManager->TornadoESpawn(Transform);
+	ObjectPoolManager->TornadoESpawn(Transform, this);
 }
 
 void ACYasuo::MRPC_PlayESkillAnim_Implementation(const bool bAnimStart)

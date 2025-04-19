@@ -95,6 +95,12 @@ void ACTornado_E::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Ou
 	DOREPLIFETIME(ACTornado_E, Damage);
 }
 
+void ACTornado_E::SetOwner(AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+	OwnerYasuo = Cast<ACYasuo>(NewOwner);
+}
+
 void ACTornado_E::SRPC_MoveTornado_Implementation()
 {
 	SetActorRotation(GetActorRotation() + Rot);

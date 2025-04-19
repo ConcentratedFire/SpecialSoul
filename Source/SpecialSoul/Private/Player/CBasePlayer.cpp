@@ -224,6 +224,18 @@ void ACBasePlayer::MyApplyDamage(float Damage, ABaseEnemy* DamagedActor)
 {
 	DamagedActor->MyDamage(Damage);
 	PS->AddKillScore();
+	// MRPC_AddKillScore();
+}
+
+void ACBasePlayer::MRPC_AddKillScore_Implementation()
+{
+	CRPC_AddKillScore();
+}
+
+void ACBasePlayer::CRPC_AddKillScore_Implementation()
+{
+	if (IsLocallyControlled())
+		PS->AddKillScore();
 }
 
 void ACBasePlayer::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

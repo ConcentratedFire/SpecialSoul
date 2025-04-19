@@ -52,7 +52,7 @@ void ACObjectPoolManager::InitSettings()
 
 	InitPool(MiddleBossPool, AppendMiddleBossSize, MiddleBossActor);
 	InitPool(MiddleBossBulletPool, AppendMiddleBossBulletSize, MiddleBossBulletActor);
-	
+
 	InitPool(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor);
 }
 
@@ -160,14 +160,14 @@ void ACObjectPoolManager::MakeTornadoPool(AActor* NewOwner)
 	InitPool(WindWallPool, AppendWindWallPoolSize, WindWallActor, NewOwner);
 }
 
-void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform)
+void ACObjectPoolManager::TornadoSpawn(const FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlaceActorSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform);
+	PlacePlayerAttackSetPlace(TornadoPool, AppendTornadoPoolSize, TornadoActor, SpawnTransform, NewOwner);
 }
 
-void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform)
+void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlaceActorSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform);
+	PlacePlayerAttackSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform, NewOwner);
 }
 
 void ACObjectPoolManager::WindWallSpawn(FTransform SpawnTransform)
@@ -188,7 +188,8 @@ void ACObjectPoolManager::MagnetSpawn(FTransform SpawnTransform)
 
 void ACObjectPoolManager::RangedEnemyProjectileSpawn(FTransform SpawnTransform)
 {
-	PlaceActorSetPlace(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor, SpawnTransform);
+	PlaceActorSetPlace(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor,
+	                   SpawnTransform);
 }
 
 void ACObjectPoolManager::PlaceItemBox()
@@ -269,10 +270,11 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 
 void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
 {
-	if (bIsMelee)
-		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	else
-		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangedEnemy);
+	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	// if (bIsMelee)
+	// 	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	// else
+	// 	PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangedEnemy);
 }
 
 void ACObjectPoolManager::MiddleBossSpawn()

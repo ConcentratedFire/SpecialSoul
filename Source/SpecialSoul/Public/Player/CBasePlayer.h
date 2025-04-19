@@ -159,6 +159,10 @@ public:
 
 public:
 	void MyApplyDamage(float Damage, class ABaseEnemy* DamagedActor);
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_AddKillScore();
+	UFUNCTION(Client, Reliable)
+	void CRPC_AddKillScore();
 
 public:
 	UPROPERTY(Replicated)

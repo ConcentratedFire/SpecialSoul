@@ -20,6 +20,9 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
+	virtual void SetActorTickEnabled(bool bEnabled) override;
+	
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class AActor* TargetPlayer;
 	UPROPERTY(Replicated)

@@ -56,7 +56,10 @@ public: // Speed
 	float GetMoveSpeed() const { return MoveSpeed; }
 
 protected:
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override;\
+
+public:
+	virtual void SetActorTickEnabled(bool bEnabled) override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
@@ -91,12 +94,6 @@ protected:
 private: // Montage CallBack
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
-	UFUNCTION()
-	void OnMyControllerTickOn();
-
-	UFUNCTION()
-	void OnMyControllerTickOff();
 
 public:
 	UPROPERTY()

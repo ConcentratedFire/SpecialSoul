@@ -20,8 +20,6 @@
 
 class ARangedEnemyProjectile;
 class AMinigunBullet;
-DECLARE_MULTICAST_DELEGATE(FEnemyGotoPool);
-DECLARE_MULTICAST_DELEGATE(FEnemyOutFromPool);
 
 UCLASS()
 class SPECIALSOUL_API ACObjectPoolManager : public AActor
@@ -40,9 +38,6 @@ public:
 	void InitSettings();
 
 public:
-	FEnemyOutFromPool EnemyOutFromPool_Dele;
-	FEnemyGotoPool EnemyGotoPool_Dele;
-
 	// Return To ObjectPool
 	void ReturnEnemy(ACMeleeEnemy* Enemy);
 	void ReturnEnemy(ARangedEnemy* Enemy);
@@ -70,7 +65,7 @@ public:
 	// Enemy Setting
 	void EnemySpawn(bool bIsMelee);
 	void MiddleBossSpawn();
-	void MiddleBossBulletSpawn(FTransform SpawnTransform);
+	void MiddleBossBulletSpawn(FTransform SpawnTransform, AActor* NewOwner);
 
 	// Enemy Projectile
 	void RangedEnemyProjectileSpawn(FTransform SpawnTransform);
@@ -277,12 +272,7 @@ void ACObjectPoolManager::PlaceEnemyRandomPlace(TArray<T*>& PoolArray, const int
 	PoolObj->SetActorEnableCollision(true);
 	PoolObj->SetActorHiddenInGame(false);
 	PoolObj->SetActorTickEnabled(true);
-	// PoolObj->SetActorLocation(GetActorLocation());
 	PoolObj->SetActorLocation(SpawnLocation);
-
-	//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation()+(SpawnLocation-GetActorLocation()), FColor::Red, false, 1.f, 0, 2.f);
-	// LOG_S(Warning, TEXT("-------Succeed-------"));
-	EnemyOutFromPool_Dele.Broadcast();
 }
 
 template <typename T>

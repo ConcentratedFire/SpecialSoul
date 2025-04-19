@@ -26,13 +26,13 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 void UEnemyAnimInstance::AnimNotify_EnemyAttack()
 {
 	ACMiddleBoss* OwnerPawn = Cast<ACMiddleBoss>(TryGetPawnOwner());
-	if (!OwnerPawn|| !OwnerPawn->HasAuthority()) return;
-	OwnerPawn->SRPC_Attack();
+	if (OwnerPawn && OwnerPawn->HasAuthority())
+		OwnerPawn->SRPC_Attack();
 }
 
 void UEnemyAnimInstance::AnimNotify_DieEnd()
 {
 	ABaseEnemy* OwnerPawn = Cast<ABaseEnemy>(TryGetPawnOwner());
-	if (!OwnerPawn || !OwnerPawn->HasAuthority())return;
-	OwnerPawn->DieEndAction();
+	if (OwnerPawn && OwnerPawn->HasAuthority())
+		OwnerPawn->DieEndAction();
 }

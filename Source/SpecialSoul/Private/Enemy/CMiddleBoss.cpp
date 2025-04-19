@@ -36,7 +36,7 @@ void ACMiddleBoss::SRPC_Attack_Implementation()
 	transform.SetRotation(GetActorRotation().Quaternion());
 	transform.SetScale3D(FVector(1));
 	
-	ObjectPoolManager->MiddleBossBulletSpawn(transform);
+	ObjectPoolManager->MiddleBossBulletSpawn(transform, this);
 }
 
 void ACMiddleBoss::DieEndAction()

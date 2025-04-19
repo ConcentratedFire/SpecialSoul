@@ -25,7 +25,8 @@ void ACMiddleBossBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (OwnerMiddleBoss && !OwnerMiddleBoss->HasAuthority()) return;
+	if (!OwnerMiddleBoss) return;
+	if (!OwnerMiddleBoss->HasAuthority()) return;
 	SRPC_MoveBullet();
 }
 
@@ -38,12 +39,6 @@ void ACMiddleBossBullet::SetActorHiddenInGame(bool bNewHidden)
 		StartLocation = GetActorLocation();
 		TargetLocation = GetActorLocation() + GetActorForwardVector() * 500;
 		CurrentTime = 0.f;
-
-		for (TActorIterator<ACMiddleBoss> It(GetWorld(), ACMiddleBoss::StaticClass()); It; ++It)
-		{
-			OwnerMiddleBoss = *It;
-			this->SetOwner(OwnerMiddleBoss);
-		}
 	}
 }
 

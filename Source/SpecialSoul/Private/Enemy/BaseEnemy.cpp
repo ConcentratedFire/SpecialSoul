@@ -14,7 +14,6 @@
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CBasePlayer.h"
 
-class ACBasePlayer;
 // Sets default values
 ABaseEnemy::ABaseEnemy()
 {
@@ -30,16 +29,8 @@ ABaseEnemy::ABaseEnemy()
 	// 레벨 배치시 or 런타임 스폰시에 자동으로 Possess 되도록 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	if (ObjectPoolManager)
-	{
-		ObjectPoolManager->EnemyOutFromPool_Dele.AddUObject(this, &ABaseEnemy::OnMyControllerTickOn);
-		ObjectPoolManager->EnemyGotoPool_Dele.AddUObject(this, &ABaseEnemy::OnMyControllerTickOff);
-	}
-
 	GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
-	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// GetMesh()->SetCollisionProfileName(FName("Enemy"));
 }
 
 void ABaseEnemy::BeginPlay()
@@ -56,8 +47,13 @@ void ABaseEnemy::BeginPlay()
 		AnimInstance = Cast<UEnemyAnimInstance>(Anim);
 		AnimInstance->OnMontageEnded.AddDynamic(this, &ABaseEnemy::OnMontageEnded);
 	}
+}
 
-	StartFindingTarget();
+void ABaseEnemy::SetActorTickEnabled(bool bEnabled)
+{
+	Super::SetActorTickEnabled(bEnabled);
+	if (auto ai = Cast<AAIController>(GetOwner()))
+		ai->SetActorTickEnabled(bEnabled);	
 }
 
 void ABaseEnemy::SetActorHiddenInGame(bool bNewHidden)
@@ -157,22 +153,6 @@ void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	{
 		MyController->bEndAttack = true;
 	}
-}
-
-void ABaseEnemy::OnMyControllerTickOn()
-{
-	if (IsHidden()) return; // 보이지 않는것은 아직 풀에 있는것임
-
-	ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
-	EC->SetActorTickEnabled(true);
-}
-
-void ABaseEnemy::OnMyControllerTickOff()
-{
-	if (!IsHidden()) return; // 보이는 것은 아직 죽지 않은 것
-
-	ACEnemyController* EC = Cast<ACEnemyController>(GetOwner());
-	EC->SetActorTickEnabled(false);
 }
 
 bool ABaseEnemy::GetIsPlayerInRange(const float Range) const

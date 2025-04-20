@@ -28,4 +28,11 @@ public:
 	// 애님 노티파이
 	UFUNCTION()
 	void AnimNotify_Attack();
+
+	
+	UFUNCTION()
+	void AnimNotify_SkillBegin();
+
+	UFUNCTION()
+	void AnimNotify_SkillEnd();
 };

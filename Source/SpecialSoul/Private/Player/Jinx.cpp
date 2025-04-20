@@ -6,14 +6,12 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/CPlayerController.h"
-#include "Player/Anim/JinxAnim.h"
 #include "Player/Components/CMovementComponent.h"
 #include "Player/Components/SkillComponent.h"
 #include "Skill/Jinx/Jinx_Attack.h"
 #include "Skill/Jinx/Jinx_ESkill.h"
 #include "Skill/Jinx/Jinx_Passive.h"
 #include "Skill/Jinx/Jinx_RSkill.h"
-#include "Utility/CDataSheetUtility.h"
 
 AJinx::AJinx()
 {
@@ -37,7 +35,7 @@ AJinx::AJinx()
 void AJinx::BeginPlay()
 {
 	Super::BeginPlay();
-	Anim = Cast<UJinxAnim>(GetMesh()->GetAnimInstance());
+	//Anim = Cast<UJinxAnim>(GetMesh()->GetAnimInstance());
 
 	SkillComponent->BindSkill(ESkillKey::Attack, NewObject<UJinx_Attack>());
 	SkillComponent->BindSkill(ESkillKey::Passive, NewObject<UJinx_Passive>());
@@ -71,20 +69,24 @@ void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
 
 void AJinx::SRPC_StartAttack_Implementation()
 {
+	// 서버에서 타이머를 돌리며
 	float remainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(AttackTimer);
+	
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
 	
 	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
 	{
+		// 모든 클라에서 애니메이션을 재생한다
 		MRPC_PlayAttackMontage();
 		
-	}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime); // -remainingTime
+	}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime-remainingTime);
 }
 
 
 void AJinx::MRPC_PlayAttackMontage_Implementation()
 {
 	PlayAnimMontage(AttackMontage);
+	UE_LOG(LogTemp, Warning, TEXT("PlayAnimMontage"));
 }
 
 
@@ -92,14 +94,12 @@ void AJinx::ActivateSkillMovement(bool bActive)
 {
 	if (bActive)
 	{
-		SkillComponent->UseSkillCount++;
 		GetCharacterMovement()->bOrientRotationToMovement = false; 
 		MoveComp->SetActive(true);
 		RotateToMouseCursor();
 		return;
 	}
 
-	SkillComponent->UseSkillCount--;
 	if (SkillComponent->UseSkillCount == 0)
 	{
 		GetCharacterMovement()->bOrientRotationToMovement = true; 
@@ -117,6 +117,8 @@ void AJinx::StartAttack()
 
 void AJinx::RotateToMouseCursor()
 {
+	if (!IsLocallyControlled()) return;
+	
 	FHitResult HitResult;
 	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	if (bHit)

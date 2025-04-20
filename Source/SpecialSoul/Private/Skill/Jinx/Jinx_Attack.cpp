@@ -26,10 +26,13 @@ void UJinx_Attack::UseSkill(ACharacter* Caster)
     }
 
     AJinx* Jinx = Cast<AJinx>(Caster);
-    if (Jinx)
-    {
-        Jinx->ActivateSkillMovement(true);
-    }
+    if (!Jinx)
+        return;
+    
+    // if (Jinx)
+    // {
+    //     Jinx->MRPC_ActivateSkillMovement(true);
+    // }
 
     ShotCount = 0;
     ShotBulletCount = 0;
@@ -58,10 +61,10 @@ void UJinx_Attack::HandleShot(ACharacter* Caster, AJinx* Jinx)
         World->GetTimerManager().ClearTimer(ShotTimer);
         World->GetTimerManager().ClearTimer(OneShotTimer);
 
-        if (Jinx)
-        {
-            Jinx->ActivateSkillMovement(false);
-        }
+        // if (Jinx)
+        // {
+        //     Jinx->MRPC_ActivateSkillMovement(false);
+        // }
         return;
     }
 

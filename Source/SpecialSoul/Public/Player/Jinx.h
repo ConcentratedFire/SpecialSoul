@@ -32,15 +32,7 @@ public:
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	TObjectPtr<UJinxAnim> Anim;
-	
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	// TObjectPtr<ACPlayerController> PC;
 
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	// TObjectPtr<USkillComponent> SkillComponent;
-	
 	void ActivateSkillMovement(bool bActive); // 스킬 사용 중 캐릭터 회전 관련
 	
 	void StartAttack();
@@ -60,6 +52,13 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> ESkillMontage;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> RSkillMontage;
 	
 };
 

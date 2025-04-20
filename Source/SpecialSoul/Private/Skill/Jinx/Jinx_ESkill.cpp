@@ -31,7 +31,7 @@ void UJinx_ESkill::UseSkill(ACharacter* Caster)
 	AJinx* Jinx = Cast<AJinx>(Caster);
 	if (Jinx)
 	{
-		Jinx->ActivateSkillMovement(true);
+		//Jinx->MRPC_ActivateSkillMovement(true);
 		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 		Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 	}
@@ -104,5 +104,5 @@ void UJinx_ESkill::EndUseSkill(AJinx* Jinx)
 	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 	
-	Jinx->ActivateSkillMovement(false);
+	//Jinx->MRPC_ActivateSkillMovement(false);
 }

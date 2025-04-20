@@ -2,7 +2,6 @@
 
 
 #include "Player/Anim/JinxAnim.h"
-
 #include "Player/Jinx.h"
 #include "Player/Components/SkillComponent.h"
 
@@ -29,4 +28,19 @@ void UJinxAnim::AnimNotify_Attack()
 	{
 		Jinx->Attack();
 	}
+}
+
+void UJinxAnim::AnimNotify_SkillBegin()
+{
+	Jinx->SkillComponent->UseSkillCount++;
+
+	Jinx->ActivateSkillMovement(true);
+}
+
+void UJinxAnim::AnimNotify_SkillEnd()
+{
+	Jinx->SkillComponent->UseSkillCount--;
+
+	Jinx->ActivateSkillMovement(false);
+	
 }

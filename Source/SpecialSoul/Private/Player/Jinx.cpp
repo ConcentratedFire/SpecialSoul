@@ -30,11 +30,6 @@ AJinx::AJinx()
 	GetCapsuleComponent()->SetCapsuleHalfHeight(68.f);
 	GetCapsuleComponent()->SetCapsuleRadius(28.f);
 	
-	// GetCharacterMovement()->bOrientRotationToMovement = false;
-	
-	// SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
-	//GetCharacterMovement()->bOrientRotationToMovement = true;
-
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	MoveComp->SetActive(false);
 }
@@ -48,21 +43,11 @@ void AJinx::BeginPlay()
 	SkillComponent->BindSkill(ESkillKey::Passive, NewObject<UJinx_Passive>());
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	SkillComponent->BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
-
-	// if (HasAuthority() && DataSheetUtility)
-	// {
-	// 	DataSheetUtility->OnDataFetched.AddDynamic(this, &AJinx::InitAllData);
-	// }
 }
 
 void AJinx::Attack()
 {
 	SkillComponent->Attack(); // 기본공격
-}
-
-void AJinx::InitAllData()
-{
-	UpdatePlayerData(1);
 }
 
 void AJinx::UpdatePlayerData(const int32 PlayerLevel)
@@ -72,17 +57,36 @@ void AJinx::UpdatePlayerData(const int32 PlayerLevel)
 		UpdateJinxAttackStat(PlayerLevel);
 	}
 
-	Super::UpdatePlayerData(PlayerLevel);
+	//Super::UpdatePlayerData(PlayerLevel);
 }
 
 void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
 {
 	// AttackData = PS->JinxAttackDataMap.FindRef(PlayerLevel);
 	PC->UpgradeWeapon(PlayerLevel);
+	
 	 // 업데이트된 데이터로 공격 시작
-	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
-	StartAttack();
+	SRPC_StartAttack_Implementation();
 }
+
+void AJinx::SRPC_StartAttack_Implementation()
+{
+	float remainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(AttackTimer);
+	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+	
+	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
+	{
+		MRPC_PlayAttackMontage();
+		
+	}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime); // -remainingTime
+}
+
+
+void AJinx::MRPC_PlayAttackMontage_Implementation()
+{
+	PlayAnimMontage(AttackMontage);
+}
+
 
 void AJinx::ActivateSkillMovement(bool bActive)
 {
@@ -105,10 +109,10 @@ void AJinx::ActivateSkillMovement(bool bActive)
 
 void AJinx::StartAttack()
 {
-	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
+	if (HasAuthority())
 	{
-		PlayAnimMontage(AttackMontage); // AttackMontage의 AnimNotify에서 애니메이션의 특정 프레임에 Attack 호출
-	}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime);
+		SRPC_StartAttack();
+	}
 }
 
 void AJinx::RotateToMouseCursor()

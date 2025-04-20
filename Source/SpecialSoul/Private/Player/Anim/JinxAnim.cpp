@@ -25,7 +25,8 @@ void UJinxAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 void UJinxAnim::AnimNotify_Attack()
 {
-	Jinx->Attack();
-	
-	// TODO : Jinx->SkillComponent->CastSkill(ESkillKey::Attack);
+	if (Jinx->HasAuthority())
+	{
+		Jinx->Attack();
+	}
 }

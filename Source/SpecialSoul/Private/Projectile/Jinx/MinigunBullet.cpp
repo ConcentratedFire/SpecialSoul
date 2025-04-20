@@ -32,40 +32,18 @@ AMinigunBullet::AMinigunBullet()
 	if (TempHitVfx.Succeeded())
 	{
 		HitVfxAsset = TempHitVfx.Object;
-		//HitVfx->SetAsset(HitVfxAsset);
-		//HitVfx->bAutoActivate = false;
 	}
-	MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AMinigunBullet::OnMeshCompBeginOverlap);
+	
 }
 
 void AMinigunBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	InitMoveComp();
+	StartLocation  = GetActorLocation();
 }
 
 void AMinigunBullet::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-}
-
-// void AMinigunBullet::ApplyLifeTime()
-// {
-// 	// 사정거리 / 속도 = 수명 (초 단위)
-// 	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
-// 	SetLifeSpan(LifeSpan); // 수명 설정
-// }
-
-void AMinigunBullet::OnMeshCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
-	{
-		Enemy->MyDamage(Damage);
-	}
-	else if (auto Item = Cast<ACBaseItem>(OtherActor))
-	{
-		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
-			Item->ActiveItem();
-	}
 }

@@ -4,12 +4,17 @@
 #include "Projectile/Projectile.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Enemy/BaseEnemy.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Item/CBaseItem.h"
 #include "Player/Jinx.h"
 
 AProjectile::AProjectile()
 {
+	bReplicates = true;
+	SetReplicatingMovement(true); 
+	
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootSceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -25,8 +30,11 @@ AProjectile::AProjectile()
 	TailVfx = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TailVFX"));
 	TailVfx->SetupAttachment(RootComponent);
 	
-	 // 이벤트 세팅
-	MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::Hit);
+	//  이벤트 세팅
+	if (HasAuthority())
+	{
+		MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::Hit);
+	}
 }
 
 void AProjectile::BeginPlay()
@@ -62,8 +70,20 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 {
 	if (HitVfxAsset)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitVfxAsset, GetActorLocation());
+		MRPC_SpawnHitVFX();
 	}
+
+	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
+	{
+		
+		Enemy->MyDamage(Damage);
+	}
+	else if (auto Item = Cast<ACBaseItem>(OtherActor))
+	{
+		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
+			Item->ActiveItem();
+	}
+	
 	Penetration--;
 	if (Penetration <= 0)
 	{
@@ -71,9 +91,20 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 	}
 }
 
+void AProjectile::MRPC_SpawnHitVFX_Implementation()
+{
+	if (HitVfxAsset)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitVfxAsset, GetActorLocation());
+	}
+}
+
 void AProjectile::OnDestroy()
 {
-	Destroy();
+	if (HasAuthority())
+	{
+		Destroy();
+	}
 }
 
 void AProjectile::ApplyCasterStat(ACharacter* Caster)

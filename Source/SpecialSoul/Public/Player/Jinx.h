@@ -29,8 +29,6 @@ public:
 
 	virtual void Attack() override;
 	
-	UFUNCTION()
-	void InitAllData();
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	
 public:
@@ -43,18 +41,22 @@ public:
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
 	// TObjectPtr<USkillComponent> SkillComponent;
 	
-	TSharedPtr<TMap<int32, FJinxAttackData>> SafeMap = MakeShared<TMap<int32, FJinxAttackData>>();
-
 	void ActivateSkillMovement(bool bActive); // 스킬 사용 중 캐릭터 회전 관련
+	
+	void StartAttack();
 
 	void RotateToMouseCursor();
 	
+	UFUNCTION(Server, Reliable)
+	void SRPC_StartAttack();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_PlayAttackMontage();
 	
 private:
 	void UpdateJinxAttackStat(int32 PlayerLevel);
 	
 	FTimerHandle AttackTimer;
-	void StartAttack();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;

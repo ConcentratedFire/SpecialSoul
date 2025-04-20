@@ -18,7 +18,7 @@ class SPECIALSOUL_API UJinx_ESkill : public UObject, public ISkillStrategy
 
 public:
 	UJinx_ESkill();
-	virtual void UseSkill(ACBasePlayer* Caster) override;
+	virtual void UseSkill(ACharacter* Caster) override;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	TSubclassOf<ARocketLauncherBullet> BulletClass;

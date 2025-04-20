@@ -12,7 +12,7 @@ UCYasuo_ESkill::UCYasuo_ESkill()
 	Yasuo = Cast<ACYasuo>(GetOuter());
 }
 
-void UCYasuo_ESkill::UseSkill(ACBasePlayer* Caster)
+void UCYasuo_ESkill::UseSkill(ACharacter* Caster)
 {
 	// E 키를 눌렀을때 들어오는 부분
 	if (SkillChargeCount == 0 || bIsESkillActive) return;

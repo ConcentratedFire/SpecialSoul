@@ -28,7 +28,7 @@ public:
 	UPROPERTY(Replicated)
 	bool bEndAttack;
 	
-private:	// Behavior Tree, For Melee Enemy & Middle Boss
+protected:	// Behavior Tree, For Melee Enemy & Middle Boss
 	UPROPERTY(EditDefaultsOnly)
 	class UBehaviorTree* BT_Enemy;
 	UPROPERTY()

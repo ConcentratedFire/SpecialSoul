@@ -4,9 +4,8 @@
 #include "Player/Components/SkillComponent.h"
 
 #include "EnhancedInputComponent.h"
+#include "Interface/SkillStrategy.h"
 #include "Player/CBasePlayer.h"
-#include "Player/CYasuo.h"
-#include "Player/Jinx.h"
 
 // Sets default values for this component's properties
 USkillComponent::USkillComponent()
@@ -39,21 +38,64 @@ void USkillComponent::InitializeComponent()
 
 	if (GetOwner())
 	{
-		OwnerCharacter = Cast<ACBasePlayer>(GetOwner());
-		if (OwnerCharacter)
+		OwnerCharacter = Cast<ACharacter>(GetOwner());
+		if (auto player = Cast<ACBasePlayer>(OwnerCharacter))
 		{
-			OwnerCharacter->OnInputBindingDel.AddUObject(this, &USkillComponent::SetInputBinding);
+			player->OnInputBindingDel.AddUObject(this, &USkillComponent::SetInputBinding);
 		}
 	}
 }
 
+void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// 쿨타임
+	UpdateCooltime(DeltaTime);
+}
+
+
+void USkillComponent::UpdateCooltime(float deltaTime)
+{
+	for (auto& timer : LeftCoolTimeMap)
+	{
+		if (timer.Value > 0.f)
+		{
+			timer.Value = FMath::Max(0.f, timer.Value - deltaTime);
+		}
+	}
+}
+
+bool USkillComponent::ResetLeftCooltime(ESkillKey key)
+{
+	if (!LeftCoolTimeMap.Contains(key) || !CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
+	{
+		return false;
+	}
+	
+	LeftCoolTimeMap[key] = CoolTimeMap[key];
+	return true;
+}
+
+bool USkillComponent::CanUseSkill(ESkillKey key)
+{
+	if (!LeftCoolTimeMap.Contains(key) || !CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Can not Use Skill... "));
+		return false;
+	}
+
+	return LeftCoolTimeMap[key] <= 0.f;
+}
+
+
 void USkillComponent::CastSkill(ESkillKey Key)
 {
-	if (!SkillMap.Contains(Key))
-	{
-		UE_LOG(LogTemp, Error, TEXT("!SkillMap.Contains(Key) "));
-		return;
-	}
+	//if (!CanUseSkill(Key))
+	//{
+	//	return;
+	//}
+	
 	if (!OwnerCharacter)
 	{
 		UE_LOG(LogTemp, Error, TEXT("!OwnerCharacter"));
@@ -61,10 +103,8 @@ void USkillComponent::CastSkill(ESkillKey Key)
 	}
 
 	if ((Key == ESkillKey::E || Key == ESkillKey::R) && (bUseESkill || bUseRSkill)) return; // 스킬 사용중에는 다른 스킬 사용 방지
-
-	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
 	
-	// UseSkillCount++;
+	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
 }
 
 void USkillComponent::SRPC_CastSkill_Implementation(ESkillKey Key)
@@ -92,13 +132,10 @@ void USkillComponent::BindSkill(ESkillKey Key, const TScriptInterface<ISkillStra
 
 void USkillComponent::SetInputBinding(class UEnhancedInputComponent* Input)
 {
-	Input->BindAction(IA_ESkill, ETriggerEvent::Started, this, &USkillComponent::OnESkillPressed);
-	Input->BindAction(IA_RSkill, ETriggerEvent::Started, this, &USkillComponent::OnRSkillPressed);
-}
-
-void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (IA_ESkill)
+		Input->BindAction(IA_ESkill, ETriggerEvent::Started, this, &USkillComponent::OnESkillPressed);
+	if (IA_RSkill)
+		Input->BindAction(IA_RSkill, ETriggerEvent::Started, this, &USkillComponent::OnRSkillPressed);
 }
 
 void USkillComponent::Attack()

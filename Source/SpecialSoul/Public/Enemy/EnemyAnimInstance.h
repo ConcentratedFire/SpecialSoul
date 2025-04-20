@@ -32,5 +32,5 @@ protected:
 	virtual void AnimNotify_EnemyAttack();
 
 	UFUNCTION()
-	void AnimNotify_DieEnd();
+	virtual void AnimNotify_DieEnd();
 };

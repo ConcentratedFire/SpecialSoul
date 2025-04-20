@@ -10,7 +10,7 @@ UCYasuo_RSkill::UCYasuo_RSkill()
 	Yasuo = Cast<ACYasuo>(GetOuter());
 }
 
-void UCYasuo_RSkill::UseSkill(ACBasePlayer* Caster)
+void UCYasuo_RSkill::UseSkill(ACharacter* Caster)
 {
 	// R 키를 눌렀을때 들어오는 부분
 	if (!bCanSkillActive) return;	

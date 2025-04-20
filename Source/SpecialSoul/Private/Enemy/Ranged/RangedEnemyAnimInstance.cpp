@@ -10,6 +10,11 @@
 
 void URangedEnemyAnimInstance::AnimNotify_EnemyAttack()
 {
+	if (!TryGetPawnOwner()->HasAuthority())
+	{
+		return;
+	}
+	
 	ARangedEnemy* RangedEnemy = Cast<ARangedEnemy>(TryGetPawnOwner());
 	if (!RangedEnemy)
 	{

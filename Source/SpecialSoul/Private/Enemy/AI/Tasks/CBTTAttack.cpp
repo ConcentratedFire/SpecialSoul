@@ -17,7 +17,7 @@ EBTNodeResult::Type UCBTTAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, 
 	if (ABaseEnemy* MyEnemy = Cast<
 		ABaseEnemy>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(FName("SelfActor"))))
 	{
-		MyEnemy->HandleAttack();		
+		MyEnemy->HandleAttack();
 		return EBTNodeResult::InProgress;
 	}
 	else

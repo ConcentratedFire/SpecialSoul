@@ -22,18 +22,34 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void InitializeComponent() override;
 
+	bool CanUseSkill(ESkillKey key);
+	bool ResetLeftCooltime(ESkillKey key);
 protected:
 	virtual void BeginPlay() override;
+
+	void UpdateCooltime(float deltaTime);
 	
 public:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<ACBasePlayer> OwnerCharacter {nullptr};
+	TObjectPtr<ACharacter> OwnerCharacter {nullptr};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	TMap<ESkillKey, TScriptInterface<ISkillStrategy>> SkillMap;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	TMap<ESkillKey, float> CoolTimeMap; // 쿨타임
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	TMap<ESkillKey, float> LeftCoolTimeMap; // 남은 쿨타임
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	TMap<ESkillKey, float> SkillRangeMap; // 스킬 사정거리
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	int32 UseSkillCount {0};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	bool bUsingSkill {false};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	bool bUseESkill {false};
@@ -54,11 +70,12 @@ public:
 	 // 플레이어의 키 입력에 따른 스킬 캐스팅
 	void BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill);
 
+	void CastSkill(ESkillKey Key);
+	
 private:
 	UFUNCTION()
 	void SetInputBinding(class UEnhancedInputComponent* Input);
 	
-	void CastSkill(ESkillKey Key);
 	UFUNCTION(Server, Reliable)
 	void SRPC_CastSkill(ESkillKey Key);
 	

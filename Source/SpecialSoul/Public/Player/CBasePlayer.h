@@ -10,7 +10,7 @@
 UENUM(BlueprintType)
 enum class ESkillKey : uint8
 {
-	Attack, Passive, E, R
+	Attack, Passive, E, R, Q, W
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FInputBindingDelegate, class UEnhancedInputComponent*)

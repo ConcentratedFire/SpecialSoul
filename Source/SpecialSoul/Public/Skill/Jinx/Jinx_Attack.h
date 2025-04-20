@@ -20,7 +20,7 @@ class SPECIALSOUL_API UJinx_Attack : public UObject, public ISkillStrategy
 public:
 	UJinx_Attack();
 	
-	virtual void UseSkill(ACBasePlayer* Caster) override;
+	virtual void UseSkill(ACharacter* Caster) override;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AMinigunBullet> BulletClass;
@@ -38,8 +38,8 @@ public:
 	float OneShotDelay = 0.02f;
 	
 private:
-	void HandleShot(ACBasePlayer* Caster, AJinx* Jinx);
-	void HandleOneShot(ACBasePlayer* Caster, FRotator SpawnRot);
+	void HandleShot(ACharacter* Caster, AJinx* Jinx);
+	void HandleOneShot(ACharacter* Caster, FRotator SpawnRot);
 	
 	int32 ShotCount {0};		// 전체 발사 수
 	int32 ShotBulletCount {0};	// 한 발사당 쏘는 총알 수 

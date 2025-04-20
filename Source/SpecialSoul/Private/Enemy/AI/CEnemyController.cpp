@@ -4,10 +4,10 @@
 #include "Enemy/AI/CEnemyController.h"
 
 #include "EngineUtils.h"
-#include "Enemy/CMeleeEnemy.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Enemy/CMeleeEnemy.h"
 #include "Enemy/CMiddleBoss.h"
-#include "Enemy/MainBoss.h"
+#include "Enemy/MainBoss/MainBoss.h"
 #include "Net/UnrealNetwork.h"
 #include "PathFinding/FlowFieldActor.h"
 #include "PathFinding/FlowFieldPFStrategy.h"
@@ -73,7 +73,8 @@ void ACEnemyController::SetActorTickEnabled(bool bEnabled)
 {
 	Super::SetActorTickEnabled(bEnabled);
 
-	if (MyPawn->IsA(ACMeleeEnemy::StaticClass()) || MyPawn->IsA(ACMiddleBoss::StaticClass()))
+	if (MyPawn->IsA(ACMeleeEnemy::StaticClass()) || MyPawn->IsA(ACMiddleBoss::StaticClass())
+			|| MyPawn->IsA(AMainBoss::StaticClass()))
 	{
 		RunBehaviorTree(bEnabled ? BT_Enemy : nullptr);
 		bUsingBT = bEnabled;

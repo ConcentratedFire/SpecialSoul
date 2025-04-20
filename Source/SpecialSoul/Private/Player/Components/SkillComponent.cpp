@@ -150,12 +150,10 @@ void USkillComponent::Passive()
 
 void USkillComponent::OnESkillPressed()
 {
-	// CastSkill(ESkillKey::E);
 	SRPC_CastSkill(ESkillKey::E);
 }
 
 void USkillComponent::OnRSkillPressed()
 {
-	// CastSkill(ESkillKey::R);
 	SRPC_CastSkill(ESkillKey::R);
 }

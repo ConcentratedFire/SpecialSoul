@@ -38,7 +38,7 @@ void UJinx_ESkill::UseSkill(ACharacter* Caster)
 	else
 	{
 		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
-		Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
+		//Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 	
 		// 스킬 캐스팅
 	
@@ -46,20 +46,6 @@ void UJinx_ESkill::UseSkill(ACharacter* Caster)
 		
 		// 스킬 발동
 		StartUseSkill(Jinx);
-		
-		// 2. CastingTime후에 스킬을 시작한다.
-		// TWeakObjectPtr<UJinx_ESkill> WeakThis(this); // GC에 의해 댕글링 포인터될 때를 위해 WeakPtr 사용
-		// TWeakObjectPtr<AJinx> WeakJinx(Jinx);
-	
-		// Jinx->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
-		// 	[WeakThis, WeakJinx]()
-		// 	{
-		// 		if (WeakThis.IsValid() && WeakJinx.IsValid())
-		// 		{
-		// 			WeakThis->StartUseSkill(WeakJinx.Get());
-		// 		}
-		// 	}),
-		// 	CastingTime, false, CastingTime);
 	}
 	
 }
@@ -111,7 +97,6 @@ void UJinx_ESkill::EndUseSkill(AJinx* Jinx)
 {
 	FiredBulletNum = 0;
 	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
-	Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
+	//Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 	bCasted = false;
-	//Jinx->MRPC_ActivateSkillMovement(false);
 }

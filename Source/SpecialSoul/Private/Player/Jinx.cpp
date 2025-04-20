@@ -112,7 +112,7 @@ void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 		break;
 	}
 }
-
+ 
 void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 {
 	UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage"));
@@ -120,14 +120,19 @@ void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 	switch (Key)
 	{
 	case ESkillKey::Attack:
-		PlayAnimMontage(AttackMontage);
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - Attack"));
+			PlayAnimMontage(AttackMontage);
+		}
 		break;
 	case ESkillKey::Passive:
 		break;
 	case ESkillKey::E:
+		UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - E"));
 		PlayAnimMontage(ESkillMontage);
 		break;
 	case ESkillKey::R:
+		UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - R"));
 		PlayAnimMontage(RSkillMontage);
 		break;
 		
@@ -135,7 +140,6 @@ void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 		break;
 	}
 }
-
 
 void AJinx::ActivateSkillMovement(bool bActive)
 {

@@ -34,7 +34,7 @@ void UJinx_RSkill::UseSkill(ACharacter* Caster)
 	}
 	else
 	{
-		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
+		//Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	
 		// TODO : 시전시간 동안 Progressbar UI를 띄우고
 
@@ -68,11 +68,12 @@ void UJinx_RSkill::StartUseSkill(AJinx* Jinx)
 	{
 		Bullet->ApplyCasterStat(Jinx); // 공격 데이터 세팅
 	}
+
+	EndUseSkill(Jinx);
 }
 
 void UJinx_RSkill::EndUseSkill(AJinx* Jinx)
 {
-	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
+	//Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	bCasted = false;
-	//Jinx->MRPC_ActivateSkillMovement(false);
 }

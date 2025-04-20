@@ -87,6 +87,7 @@ protected: // MoveSpeed
 
 public: // Update Info
 	virtual void UpdatePlayerData(const int32 PlayerLevel);
+	void SetCardData(const TArray<FString>& CardList, TArray<FCardStruct>& CardData);
 	void EndUpgrade();
 
 public:
@@ -106,6 +107,10 @@ protected: // Arrow UI
 
 private: // 업그레이드 UI
 	void InitUpgradeUI();
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_ShowUpgradeUI(const TArray<FString>& cardList, const TArray<FCardStruct>& CardData);
+	UFUNCTION(Client, Reliable)
+	void CRPC_ShowUpgradeUI(const TArray<FString>& cardList, const TArray<FCardStruct>& CardData);
 
 protected:
 	UPROPERTY()

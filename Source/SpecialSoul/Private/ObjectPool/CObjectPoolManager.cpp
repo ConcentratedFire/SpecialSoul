@@ -246,10 +246,11 @@ void ACObjectPoolManager::InitPool(TArray<ABaseEnemy*>& PoolArray, const int32& 
 
 void ACObjectPoolManager::EnemySpawn(bool bIsMelee)
 {
-	if (bIsMelee)
-		PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
-	else
-		PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangedEnemy);
+	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	// if (bIsMelee)
+	// 	PlaceEnemyRandomPlace(MeleePool, AppendEnemyPoolSize, MeleeEnemy);
+	// else
+	// 	PlaceEnemyRandomPlace(RangePool, AppendEnemyPoolSize, RangedEnemy);
 }
 
 void ACObjectPoolManager::MiddleBossSpawn()

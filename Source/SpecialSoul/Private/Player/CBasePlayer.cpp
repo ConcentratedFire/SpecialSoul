@@ -114,8 +114,8 @@ void ACBasePlayer::BeginPlay()
 		}
 	}
 
-	// if (IsLocallyControlled())
-	// 	InitUpgradeUI(); // 업그레이드 UI 생성
+	if (IsLocallyControlled())
+		InitUpgradeUI(); // 업그레이드 UI 생성
 }
 
 void ACBasePlayer::PrintNetLog()
@@ -176,22 +176,143 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 {
+	// 서버에서 업그레이드할 카드를 정해서 넘겨줌
+	TArray<FString> cardList = PS->ChooseUpgradeCardList();
+	if (cardList.Num() == 0) return;
+	// LOG_S(Warning, TEXT("Player Name : %s"), *GetName());
+	// for (auto& card : cardList)
+	// {
+	// 	LOG_S(Warning, TEXT("card : %s"), *card);
+	// }
+	TArray<FCardStruct> CardData;
+	SetCardData(cardList, CardData);
+	MRPC_ShowUpgradeUI(cardList, CardData);
+}
+
+void ACBasePlayer::SetCardData(const TArray<FString>& CardList, TArray<FCardStruct>& CardData)
+{
+	for (auto& card : CardList)
+	{
+		FCardStruct tempCardData;
+		GetCurGrade(tempCardData.WeaponGrade, tempCardData.DamageGrade, tempCardData.AbilityHasteGrade,
+		            tempCardData.ProjectilesGrade, tempCardData.CritChanceGrade);
+		if (card == "Weapon")
+		{
+			if (this->IsA(ACYasuo::StaticClass()))
+			{
+				tempCardData.bIsYasuo = true;
+				GetCurDamageNextDamage(tempCardData.WeaponGrade, tempCardData.curDamage, tempCardData.nextDamage, true);
+				GetCurProjectileNextProjectile(tempCardData.WeaponGrade, tempCardData.curProjectile,
+				                               tempCardData.nextProjectile, true);
+				// 다음 업글 단계가 Final인지 확인
+				tempCardData.bIsNextWeaponFinal = IsNextWeaponFinal(true);
+				if (tempCardData.bIsNextWeaponFinal)
+				{
+					tempCardData.strLevel = FString::Printf(TEXT("진화"));
+					tempCardData.strTitle = FString::Printf(TEXT("떠도는 폭풍"));
+					tempCardData.strDesc = FString::Printf(TEXT(
+						"야스오가 기력을 연마해 수는\n적지만 훨씬 큰 소용돌이를\n방출합니다. 소용돌이는 포물선을\n그리며 날아가며 목표 지점에\n피해를 입히는 폭풍을 남깁니다."));
+				}
+				else
+				{
+					tempCardData.strLevel = FString::Printf(TEXT("%d레벨"), tempCardData.WeaponGrade + 1);
+					tempCardData.strTitle = FString::Printf(TEXT("강철 폭풍"));
+					tempCardData.strDesc = FString::Printf(TEXT("피해량"));
+					tempCardData.strStat = FString::Printf(
+						TEXT("%d > %d"), tempCardData.curDamage, tempCardData.nextDamage);
+					tempCardData.strDesc2 = FString::Printf(TEXT("투사체"));
+					tempCardData.strStat2 = FString::Printf(
+						TEXT("%d > %d"), tempCardData.curProjectile, tempCardData.nextProjectile);
+				}
+			}
+			else
+			{
+				tempCardData.bIsYasuo = false;
+				GetCurDamageNextDamage(tempCardData.WeaponGrade, tempCardData.curDamage, tempCardData.nextDamage,
+				                       false);
+				GetCurProjectileNextProjectile(tempCardData.WeaponGrade, tempCardData.curProjectile,
+				                               tempCardData.nextProjectile, false);
+				tempCardData.bIsNextWeaponFinal = IsNextWeaponFinal(false);
+				if (tempCardData.bIsNextWeaponFinal)
+				{
+					tempCardData.strLevel = FString::Printf(TEXT("진화"));
+					tempCardData.strTitle = FString::Printf(TEXT("전투 고양이 총알\n세례"));
+					tempCardData.strDesc = FString::Printf(
+						TEXT("총알이 대상을 관통합니다. 처음\n적중한 이후에는 피해량이\n감소합니다. 재사용 대기시간이\n크게 감소합니다."));
+				}
+				else
+				{
+					tempCardData.strLevel = FString::Printf(TEXT("%d레벨"), tempCardData.WeaponGrade + 1);
+					tempCardData.strTitle = FString::Printf(TEXT("야옹 야옹"));
+					tempCardData.strDesc = FString::Printf(TEXT("피해량"));
+					tempCardData.strStat = FString::Printf(
+						TEXT("%d > %d"), tempCardData.curDamage, tempCardData.nextDamage);
+					tempCardData.strDesc2 = FString::Printf(TEXT("투사체"));
+					tempCardData.strStat2 = FString::Printf(
+						TEXT("%d > %d"), tempCardData.curProjectile, tempCardData.nextProjectile);
+				}
+			}
+		}
+		else
+		{
+			tempCardData.strUpgradeStat = GetUpgradeData(card, tempCardData.strDesc, tempCardData.strTitle);
+			int32 nextLevel = 0;
+			if (card == "Damage")
+			{
+				nextLevel = tempCardData.DamageGrade + 1;
+			}
+			else if (card == "AbilityHaste")
+			{
+				nextLevel = tempCardData.AbilityHasteGrade + 1;
+			}
+			else if (card == "Projectiles")
+			{
+				nextLevel = tempCardData.ProjectilesGrade + 1;
+			}
+			else if (card == "CritChance")
+			{
+				nextLevel = tempCardData.CritChanceGrade + 1;
+			}
+
+			tempCardData.strLevel = FString::Printf(TEXT("%d레벨"), nextLevel);
+		}
+		CardData.Add(tempCardData);
+	}
+}
+
+void ACBasePlayer::MRPC_ShowUpgradeUI_Implementation(const TArray<FString>& cardList,
+                                                     const TArray<FCardStruct>& CardData)
+{
+	// if (IsLocallyControlled())
+		CRPC_ShowUpgradeUI(cardList, CardData);
+}
+
+void ACBasePlayer::CRPC_ShowUpgradeUI_Implementation(const TArray<FString>& cardList,
+                                                     const TArray<FCardStruct>& CardData)
+{
 	if (!SelectUpgradeWidget) return;
+	LOG_S(Warning, TEXT("Player Name : %s"), *GetName());
+	for (auto& card : cardList)
+	{
+		LOG_S(Warning, TEXT("card : %s"), *card);
+	}
+	for (auto cardData : CardData)
+		cardData.Print_Log();
+	
+
 	// 업그레이드 할 항목 지정 후 화면에 출력
 	// 랜덤으로 카드 3개를 선택 (남은 카드가 3장보다 적으면 1~2장까지만 뽑음)
 	// 업그레이드 가능 항목이 없으면 진행하지 않음
-	TArray<FString> cardList = PS->ChooseUpgradeCardList();
-	if (cardList.Num() == 0) return;
+	// SelectUpgradeWidget->SetCardData(cardList, CardData);
 
-	SelectUpgradeWidget->SetCardData(cardList);
-	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
-
-	if (this->IsA(ACYasuo::StaticClass()))
-	{
-		PC->GetNextLevelYasuoMoveStat();
-	}
+	// SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	//
+	// UGameplayStatics::SetGamePaused(GetWorld(), true);
+	//
+	// if (this->IsA(ACYasuo::StaticClass()))
+	// {
+	// 	PC->GetNextLevelYasuoMoveStat();
+	// }
 }
 
 void ACBasePlayer::InitUpgradeUI()

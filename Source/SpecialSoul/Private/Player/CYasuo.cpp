@@ -276,6 +276,8 @@ void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)
 	// MoveData는 키값 체크 후 넘기기
 	if (PS->YasuoMoveDataMap.Contains(PlayerLevel))
 		PC->UpdateYasuoMoveStat(PlayerLevel);
+	
+	Super::UpdatePlayerData(PlayerLevel);
 }
 
 void ACYasuo::SRPC_PlayAttackAnim_Implementation()

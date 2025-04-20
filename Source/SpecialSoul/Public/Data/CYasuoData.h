@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SpecialSoul.h"
 #include "Engine/DataTable.h"
 #include "CYasuoData.generated.h"
 
@@ -70,7 +71,7 @@ struct FYasuoMoveData // 야스오 이동거리 기류 획득 데이터
 /**
  * 
  */
-USTRUCT(Atomic,BlueprintType)
+USTRUCT(Atomic, BlueprintType)
 struct FCYasuoData : public FTableRowBase
 {
 	GENERATED_BODY()
@@ -90,4 +91,46 @@ public:
 	float AOEDamage;
 	UPROPERTY(EditAnywhere)
 	float AOEDamageCoolTime;
+};
+
+USTRUCT(BlueprintType)
+struct FCardStruct
+{
+	GENERATED_BODY()
+
+	bool bIsNextWeaponFinal;
+	bool bIsYasuo;
+	int32 WeaponGrade;
+	int32 DamageGrade;
+	int32 AbilityHasteGrade;
+	int32 ProjectilesGrade;
+	int32 CritChanceGrade;
+	int32 curDamage;
+	int32 nextDamage;
+	int32 curProjectile;
+	int32 nextProjectile;
+	FString strLevel;
+	FString strTitle;
+	FString strDesc;
+	FString strStat;
+	FString strDesc2;
+	FString strStat2;
+	FString strUpgradeStat;
+
+	FCardStruct(): bIsNextWeaponFinal(false), bIsYasuo(false), WeaponGrade(0), DamageGrade(0), AbilityHasteGrade(0),
+	               ProjectilesGrade(0), CritChanceGrade(0), curDamage(0), nextDamage(0), curProjectile(0),
+	               nextProjectile(0),
+	               strLevel(""), strTitle(""), strDesc(""), strStat(""), strDesc2(""), strStat2(""), strUpgradeStat("")
+	{
+	}
+
+	void Print_Log()
+	{
+		UE_LOG(LogTemp, Warning,TEXT(
+				  "\nbIsNextWeaponFinal: %d, bIsYasuo: %d\nWeaponGrade: %d, DamageGrade: %d, AbilityHasteGrade: %d, ProjectilesGrade: %d\n"
+				  "CritChanceGrade: %d, curDamage: %d, nextDamage: %d, curProjectile: %d, nextProjectile: %d\n"
+				  "strLevel: %s, strTitle: %s, strDesc: %s, strStat: %s\nstrDesc2: %s, strStat2: %s, strUpgradeStat: %s"),
+				  bIsNextWeaponFinal, bIsYasuo, WeaponGrade, DamageGrade, AbilityHasteGrade, ProjectilesGrade, CritChanceGrade,curDamage, nextDamage, curProjectile, nextProjectile,
+				  *strLevel, *strTitle, *strDesc, *strStat, *strDesc2, *strStat2, *strUpgradeStat);
+	}
 };

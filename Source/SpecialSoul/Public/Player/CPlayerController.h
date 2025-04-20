@@ -44,4 +44,8 @@ public: // For Yasuo
 
 public:
 	float CalcHaste(float CurHaste);
+
+public:
+	UFUNCTION(Server, Reliable)
+	void SRPC_UpgradeStat(const FString& statName);
 };

@@ -176,6 +176,7 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 {
+	// 이 함수를 호출하는 위치가 서버임
 	// 서버에서 업그레이드할 카드를 정해서 넘겨줌
 	TArray<FString> cardList = PS->ChooseUpgradeCardList();
 	if (cardList.Num() == 0) return;
@@ -311,7 +312,7 @@ void ACBasePlayer::CRPC_ShowUpgradeUI_Implementation(const TArray<FString>& card
 	// 랜덤으로 카드 3개를 선택 (남은 카드가 3장보다 적으면 1~2장까지만 뽑음)
 	// 업그레이드 가능 항목이 없으면 진행하지 않음
 	SelectUpgradeWidget->SetCardData(cardList, CardData);
-	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);	
+	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
@@ -370,9 +371,39 @@ void ACBasePlayer::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& O
 
 void ACBasePlayer::EndUpgrade()
 {
+	MRPC_EndUpgrade();
+	++GS->UpgradeSelectPlayerCount;
+	// if (HasAuthority() && IsLocallyControlled())
+		GS->OnRep_UpgradeSelectPlayerCount();
+	// UGameplayStatics::SetGamePaused(GetWorld(), false);
+}
+
+void ACBasePlayer::MRPC_EndUpgrade_Implementation()
+{
+	if (IsLocallyControlled())
+		CRPC_EndUpgrade();
+}
+
+void ACBasePlayer::CRPC_EndUpgrade_Implementation()
+{
 	if (SelectUpgradeWidget)
 	{
 		SelectUpgradeWidget->ClearCardData();
 	}
+}
+
+void ACBasePlayer::SRPC_UnPause_Implementation()
+{
+	MRPC_UnPause();
+}
+
+void ACBasePlayer::MRPC_UnPause_Implementation()
+{
+	if (IsLocallyControlled())
+		CRPC_UnPause();
+}
+
+void ACBasePlayer::CRPC_UnPause_Implementation()
+{
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }

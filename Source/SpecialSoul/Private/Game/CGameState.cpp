@@ -158,9 +158,20 @@ void ACGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ACGameState, GamePlayTime);
+	DOREPLIFETIME(ACGameState, UpgradeSelectPlayerCount);
 }
 
 void ACGameState::OnRep_PlayTime()
 {
 	HUD->SetTime(GamePlayTime);
+}
+
+void ACGameState::OnRep_UpgradeSelectPlayerCount()
+{
+	if (UpgradeSelectPlayerCount < PlayerArray.Num()) return;
+	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
+	{
+		(*It)->SRPC_UnPause();
+	}
+	UpgradeSelectPlayerCount = 0;
 }

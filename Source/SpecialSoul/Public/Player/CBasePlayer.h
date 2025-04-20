@@ -89,6 +89,10 @@ public: // Update Info
 	virtual void UpdatePlayerData(const int32 PlayerLevel);
 	void SetCardData(const TArray<FString>& CardList, TArray<FCardStruct>& CardData);
 	void EndUpgrade();
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_EndUpgrade();
+	UFUNCTION(Client, Reliable)
+	void CRPC_EndUpgrade();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -183,4 +187,12 @@ public:
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+public:
+	UFUNCTION(Server, Reliable)
+	void SRPC_UnPause();
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_UnPause();
+	UFUNCTION(Client, Reliable)
+	void CRPC_UnPause();
 };

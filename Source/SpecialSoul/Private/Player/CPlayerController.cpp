@@ -5,6 +5,7 @@
 
 #include "Game/CGameState.h"
 #include "Game/CPlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/CBasePlayer.h"
 #include "Player/CYasuo.h"
 
@@ -88,3 +89,9 @@ float ACPlayerController::CalcHaste(float CurHaste)
 	if (!MyPlayerState) return CurHaste;
 	return MyPlayerState->CalcAbilityHaste(CurHaste);
 }
+
+void ACPlayerController::SRPC_UpgradeStat_Implementation(const FString& statName)
+{
+	MyPlayerState->UpgradeStat(statName);
+}
+

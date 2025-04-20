@@ -126,7 +126,7 @@ TArray<FString> ACPlayerState::ChooseUpgradeCardList()
 	return CardList;
 }
 
-void ACPlayerState::UpgradeStat(const FString statName)
+void ACPlayerState::UpgradeStat(const FString& statName)
 {
 	if (statName == "Weapon")
 	{

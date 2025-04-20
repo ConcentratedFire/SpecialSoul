@@ -43,6 +43,8 @@ public:
 private:
 	UPROPERTY()
 	class ACPlayerState* PlayerState;
+	UPROPERTY()
+	class ACPlayerController* PC;
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))

@@ -28,6 +28,12 @@ public:
 	// 애님 노티파이
 	UFUNCTION()
 	void AnimNotify_Attack();
+	
+	UFUNCTION()
+	void AnimNotify_ESkill();
+
+	UFUNCTION()
+	void AnimNotify_RSkill();
 
 	
 	UFUNCTION()
@@ -35,4 +41,17 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_SkillEnd();
+	
+	UFUNCTION()
+	void AnimNotify_ESkillBegin();
+
+	UFUNCTION()
+	void AnimNotify_ESkillEnd();
+
+	UFUNCTION()
+	void AnimNotify_RSkillBegin();
+
+	UFUNCTION()
+	void AnimNotify_RSkillEnd();
+
 };

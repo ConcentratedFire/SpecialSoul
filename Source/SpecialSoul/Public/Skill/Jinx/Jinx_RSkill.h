@@ -18,6 +18,8 @@ public:
 	UJinx_RSkill();
 	virtual void UseSkill(ACharacter* Caster) override;
 
+	bool bCasted {false};
+
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	TSubclassOf<AMegaRocketBullet> BulletClass;
 	

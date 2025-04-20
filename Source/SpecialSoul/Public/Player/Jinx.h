@@ -28,22 +28,29 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Attack() override;
+	void UseESkill();
+	void UseRSkill();
 	
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	
 public:
-
 	void ActivateSkillMovement(bool bActive); // 스킬 사용 중 캐릭터 회전 관련
 	
 	void StartAttack();
 
 	void RotateToMouseCursor();
 	
+	// UFUNCTION(Server, Reliable)
+	// void SRPC_StartAttack();
+	//
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MRPC_PlayAttackMontage();
+
 	UFUNCTION(Server, Reliable)
-	void SRPC_StartAttack();
+	void SRPC_UseSkill(ESkillKey Key);
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void MRPC_PlayAttackMontage();
+	void MRPC_PlaySkillMontage(ESkillKey Key);
 	
 private:
 	void UpdateJinxAttackStat(int32 PlayerLevel);

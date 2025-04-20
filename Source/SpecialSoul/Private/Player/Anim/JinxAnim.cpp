@@ -30,6 +30,22 @@ void UJinxAnim::AnimNotify_Attack()
 	}
 }
 
+void UJinxAnim::AnimNotify_ESkill()
+{
+	if (Jinx->HasAuthority())
+	{
+		Jinx->UseESkill();
+	}
+}
+
+void UJinxAnim::AnimNotify_RSkill()
+{
+	if (Jinx->HasAuthority())
+	{
+		Jinx->UseRSkill();
+	}
+}
+
 void UJinxAnim::AnimNotify_SkillBegin()
 {
 	Jinx->SkillComponent->UseSkillCount++;
@@ -41,6 +57,45 @@ void UJinxAnim::AnimNotify_SkillEnd()
 {
 	Jinx->SkillComponent->UseSkillCount--;
 
-	Jinx->ActivateSkillMovement(false);
-	
+	if (Jinx->SkillComponent->UseSkillCount <= 0)
+	{
+		Jinx->SkillComponent->UseSkillCount = 0;
+		Jinx->ActivateSkillMovement(false);
+	}
+}
+
+void UJinxAnim::AnimNotify_ESkillBegin()
+{
+	Jinx->SkillComponent->UseSkillCount++;
+
+	Jinx->ActivateSkillMovement(true);
+}
+
+void UJinxAnim::AnimNotify_ESkillEnd()
+{
+	Jinx->SkillComponent->UseSkillCount--;
+
+	if (Jinx->SkillComponent->UseSkillCount <= 0)
+	{
+		Jinx->SkillComponent->UseSkillCount = 0;
+		Jinx->ActivateSkillMovement(false);
+	}
+}
+
+void UJinxAnim::AnimNotify_RSkillBegin()
+{
+	Jinx->SkillComponent->UseSkillCount++;
+
+	Jinx->ActivateSkillMovement(true);
+}
+
+void UJinxAnim::AnimNotify_RSkillEnd()
+{
+	Jinx->SkillComponent->UseSkillCount--;
+
+	if (Jinx->SkillComponent->UseSkillCount <= 0)
+	{
+		Jinx->SkillComponent->UseSkillCount = 0;
+		Jinx->ActivateSkillMovement(false);
+	}
 }

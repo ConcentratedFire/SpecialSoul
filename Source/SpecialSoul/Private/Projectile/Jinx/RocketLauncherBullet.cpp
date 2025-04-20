@@ -16,8 +16,8 @@ ARocketLauncherBullet::ARocketLauncherBullet()
 		MeshComp->SetRelativeLocation(FVector(20.f, 0.f, 0.f));
 		MeshComp->SetRelativeRotation(FRotator(-90.f, 0, 0));
 		MeshComp->SetRelativeScale3D(FVector(0.2f));
+		MeshComp->SetCollisionProfileName("PlayerAttack");
 	}
-	MeshComp->SetCollisionProfileName("PlayerAttack");
 
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempTailVfx(TEXT("/Script/Niagara.NiagaraSystem'/Game/Asset/Jinx/VFX/Particles/Projectiles/NS_Jinx_E_Tail.NS_Jinx_E_Tail'"));
 	if (TempTailVfx.Succeeded())
@@ -37,14 +37,9 @@ ARocketLauncherBullet::ARocketLauncherBullet()
 void ARocketLauncherBullet::BeginPlay()
 {
 	Super::BeginPlay();
+	InitMoveComp();
+	StartLocation  = GetActorLocation();
 }
-
-// void ARocketLauncherBullet::ApplyLifeTime()
-// {
-// 	// 사정거리 / 속도 = 수명 (초 단위)
-// 	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
-// 	SetLifeSpan(LifeSpan); // 수명 설정
-// }
 
 void ARocketLauncherBullet::Tick(float DeltaSeconds)
 {
@@ -52,18 +47,18 @@ void ARocketLauncherBullet::Tick(float DeltaSeconds)
 
 	// 좌우 왔다갔다 하면서 날라감sd
 		// Root기준으로 좌우 와리가리
-	if (bMoveRight)
-	{
-		MeshComp->SetRelativeLocation(GetActorLocation() + GetActorRightVector() * MoveAmplitudeSpeed * DeltaSeconds);
-		if (MeshComp->GetRelativeLocation().Y >= GetActorLocation().Y + MoveAmplitude)
-			bMoveRight = false;
-	}
-	else
-	{
-		MeshComp->SetRelativeLocation(GetActorLocation() + -GetActorRightVector() * MoveAmplitudeSpeed * DeltaSeconds);
-		if (MeshComp->GetRelativeLocation().Y <= GetActorLocation().Y - MoveAmplitude)
-			bMoveRight = true;
-	}
+	// if (bMoveRight)
+	// {
+	// 	MeshComp->SetRelativeLocation(GetActorLocation() + GetActorRightVector() * MoveAmplitudeSpeed * DeltaSeconds);
+	// 	if (MeshComp->GetRelativeLocation().Y >= GetActorLocation().Y + MoveAmplitude)
+	// 		bMoveRight = false;
+	// }
+	// else
+	// {
+	// 	MeshComp->SetRelativeLocation(GetActorLocation() + -GetActorRightVector() * MoveAmplitudeSpeed * DeltaSeconds);
+	// 	if (MeshComp->GetRelativeLocation().Y <= GetActorLocation().Y - MoveAmplitude)
+	// 		bMoveRight = true;
+	// }
 	
 	// 360도 돌면서 날라감
 	

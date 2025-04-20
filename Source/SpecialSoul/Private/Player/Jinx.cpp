@@ -48,6 +48,16 @@ void AJinx::Attack()
 	SkillComponent->Attack(); // 기본공격
 }
 
+void AJinx::UseESkill()
+{
+	SkillComponent->CastSkill(ESkillKey::E);
+}
+
+void AJinx::UseRSkill()
+{
+	SkillComponent->CastSkill(ESkillKey::R);
+}
+
 void AJinx::UpdatePlayerData(const int32 PlayerLevel)
 {
 	if (PS->JinxAttackDataMap.Contains(PlayerLevel))
@@ -64,29 +74,66 @@ void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
 	PC->UpgradeWeapon(PlayerLevel);
 	
 	 // 업데이트된 데이터로 공격 시작
-	SRPC_StartAttack_Implementation();
+	SRPC_UseSkill_Implementation(ESkillKey::Attack);
 }
 
-void AJinx::SRPC_StartAttack_Implementation()
+void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 {
-	// 서버에서 타이머를 돌리며
-	float remainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(AttackTimer);
-	
-	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
-	
-	GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this]()
+	switch (Key)
 	{
-		// 모든 클라에서 애니메이션을 재생한다
-		MRPC_PlayAttackMontage();
+	case ESkillKey::Attack:
+		{
+			// 서버에서 타이머를 돌리며
+			float remainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(AttackTimer);
+	
+			GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+	
+			GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this, Key]()
+			{
+				// 모든 클라에서 애니메이션을 재생한다
+				MRPC_PlaySkillMontage(Key);
 		
-	}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime-remainingTime);
+			}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime-remainingTime);
+		}
+		break;
+		
+	case ESkillKey::Passive:
+		break;
+		
+	case ESkillKey::E:
+		MRPC_PlaySkillMontage_Implementation(ESkillKey::E);
+		break;
+		
+	case ESkillKey::R:
+		MRPC_PlaySkillMontage_Implementation(ESkillKey::R);
+		break;
+		
+	default:
+		break;
+	}
 }
 
-
-void AJinx::MRPC_PlayAttackMontage_Implementation()
+void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 {
-	PlayAnimMontage(AttackMontage);
-	UE_LOG(LogTemp, Warning, TEXT("PlayAnimMontage"));
+	UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage"));
+	
+	switch (Key)
+	{
+	case ESkillKey::Attack:
+		PlayAnimMontage(AttackMontage);
+		break;
+	case ESkillKey::Passive:
+		break;
+	case ESkillKey::E:
+		PlayAnimMontage(ESkillMontage);
+		break;
+	case ESkillKey::R:
+		PlayAnimMontage(RSkillMontage);
+		break;
+		
+	default:
+		break;
+	}
 }
 
 
@@ -111,9 +158,10 @@ void AJinx::StartAttack()
 {
 	if (HasAuthority())
 	{
-		SRPC_StartAttack();
+		SRPC_UseSkill(ESkillKey::Attack);
 	}
 }
+
 
 void AJinx::RotateToMouseCursor()
 {
@@ -134,4 +182,3 @@ void AJinx::RotateToMouseCursor()
 		SetActorRotation(targetRot);
 	}
 }
-

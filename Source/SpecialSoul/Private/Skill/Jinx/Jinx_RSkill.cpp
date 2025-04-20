@@ -15,31 +15,39 @@ UJinx_RSkill::UJinx_RSkill()
 	}
 }
 
+// 서버에서 호출된다.
 void UJinx_RSkill::UseSkill(ACharacter* Caster)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Jinx_RSkill"));
+	//UE_LOG(LogTemp, Warning, TEXT("Jinx_RSkill"));
 
-	if (!Caster || !BulletClass)
+	AJinx* Jinx = Cast<AJinx>(Caster);
+	if (!Caster || !BulletClass || !Jinx)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Caster or MinigunBullet is nullptr..."));
+		UE_LOG(LogTemp, Warning, TEXT("Caster or MinigunBullet or Jinx is nullptr..."));
 		return;
 	}
 
-	AJinx* Jinx = Cast<AJinx>(Caster);
-	if (Jinx)
+	if (!bCasted)
 	{
-		//Jinx->MRPC_ActivateSkillMovement(true);
-		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
+		Jinx->MRPC_PlaySkillMontage(ESkillKey::R);
+		bCasted = true;
 	}
+	else
+	{
+		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	
-	// TODO : 시전시간 동안 Progressbar UI를 띄우고
+		// TODO : 시전시간 동안 Progressbar UI를 띄우고
+
+		// 스킬 발동
+		StartUseSkill(Jinx);
 	
-	Jinx->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
-		[this,Jinx]()
-		{
-			this->StartUseSkill(Jinx);
-		}),
-		CastingTime, false, CastingTime);
+		// Jinx->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
+		// 	[this,Jinx]()
+		// 	{
+		// 		this->StartUseSkill(Jinx);
+		// 	}),
+		// 	CastingTime, false, CastingTime);
+	}
 }
 
 void UJinx_RSkill::StartUseSkill(AJinx* Jinx)
@@ -65,5 +73,6 @@ void UJinx_RSkill::StartUseSkill(AJinx* Jinx)
 void UJinx_RSkill::EndUseSkill(AJinx* Jinx)
 {
 	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
+	bCasted = false;
 	//Jinx->MRPC_ActivateSkillMovement(false);
 }

@@ -28,11 +28,6 @@ void UJinx_Attack::UseSkill(ACharacter* Caster)
     AJinx* Jinx = Cast<AJinx>(Caster);
     if (!Jinx)
         return;
-    
-    // if (Jinx)
-    // {
-    //     Jinx->MRPC_ActivateSkillMovement(true);
-    // }
 
     ShotCount = 0;
     ShotBulletCount = 0;

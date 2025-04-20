@@ -58,7 +58,7 @@ void ACPlayerState::SRPC_SetInitialData_Implementation()
 
 		if (auto jinx = Cast<AJinx>(Player))
 		{
-			jinx->SRPC_StartAttack();
+			jinx->SRPC_UseSkill(ESkillKey::Attack);
 		}
 	}
 

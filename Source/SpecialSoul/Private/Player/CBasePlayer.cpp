@@ -186,7 +186,14 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 	// }
 	TArray<FCardStruct> CardData;
 	SetCardData(cardList, CardData);
+	LOG_S(Warning, TEXT("cardList Count : %d"), cardList.Num());
+	LOG_S(Warning, TEXT("CardData Count : %d"), CardData.Num());
 	MRPC_ShowUpgradeUI(cardList, CardData);
+
+	if (this->IsA(ACYasuo::StaticClass()))
+	{
+		PC->GetNextLevelYasuoMoveStat();
+	}
 }
 
 void ACBasePlayer::SetCardData(const TArray<FString>& CardList, TArray<FCardStruct>& CardData)
@@ -283,7 +290,7 @@ void ACBasePlayer::SetCardData(const TArray<FString>& CardList, TArray<FCardStru
 void ACBasePlayer::MRPC_ShowUpgradeUI_Implementation(const TArray<FString>& cardList,
                                                      const TArray<FCardStruct>& CardData)
 {
-	// if (IsLocallyControlled())
+	if (IsLocallyControlled())
 		CRPC_ShowUpgradeUI(cardList, CardData);
 }
 
@@ -291,28 +298,21 @@ void ACBasePlayer::CRPC_ShowUpgradeUI_Implementation(const TArray<FString>& card
                                                      const TArray<FCardStruct>& CardData)
 {
 	if (!SelectUpgradeWidget) return;
-	LOG_S(Warning, TEXT("Player Name : %s"), *GetName());
-	for (auto& card : cardList)
-	{
-		LOG_S(Warning, TEXT("card : %s"), *card);
-	}
-	for (auto cardData : CardData)
-		cardData.Print_Log();
-	
+	// LOG_S(Warning, TEXT("Player Name : %s"), *GetName());
+	// for (auto& card : cardList)
+	// {
+	// 	LOG_S(Warning, TEXT("card : %s"), *card);
+	// }
+	// for (auto cardData : CardData)
+	// 	cardData.Print_Log();
+	// LOG_S(Warning, TEXT("============="));
 
 	// 업그레이드 할 항목 지정 후 화면에 출력
 	// 랜덤으로 카드 3개를 선택 (남은 카드가 3장보다 적으면 1~2장까지만 뽑음)
 	// 업그레이드 가능 항목이 없으면 진행하지 않음
-	// SelectUpgradeWidget->SetCardData(cardList, CardData);
-
-	// SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-	//
-	// UGameplayStatics::SetGamePaused(GetWorld(), true);
-	//
-	// if (this->IsA(ACYasuo::StaticClass()))
-	// {
-	// 	PC->GetNextLevelYasuoMoveStat();
-	// }
+	SelectUpgradeWidget->SetCardData(cardList, CardData);
+	SelectUpgradeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);	
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
 void ACBasePlayer::InitUpgradeUI()

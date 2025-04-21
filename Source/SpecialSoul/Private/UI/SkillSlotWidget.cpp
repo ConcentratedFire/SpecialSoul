@@ -6,12 +6,13 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Player/CBasePlayer.h"
 
-void USkillSlotWidget::InitialSetup(FString keyStr, UObject* InResoueceObject) 
+void USkillSlotWidget::SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject) 
 {
 	if (txt_SkillKey)
 	{
-		txt_SkillKey->SetText(FText::FromString(keyStr));
+		txt_SkillKey->SetText(FText::FromString(KeyToString(skillKey)));
 	}
 	if (btn_SkillSlot && InResoueceObject)
 	{
@@ -26,14 +27,13 @@ void USkillSlotWidget::InitialSetup(FString keyStr, UObject* InResoueceObject)
 
 		// 버튼 스타일 적용 (Setter 사용)
 		btn_SkillSlot->SetStyle(buttonStyle);
-		
-		btn_SkillSlot->SetStyle(buttonStyle);
 	}
-		btn_SkillSlot->WidgetStyle.Normal.SetResourceObject(InResoueceObject);
 }
 
 void USkillSlotWidget::UpdateCoolTime(float leftTime, float totalTime)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("USkillSlotWidget::UpdateSkillCooltime"));
+
 	UpdateImages_LeftCooltimePercent(leftTime/totalTime);
 	UpdateText_LeftCooltime(leftTime);
 }
@@ -56,6 +56,15 @@ void USkillSlotWidget::UpdateText_LeftCooltime(float leftTime)
 {
 	FString t = FString::Printf(TEXT("%.1f"), leftTime); // 소수점 1자리까지 표시
 	txt_Cooltime->SetText(FText::FromString(t));
+
+	if (t == "0.0")
+	{
+		txt_Cooltime->SetVisibility(ESlateVisibility::Hidden);	
+	}
+	else
+	{
+		txt_Cooltime->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void USkillSlotWidget::SetBlurMaterialScalarParam(FName paramName, float value)
@@ -75,5 +84,15 @@ void USkillSlotWidget::SetCoverMaterialScalarParam(FName paramName, float value)
 		auto dm = img_Cover->GetDynamicMaterial();
 		if (dm)
 			dm->SetScalarParameterValue(paramName, value);
+	}
+}
+
+FString USkillSlotWidget::KeyToString(ESkillKey Key)
+{
+	switch (Key)
+	{
+	case ESkillKey::E: return TEXT("E");
+	case ESkillKey::R: return TEXT("R");
+	default: return TEXT("?");
 	}
 }

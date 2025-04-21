@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "SkillSlotWidget.generated.h"
 
+enum class ESkillKey : uint8;
 /**
  * 
  */
@@ -31,7 +32,7 @@ public:
 	class UTextBlock* txt_Cooltime;
 
 	UFUNCTION()
-	void InitialSetup(FString keyStr, UObject* InResoueceObject); // 버튼 이미지 세팅 함수
+	void SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject); // 버튼 이미지 세팅 함수
 
 	UFUNCTION()
 	void UpdateCoolTime(float leftTime, float totalTime);
@@ -49,4 +50,6 @@ private:
 
 	UFUNCTION()
 	void SetCoverMaterialScalarParam(FName paramName, float value);
+
+	FString KeyToString(ESkillKey Key);
 };

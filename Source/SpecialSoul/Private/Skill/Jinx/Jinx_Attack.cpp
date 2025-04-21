@@ -53,10 +53,7 @@ void UJinx_Attack::HandleShot(ACharacter* Caster, AJinx* Jinx)
         World->GetTimerManager().ClearTimer(ShotTimer);
         World->GetTimerManager().ClearTimer(OneShotTimer);
 
-        // if (Jinx)
-        // {
-        //     Jinx->MRPC_ActivateSkillMovement(false);
-        // }
+        
         return;
     }
 

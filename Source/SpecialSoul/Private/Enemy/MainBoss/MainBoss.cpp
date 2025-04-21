@@ -35,11 +35,11 @@ void AMainBoss::BeginPlay()
 	SkillComponent->BindSkill(ESkillKey::Attack, NewObject<UMainBoss_Attack>());
 	SkillComponent->BindSkill(ESkillKey::Q, NewObject<UMainBoss_DarkinBlade>());
 
-	SkillComponent->CoolTimeMap.Add(ESkillKey::Attack, 1.5f);
-	SkillComponent->CoolTimeMap.Add(ESkillKey::Q, 8.f);
+	SkillComponent->CoolTimeMap.Add(ESkillKey::Attack, FSkillCooltime(1.5f, 0.f));
+	SkillComponent->CoolTimeMap.Add(ESkillKey::Q, FSkillCooltime(8.f, 0.f));
 	
-	SkillComponent->LeftCoolTimeMap.Add(ESkillKey::Attack, 1.5f);
-	SkillComponent->LeftCoolTimeMap.Add(ESkillKey::Q, 8.f);
+	// SkillComponent->LeftCoolTimeMap.Add(ESkillKey::Attack, 1.5f);
+	// SkillComponent->LeftCoolTimeMap.Add(ESkillKey::Q, 8.f);
 	
 	SkillComponent->SkillRangeMap.Add(ESkillKey::Attack, 500.f);
 	SkillComponent->SkillRangeMap.Add(ESkillKey::Q, 500.f);

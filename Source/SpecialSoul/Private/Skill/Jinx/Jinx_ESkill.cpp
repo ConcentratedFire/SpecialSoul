@@ -19,8 +19,6 @@ UJinx_ESkill::UJinx_ESkill()
 // 서버에서 호출됨
 void UJinx_ESkill::UseSkill(ACharacter* Caster)
 {
-	// TODO : 서버에 의한 쿨타임 확인 적용해야함
-	
 	//UE_LOG(LogTemp, Warning, TEXT("Jinx_ESkill"));
 
 	if (!Caster || !BulletClass)
@@ -38,9 +36,6 @@ void UJinx_ESkill::UseSkill(ACharacter* Caster)
 	else
 	{
 		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
-		//Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
-	
-		// 스킬 캐스팅
 	
 		// TODO : CastingTime 시간 동안 Progressbar UI를 띄우고
 		
@@ -99,4 +94,6 @@ void UJinx_ESkill::EndUseSkill(AJinx* Jinx)
 	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	//Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 	bCasted = false;
+
+	Jinx->ResetLeftCooltime(ESkillKey::E);
 }

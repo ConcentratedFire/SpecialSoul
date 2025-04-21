@@ -12,6 +12,9 @@
 #include "Skill/Jinx/Jinx_ESkill.h"
 #include "Skill/Jinx/Jinx_Passive.h"
 #include "Skill/Jinx/Jinx_RSkill.h"
+#include "UI/ChampionStatusWidget.h"
+#include "UI/GameWidget.h"
+#include "UI/HUD/GameHUD.h"
 
 AJinx::AJinx()
 {
@@ -41,6 +44,25 @@ void AJinx::BeginPlay()
 	SkillComponent->BindSkill(ESkillKey::Passive, NewObject<UJinx_Passive>());
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	SkillComponent->BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
+
+	SkillComponent->CoolTimeMap.Add(ESkillKey::Attack, FSkillCooltime(1.5f, 0.f));
+	SkillComponent->CoolTimeMap.Add(ESkillKey::E, FSkillCooltime(1.5f, 0.f));
+	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(1.5f, 0.f));
+
+
+	if (IsLocallyControlled())
+	{
+		SkillComponent->OnCooltimeUpdated.AddDynamic(this, &AJinx::OnCooltimeChanged);
+		
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Fishbones.Fishbones"));
+			UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/MegaRocket.MegaRocket"));
+			
+			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
+			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
+		}
+	}
 }
 
 void AJinx::Attack()
@@ -66,6 +88,26 @@ void AJinx::UpdatePlayerData(const int32 PlayerLevel)
 	}
 
 	//Super::UpdatePlayerData(PlayerLevel);
+}
+
+void AJinx::OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo)
+{
+	if (IsLocallyControlled())
+	{
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			hud->GameWidget->UpdateSkillCooltime(skillKey, cooltimeInfo);
+		}
+	}
+}
+
+void AJinx::ResetLeftCooltime(ESkillKey skillKey)
+{
+	if (SkillComponent->CoolTimeMap.Contains(skillKey))
+	{
+		auto& cooltimeInfo = SkillComponent->CoolTimeMap[skillKey];
+		cooltimeInfo.LeftCooltime = cooltimeInfo.TotalCooltime;
+	}
 }
 
 void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
@@ -112,7 +154,7 @@ void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 		break;
 	}
 }
- 
+
 void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 {
 	UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage"));

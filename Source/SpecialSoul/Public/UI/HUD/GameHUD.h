@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Player/Components/SkillComponent.h"
 #include "GameHUD.generated.h"
 
+enum class ESkillKey : uint8;
 class UGameWidget;
 /**
  * 
@@ -18,7 +20,9 @@ class SPECIALSOUL_API AGameHUD : public AHUD
 public:
 	void SetKillScore(int32 KillScore);
 	void SetTime(float Time);
-	
+
+	void UpdateSkillCooltime(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
+
 public:
 	//AGameHUD();
 

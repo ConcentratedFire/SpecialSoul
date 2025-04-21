@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SkillComponent.h"
 #include "Data/JinxData.h"
 #include "Interface/SkillStrategy.h"
 #include "Player/CBasePlayer.h"
@@ -40,18 +41,17 @@ public:
 
 	void RotateToMouseCursor();
 	
-	// UFUNCTION(Server, Reliable)
-	// void SRPC_StartAttack();
-	//
-	// UFUNCTION(NetMulticast, Reliable)
-	// void MRPC_PlayAttackMontage();
-
 	UFUNCTION(Server, Reliable)
 	void SRPC_UseSkill(ESkillKey Key);
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_PlaySkillMontage(ESkillKey Key);
+
+	UFUNCTION()
+	void OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
 	
+	void ResetLeftCooltime(ESkillKey skillKey);
+
 private:
 	void UpdateJinxAttackStat(int32 PlayerLevel);
 	

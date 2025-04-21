@@ -13,5 +13,11 @@ UCLASS()
 class SPECIALSOUL_API UChampionStatusWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class USkillSlotWidget* SkillSlot_E;
+
+	UPROPERTY(meta = (BindWidget))
+	class USkillSlotWidget* SkillSlot_R;
 };

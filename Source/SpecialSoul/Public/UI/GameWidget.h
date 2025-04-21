@@ -23,4 +23,13 @@ private:
 	class UCKillScoreWidget* WBP_KillScore;
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCTimeWidget* WBP_Timer;
+
+	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
+	class UChampionStatusWidget* WBP_ChampionStatusWidget;
+
+	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
+	class UChampionStatWidget* WBP_ChampionStatWidget;
+
+	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
+	class UOverheadStatusWidget* WBP_OverheadStatusWidget;
 };

@@ -41,17 +41,4 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_SkillEnd();
-	
-	UFUNCTION()
-	void AnimNotify_ESkillBegin();
-
-	UFUNCTION()
-	void AnimNotify_ESkillEnd();
-
-	UFUNCTION()
-	void AnimNotify_RSkillBegin();
-
-	UFUNCTION()
-	void AnimNotify_RSkillEnd();
-
 };

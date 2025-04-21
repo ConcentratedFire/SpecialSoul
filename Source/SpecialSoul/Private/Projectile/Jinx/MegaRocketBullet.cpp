@@ -36,6 +36,9 @@ AMegaRocketBullet::AMegaRocketBullet()
 	{
 		HitVfxAsset = TempHitVfx.Object;
 	}
+
+	AttackType = EAttackType::AreaOfEffect;
+	ExplosionRadius = 250.f;
 }
 
 void AMegaRocketBullet::BeginPlay()
@@ -43,7 +46,8 @@ void AMegaRocketBullet::BeginPlay()
 	Super::BeginPlay();
 	InitMoveComp();
 	StartLocation  = GetActorLocation();
-
+	if (!HasAuthority())
+		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 

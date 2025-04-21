@@ -4,6 +4,7 @@
 #include "Skill/Jinx/Jinx_RSkill.h"
 
 #include "Player/Jinx.h"
+#include "Player/Components/SkillComponent.h"
 #include "Projectile/Jinx/MegaRocketBullet.h"
 
 UJinx_RSkill::UJinx_RSkill()
@@ -74,6 +75,5 @@ void UJinx_RSkill::StartUseSkill(AJinx* Jinx)
 
 void UJinx_RSkill::EndUseSkill(AJinx* Jinx)
 {
-	//Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	bCasted = false;
 }

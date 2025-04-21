@@ -33,7 +33,8 @@ AMinigunBullet::AMinigunBullet()
 	{
 		HitVfxAsset = TempHitVfx.Object;
 	}
-	
+
+	AttackType = EAttackType::SingleTarget;
 }
 
 void AMinigunBullet::BeginPlay()
@@ -41,6 +42,9 @@ void AMinigunBullet::BeginPlay()
 	Super::BeginPlay();
 	InitMoveComp();
 	StartLocation  = GetActorLocation();
+
+	if (!HasAuthority())
+		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void AMinigunBullet::Tick(float DeltaSeconds)

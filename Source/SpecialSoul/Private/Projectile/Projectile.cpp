@@ -73,16 +73,46 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 		MRPC_SpawnHitVFX();
 	}
 
-	if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
+	if (AttackType == EAttackType::SingleTarget)
+	{
+		if (auto Enemy = Cast<ABaseEnemy>(OtherActor))
+		{
+			Enemy->MyDamage(Damage);
+		}
+		else if (auto Item = Cast<ACBaseItem>(OtherActor))
+		{
+			if (Item->GetActorNameOrLabel().Contains("ItemBox"))
+				Item->ActiveItem();
+		}
+	}
+	else // 범위공격 AOE
 	{
 		
-		Enemy->MyDamage(Damage);
+		TArray<FHitResult> hitResults;
+		FCollisionShape SphereShape = FCollisionShape::MakeSphere(ExplosionRadius);
+		bool bHit = GetWorld()->SweepMultiByChannel(hitResults, GetActorLocation(), GetActorLocation(),
+			FQuat::Identity, MeshComp->GetCollisionObjectType(), SphereShape);
+
+		for (FHitResult hitResult : hitResults)
+		{
+			//UE_LOG(LogTemp, Error, TEXT("hitResults.Num() = %d"), hitResults.Num());
+			FVector hitLocation = hitResult.ImpactPoint; // 충돌지점
+
+			DrawDebugSphere(GetWorld(), hitLocation, ExplosionRadius, 20, FColor::Yellow, false, 0.1f);
+			
+			AActor* hitActor = hitResult.GetActor();
+			if (auto Enemy = Cast<ABaseEnemy>(hitActor))
+			{
+				Enemy->MyDamage(Damage);
+			}
+			else if (auto Item = Cast<ACBaseItem>(hitActor))
+			{
+				if (Item->GetActorNameOrLabel().Contains("ItemBox"))
+					Item->ActiveItem();
+			}
+		}
 	}
-	else if (auto Item = Cast<ACBaseItem>(OtherActor))
-	{
-		if (Item->GetActorNameOrLabel().Contains("ItemBox"))
-			Item->ActiveItem();
-	}
+	
 	
 	Penetration--;
 	if (Penetration <= 0)

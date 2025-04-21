@@ -20,7 +20,10 @@ ARangedEnemyProjectile::ARangedEnemyProjectile()
 	{
 		MeshComp->SetStaticMesh(TempMesh.Object);
 		MeshComp->SetVisibility(false);
-		MeshComp->SetCollisionProfileName("Enemy");
+		if (HasAuthority())
+			MeshComp->SetCollisionProfileName("Enemy");
+		else
+			MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
 
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempTailVfx(TEXT("/Script/Niagara.NiagaraSystem'/Game/Asset/RangeMinion/NS_RangedEnemy_Attack.NS_RangedEnemy_Attack'"));
@@ -51,6 +54,8 @@ ARangedEnemyProjectile::ARangedEnemyProjectile()
 		ProjectileMovementComp->bRotationFollowsVelocity = true;
 		ProjectileMovementComp->bSimulationEnabled = true;
 	}
+
+	AttackType = EAttackType::SingleTarget;
 }
 
 
@@ -131,6 +136,14 @@ void ARangedEnemyProjectile::OnDestroy()
 	}
 
 	ObjectPoolManager->ReturnRangedEnemyProjectile(this);
+}
+
+void ARangedEnemyProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!HasAuthority())
+		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void ARangedEnemyProjectile::OnRep_ServerLocation()

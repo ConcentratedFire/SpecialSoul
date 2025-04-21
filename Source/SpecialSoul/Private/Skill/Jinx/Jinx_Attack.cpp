@@ -17,7 +17,7 @@ UJinx_Attack::UJinx_Attack()
 
 void UJinx_Attack::UseSkill(ACharacter* Caster)
 {
-    UE_LOG(LogTemp, Warning, TEXT("UJinx_Attack::UseSkill"));
+    //UE_LOG(LogTemp, Warning, TEXT("UJinx_Attack::UseSkill"));
 
     if (!Caster || !BulletClass)
     {
@@ -42,7 +42,6 @@ void UJinx_Attack::UseSkill(ACharacter* Caster)
         FTimerDelegate::CreateUObject(this, &UJinx_Attack::HandleShot, Caster, Jinx),
         ShotDelay, true, 0.f);
 
-    UE_LOG(LogTemp, Warning, TEXT("Shot Timer started"));
 }
 
 void UJinx_Attack::HandleShot(ACharacter* Caster, AJinx* Jinx)
@@ -50,8 +49,6 @@ void UJinx_Attack::HandleShot(ACharacter* Caster, AJinx* Jinx)
     // ShotCount가 TotalShot 이상이면 종료
     if (ShotCount >= TotalShot)
     {
-        UE_LOG(LogTemp, Warning, TEXT("All shots fired! TotalShot reached."));
-
         UWorld* World = Caster->GetWorld();
         World->GetTimerManager().ClearTimer(ShotTimer);
         World->GetTimerManager().ClearTimer(OneShotTimer);

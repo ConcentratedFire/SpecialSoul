@@ -11,6 +11,13 @@ class UNiagaraSystem;
 class UNiagaraComponent;
 class UProjectileMovementComponent;
 
+UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+	SingleTarget, // 단일 타겟 공격
+	AreaOfEffect  // 범위 공격 
+};
+
 UCLASS()
 class SPECIALSOUL_API AProjectile : public AActor
 {
@@ -61,17 +68,23 @@ protected:
 	virtual void OnDestroy(); // Destory OR Pool->Push
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Projectile")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
+	EAttackType AttackType = EAttackType::SingleTarget;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
 	int32 Penetration {1}; // 사거리
 
-	UPROPERTY(VisibleAnywhere, Category = "Projectile")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
 	float Damage {30.f}; // 데미지
 
-	UPROPERTY(EditAnywhere, Category = "Projectile")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
 	float AttackRange {1500.f}; // 사거리
 	
-	UPROPERTY(EditAnywhere, Category = "Projectile")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
 	float CurrentDistance;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile", meta = (EditCondition = "AttackType == EAttackType::AreaOfEffect"))
+	float ExplosionRadius = 100.0f;
 };
 
 //NS_FireArrow & NS_FireArrow_Hit=> 징키 평타 꼬리VFX(크기 줄이기) & E공격 꼬리 VFX

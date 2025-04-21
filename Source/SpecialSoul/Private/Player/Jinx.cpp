@@ -121,18 +121,18 @@ void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 	{
 	case ESkillKey::Attack:
 		{
-			UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - Attack"));
+			//UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - Attack"));
 			PlayAnimMontage(AttackMontage);
 		}
 		break;
 	case ESkillKey::Passive:
 		break;
 	case ESkillKey::E:
-		UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - E"));
+		//UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - E"));
 		PlayAnimMontage(ESkillMontage);
 		break;
 	case ESkillKey::R:
-		UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - R"));
+		//UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - R"));
 		PlayAnimMontage(RSkillMontage);
 		break;
 		

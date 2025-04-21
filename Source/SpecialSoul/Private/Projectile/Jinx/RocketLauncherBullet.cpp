@@ -32,6 +32,8 @@ ARocketLauncherBullet::ARocketLauncherBullet()
 	{
 		HitVfxAsset = TempHitVfx.Object;
 	}
+
+	AttackType = EAttackType::AreaOfEffect;
 }
 
 void ARocketLauncherBullet::BeginPlay()
@@ -39,6 +41,9 @@ void ARocketLauncherBullet::BeginPlay()
 	Super::BeginPlay();
 	InitMoveComp();
 	StartLocation  = GetActorLocation();
+	
+	if (!HasAuthority())
+		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void ARocketLauncherBullet::Tick(float DeltaSeconds)

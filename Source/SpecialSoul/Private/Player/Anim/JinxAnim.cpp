@@ -63,39 +63,3 @@ void UJinxAnim::AnimNotify_SkillEnd()
 		Jinx->ActivateSkillMovement(false);
 	}
 }
-
-void UJinxAnim::AnimNotify_ESkillBegin()
-{
-	Jinx->SkillComponent->UseSkillCount++;
-
-	Jinx->ActivateSkillMovement(true);
-}
-
-void UJinxAnim::AnimNotify_ESkillEnd()
-{
-	Jinx->SkillComponent->UseSkillCount--;
-
-	if (Jinx->SkillComponent->UseSkillCount <= 0)
-	{
-		Jinx->SkillComponent->UseSkillCount = 0;
-		Jinx->ActivateSkillMovement(false);
-	}
-}
-
-void UJinxAnim::AnimNotify_RSkillBegin()
-{
-	Jinx->SkillComponent->UseSkillCount++;
-
-	Jinx->ActivateSkillMovement(true);
-}
-
-void UJinxAnim::AnimNotify_RSkillEnd()
-{
-	Jinx->SkillComponent->UseSkillCount--;
-
-	if (Jinx->SkillComponent->UseSkillCount <= 0)
-	{
-		Jinx->SkillComponent->UseSkillCount = 0;
-		Jinx->ActivateSkillMovement(false);
-	}
-}

@@ -21,7 +21,7 @@ void UJinx_ESkill::UseSkill(ACharacter* Caster)
 {
 	// TODO : 서버에 의한 쿨타임 확인 적용해야함
 	
-	UE_LOG(LogTemp, Warning, TEXT("Jinx_ESkill"));
+	//UE_LOG(LogTemp, Warning, TEXT("Jinx_ESkill"));
 
 	if (!Caster || !BulletClass)
 	{

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SpecialSoul.h"
 #include "Engine/DataTable.h"
 #include "CYasuoData.generated.h"
 
@@ -70,7 +71,7 @@ struct FYasuoMoveData // 야스오 이동거리 기류 획득 데이터
 /**
  * 
  */
-USTRUCT(Atomic,BlueprintType)
+USTRUCT(Atomic, BlueprintType)
 struct FCYasuoData : public FTableRowBase
 {
 	GENERATED_BODY()
@@ -90,4 +91,73 @@ public:
 	float AOEDamage;
 	UPROPERTY(EditAnywhere)
 	float AOEDamageCoolTime;
+};
+
+USTRUCT(BlueprintType)
+struct FCardStruct
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsNextWeaponFinal;
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsYasuo;
+	UPROPERTY(BlueprintReadWrite)
+	int32 WeaponGrade;
+	UPROPERTY(BlueprintReadWrite)
+	int32 DamageGrade;
+	UPROPERTY(BlueprintReadWrite)
+	int32 AbilityHasteGrade;
+	UPROPERTY(BlueprintReadWrite)
+	int32 ProjectilesGrade;
+	UPROPERTY(BlueprintReadWrite)
+	int32 CritChanceGrade;
+	UPROPERTY(BlueprintReadWrite)
+	int32 curDamage;
+	UPROPERTY(BlueprintReadWrite)
+	int32 nextDamage;
+	UPROPERTY(BlueprintReadWrite)
+	int32 curProjectile;
+	UPROPERTY(BlueprintReadWrite)
+	int32 nextProjectile;
+	UPROPERTY(BlueprintReadWrite)
+	FString strLevel;
+	UPROPERTY(BlueprintReadWrite)
+	FString strTitle;
+	UPROPERTY(BlueprintReadWrite)
+	FString strDesc;
+	UPROPERTY(BlueprintReadWrite)
+	FString strStat;
+	UPROPERTY(BlueprintReadWrite)
+	FString strDesc2;
+	UPROPERTY(BlueprintReadWrite)
+	FString strStat2;
+	UPROPERTY(BlueprintReadWrite)
+	FString strUpgradeStat;
+	
+	FCardStruct(): bIsNextWeaponFinal(false), bIsYasuo(false), WeaponGrade(0), DamageGrade(0), AbilityHasteGrade(0),
+	               ProjectilesGrade(0), CritChanceGrade(0), curDamage(0), nextDamage(0), curProjectile(0),
+	               nextProjectile(0),
+	               strLevel(""), strTitle(""), strDesc(""), strStat(""), strDesc2(""), strStat2(""), strUpgradeStat("")
+	{
+	}
+
+	void Print_Log()
+	{
+		UE_LOG(LogTemp, Warning,TEXT(
+				  "\nbIsNextWeaponFinal: %d, bIsYasuo: %d\nWeaponGrade: %d, DamageGrade: %d, AbilityHasteGrade: %d, ProjectilesGrade: %d\n"
+				  "CritChanceGrade: %d, curDamage: %d, nextDamage: %d, curProjectile: %d, nextProjectile: %d\n"
+				  "strLevel: %s, strTitle: %s, strDesc: %s, strStat: %s\nstrDesc2: %s, strStat2: %s, strUpgradeStat: %s"),
+				  bIsNextWeaponFinal, bIsYasuo, WeaponGrade, DamageGrade, AbilityHasteGrade, ProjectilesGrade, CritChanceGrade,curDamage, nextDamage, curProjectile, nextProjectile,
+				  *strLevel, *strTitle, *strDesc, *strStat, *strDesc2, *strStat2, *strUpgradeStat);
+	}
+};
+
+template<>
+struct TStructOpsTypeTraits<FCardStruct> : public TStructOpsTypeTraitsBase2<FCardStruct>
+{
+	enum 
+	{
+		WithCopy = true // 구조체 복사를 허용합니다
+	};
 };

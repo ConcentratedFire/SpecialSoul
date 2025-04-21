@@ -34,13 +34,13 @@ void ACGameState::BeginPlay()
 			GM->ReadExcelData();
 			ReadExcelData(GM->DataSheetUtility);
 		}
-	
+
 		for (TActorIterator<ACObjectPoolManager> It(GetWorld(), ACObjectPoolManager::StaticClass()); It; ++It)
 		{
 			ObjectPoolManager = *It;
 			ObjectPoolManager->InitSettings();
 		}
-	}	
+	}
 }
 
 void ACGameState::Tick(float DeltaSeconds)
@@ -48,7 +48,7 @@ void ACGameState::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (!HasAuthority()) return;
-	
+
 	if (GM && GM->bIsStartRegen)
 	{
 		if (ObjectPoolManager)
@@ -58,7 +58,9 @@ void ACGameState::Tick(float DeltaSeconds)
 			CurRegenTime += DeltaSeconds;
 
 			OnRep_PlayTime();
-			LOG_SCREEN_IDX(0, FColor::Blue, "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f", curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
+			LOG_SCREEN_IDX(0, FColor::Blue,
+			               "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f",
+			               curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
 			LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
 			LOG_SCREEN_IDX(2, FColor::Red, "RegenCount : %d, CurRegenCount : %d", RegenCount, CurRegenCount);
 			if (CurRegenTime >= RegenTime)
@@ -68,7 +70,7 @@ void ACGameState::Tick(float DeltaSeconds)
 					++CurRegenCount;
 					ObjectPoolManager->EnemySpawn(CurRegenCount & 1);
 				}
-				
+
 				CurRegenTime -= RegenTime;
 			}
 			if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
@@ -76,10 +78,10 @@ void ACGameState::Tick(float DeltaSeconds)
 				ObjectPoolManager->MiddleBossSpawn();
 				++MiddleBossCount;
 			}
-				
+
 			if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
 			{
-			}			
+			}
 
 			if (CurStageTime >= StageTime)
 			{
@@ -88,15 +90,13 @@ void ACGameState::Tick(float DeltaSeconds)
 			}
 		}
 	}
-	
-	// if (EXPDataMap.Num() > 0 && curExp >= ExpInfo.XP)
-	// {
-	// 	++curLevel;
-	// 	curExp -= ExpInfo.XP;
-	// 	UpdateExpInfo(ExpInfo.ID + 1);
-	// }
-	//
-	
+
+	if (EXPDataMap.Num() > 0 && curExp >= ExpInfo.XP)
+	{
+		++curLevel;
+		curExp -= ExpInfo.XP;
+		UpdateExpInfo(ExpInfo.ID + 1);
+	}
 }
 
 void ACGameState::PrintExpDataMap()
@@ -147,7 +147,7 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 	ExpInfo.XP = StatData.XP;
 
 	if (Level == 1) return;
-
+	LOG_S(Warning, TEXT("UpdateExpInfo : %d, %d"), ExpInfo.ID, ExpInfo.XP);
 	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
 	{
 		(*It)->UpdatePlayerData(Level);
@@ -158,9 +158,20 @@ void ACGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ACGameState, GamePlayTime);
+	DOREPLIFETIME(ACGameState, UpgradeSelectPlayerCount);
 }
 
 void ACGameState::OnRep_PlayTime()
 {
 	HUD->SetTime(GamePlayTime);
+}
+
+void ACGameState::OnRep_UpgradeSelectPlayerCount()
+{
+	if (UpgradeSelectPlayerCount < PlayerArray.Num()) return;
+	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
+	{
+		(*It)->SRPC_UnPause();
+	}
+	UpgradeSelectPlayerCount = 0;
 }

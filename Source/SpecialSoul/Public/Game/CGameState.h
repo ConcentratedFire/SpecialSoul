@@ -106,4 +106,9 @@ private:
 	
 	UFUNCTION()
 	void OnRep_PlayTime();
+public:
+	UPROPERTY(ReplicatedUsing = OnRep_UpgradeSelectPlayerCount)
+	int32 UpgradeSelectPlayerCount = 0;
+	UFUNCTION()
+	void OnRep_UpgradeSelectPlayerCount();
 };

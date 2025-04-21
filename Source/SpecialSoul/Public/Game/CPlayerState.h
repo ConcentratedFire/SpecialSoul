@@ -72,7 +72,7 @@ public:
 	void SRPC_SetInitialData();
 
 	TArray<FString> ChooseUpgradeCardList(); // 업그레이드 카드 리스트 선택
-	void UpgradeStat(const FString statName);
+	void UpgradeStat(const FString& statName);
 
 	// 현재 업그레이드 단계
 	FORCEINLINE void GetCurrentUpgradeGrade(int32& WeaponGrade, int32& DamageGrade, int32& AbilityHasteGrade,

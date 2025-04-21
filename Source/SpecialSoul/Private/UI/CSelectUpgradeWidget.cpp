@@ -2,82 +2,56 @@
 
 
 #include "UI/CSelectUpgradeWidget.h"
-
 #include "Components/HorizontalBox.h"
 #include "Game/CPlayerState.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/CYasuo.h"
 #include "UI/CUpgradeWidget.h"
+#include "Data/CYasuoData.h"
 
-void UCSelectUpgradeWidget::SetCardData(TArray<FString> Data)
+void UCSelectUpgradeWidget::SetCardData(TArray<FString> Data, const TArray<FCardStruct>& CardData)
 {
-	ACBasePlayer* Player = Cast<ACBasePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	int32 WeaponGrade, DamageGrade, AbilityHasteGrade, ProjectilesGrade, CritChanceGrade;
-	Player->GetCurGrade(WeaponGrade, DamageGrade, AbilityHasteGrade, ProjectilesGrade, CritChanceGrade);
-
-	for (auto& data : Data)
+	for (int i = 0; i < Data.Num(); ++i)
 	{
 		UCUpgradeWidget* cardWidget = Cast<UCUpgradeWidget>(CreateWidget(GetWorld(), UpgradeWidgetFactory));
 
-		cardWidget->CardName = data;
-		if (data == "Weapon")
+		cardWidget->CardName = Data[i];
+		if (Data[i] == "Weapon")
 		{
-			int32 curDamage, nextDamage;
-			int32 curProjectile, nextProjectile;
-			FString strLevel, strTitle, strDesc, strStat;
-			FString strDesc2, strStat2;
-
 			cardWidget->SetBg(UIDataArray[0].TypeBG["Skill"]);
 
-			if (Player->IsA(ACYasuo::StaticClass()))
+			if (CardData[i].bIsYasuo)
 			{
-				Player->GetCurDamageNextDamage(WeaponGrade, curDamage, nextDamage, true);
-				Player->GetCurProjectileNextProjectile(WeaponGrade, curProjectile, nextProjectile, true);
 				// 다음 업글 단계가 Final인지 확인
-				if (Player->IsNextWeaponFinal(true))
+				if (CardData[i].bIsNextWeaponFinal)
 				{
-					strLevel = FString::Printf(TEXT("진화"));
-					strTitle = FString::Printf(TEXT("떠도는 폭풍"));
-					strDesc = FString::Printf(TEXT(
-						"야스오가 기력을 연마해 수는\n적지만 훨씬 큰 소용돌이를\n방출합니다. 소용돌이는 포물선을\n그리며 날아가며 목표 지점에\n피해를 입히는 폭풍을 남깁니다."));
-					cardWidget->SetTarget(strLevel, UIDataArray[0].UpgradeTextures["YasuoFinal"], strTitle, strDesc,
-					                      strStat);
+					cardWidget->SetTarget(CardData[i].strLevel, UIDataArray[0].UpgradeTextures["YasuoFinal"],
+					                      CardData[i].strTitle, CardData[i].strDesc,
+					                      CardData[i].strStat);
 				}
 				else
 				{
-					strLevel = FString::Printf(TEXT("%d레벨"), WeaponGrade + 1);
-					strTitle = FString::Printf(TEXT("강철 폭풍"));
-					strDesc = FString::Printf(TEXT("피해량"));
-					strStat = FString::Printf(TEXT("%d > %d"), curDamage, nextDamage);
-					strDesc2 = FString::Printf(TEXT("투사체"));
-					strStat2 = FString::Printf(TEXT("%d > %d"), curProjectile, nextProjectile);
-					cardWidget->SetTarget(strLevel, UIDataArray[0].UpgradeTextures["YasuoNormal"], strTitle,
-					                      strDesc, strStat, strDesc2, strStat2);
+					cardWidget->SetTarget(CardData[i].strLevel, UIDataArray[0].UpgradeTextures["YasuoNormal"],
+					                      CardData[i].strTitle,
+					                      CardData[i].strDesc, CardData[i].strStat, CardData[i].strDesc2,
+					                      CardData[i].strStat2);
 				}
 			}
 			else
 			{
-				Player->GetCurDamageNextDamage(WeaponGrade, curDamage, nextDamage, false);
-				Player->GetCurProjectileNextProjectile(WeaponGrade, curProjectile, nextProjectile, false);
 				// 다음 업글 단계가 Final인지 확인
-				if (Player->IsNextWeaponFinal(false))
+				if (CardData[i].bIsNextWeaponFinal)
 				{
-					strLevel = FString::Printf(TEXT("진화"));
-					strTitle = FString::Printf(TEXT("전투 고양이 총알\n세례"));
-					strDesc = FString::Printf(
-						TEXT("총알이 대상을 관통합니다. 처음\n적중한 ㅏ이후에는 피해량이\n감소합니다. 재사용 대기시간이\n크게 감소합니다."));
-					cardWidget->SetTarget(strLevel, UIDataArray[0].UpgradeTextures["JinxFinal"], strTitle,
-					                      strDesc, "");
+					cardWidget->SetTarget(CardData[i].strLevel, UIDataArray[0].UpgradeTextures["JinxFinal"],
+					                      CardData[i].strTitle,
+					                      CardData[i].strDesc, "");
 				}
 				else
 				{
-					strLevel = FString::Printf(TEXT("%d레벨"), WeaponGrade + 1);
-					strTitle = FString::Printf(TEXT("야옹 야옹"));
-					strDesc = FString::Printf(TEXT("피해량"));
-					strStat = FString::Printf(TEXT("%d > %d"), curDamage, nextDamage);
-					strDesc2 = FString::Printf(TEXT("투사체"));
-					strStat2 = FString::Printf(TEXT("%d > %d"), curProjectile, nextProjectile);
-					cardWidget->SetTarget(strLevel, UIDataArray[0].UpgradeTextures["JinxNormal"], strTitle,
-					                      strDesc, strStat, strDesc2, strStat2);
+					cardWidget->SetTarget(CardData[i].strLevel, UIDataArray[0].UpgradeTextures["JinxNormal"],
+					                      CardData[i].strTitle,
+					                      CardData[i].strDesc, CardData[i].strStat, CardData[i].strDesc2,
+					                      CardData[i].strStat2);
 				}
 			}
 		}
@@ -85,35 +59,26 @@ void UCSelectUpgradeWidget::SetCardData(TArray<FString> Data)
 		{
 			cardWidget->SetBg(UIDataArray[0].TypeBG["Stat"]);
 
-			FString strDesc, strUpgradeStat, strTitle;
-			strUpgradeStat = Player->GetUpgradeData(data, strDesc, strTitle);
-			int32 nextLevel = 0;
 			UTexture* upgradeTexture;
-			if (data == "Damage")
+			if (Data[i] == "Damage")
 			{
-				nextLevel = DamageGrade + 1;
 				upgradeTexture = UIDataArray[0].UpgradeTextures["Damage"];
 			}
-			else if (data == "AbilityHaste")
+			else if (Data[i] == "AbilityHaste")
 			{
-				nextLevel = AbilityHasteGrade + 1;
 				upgradeTexture = UIDataArray[0].UpgradeTextures["CoolTime"];
 			}
-			else if (data == "Projectiles")
+			else if (Data[i] == "Projectiles")
 			{
-				nextLevel = ProjectilesGrade + 1;
 				upgradeTexture = UIDataArray[0].UpgradeTextures["ProjectileCount"];
 			}
-			else if (data == "CritChance")
+			else if (Data[i] == "CritChance")
 			{
-				nextLevel = CritChanceGrade + 1;
 				upgradeTexture = UIDataArray[0].UpgradeTextures["Critical"];
 			}
 
-			FString strLevel = FString::Printf(TEXT("%d레벨"), nextLevel);
-
-			cardWidget->SetTarget(strLevel, upgradeTexture, strTitle, strDesc,
-			                      strUpgradeStat);
+			cardWidget->SetTarget(CardData[i].strLevel, upgradeTexture, CardData[i].strTitle, CardData[i].strDesc,
+			                      CardData[i].strUpgradeStat);
 		}
 
 		// Horizontal Box에 넣음
@@ -127,4 +92,10 @@ void UCSelectUpgradeWidget::ClearCardData()
 {
 	HorizonCard->ClearChildren();
 	SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UCSelectUpgradeWidget::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UCSelectUpgradeWidget, UIDataArray);
 }

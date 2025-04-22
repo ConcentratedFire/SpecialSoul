@@ -24,23 +24,39 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UImage* img_Cover;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UImage* img_Charge;
 
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* txt_SkillKey;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* txt_Cooltime;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* txt_ChargeCount;
+	
+	bool bCharging { false };
 
 	UFUNCTION()
 	void SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject); // 버튼 이미지 세팅 함수
 
 	UFUNCTION()
 	void UpdateCoolTime(float leftTime, float totalTime);
+	void SetIsCharging(bool bIsCharging);
+	void SetChargeCount(int32 count);
+
+	// UFUNCTION()
+	// void UpdateChargeTime(float leftTime, float totalTime);
 
 
 private:
 	UFUNCTION()
 	void UpdateImages_LeftCooltimePercent(float leftPercent);
+	
+	UFUNCTION()
+	void UpdateChargeImagePercent(float leftPercent);
 	
 	UFUNCTION()
 	void UpdateText_LeftCooltime(float leftTime);
@@ -50,6 +66,9 @@ private:
 
 	UFUNCTION()
 	void SetCoverMaterialScalarParam(FName paramName, float value);
+
+	UFUNCTION()
+	void SetChargeMaterialScalarParam(FName paramName, float value);
 
 	FString KeyToString(ESkillKey Key);
 };

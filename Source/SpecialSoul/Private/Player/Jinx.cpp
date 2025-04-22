@@ -45,15 +45,12 @@ void AJinx::BeginPlay()
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	SkillComponent->BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
 
-	SkillComponent->CoolTimeMap.Add(ESkillKey::Attack, FSkillCooltime(1.5f, 0.f));
 	SkillComponent->CoolTimeMap.Add(ESkillKey::E, FSkillCooltime(1.5f, 0.f));
 	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(1.5f, 0.f));
 
 
 	if (IsLocallyControlled())
 	{
-		SkillComponent->OnCooltimeUpdated.AddDynamic(this, &AJinx::OnCooltimeChanged);
-		
 		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 		{
 			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Fishbones.Fishbones"));
@@ -88,26 +85,6 @@ void AJinx::UpdatePlayerData(const int32 PlayerLevel)
 	}
 
 	//Super::UpdatePlayerData(PlayerLevel);
-}
-
-void AJinx::OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo)
-{
-	if (IsLocallyControlled())
-	{
-		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
-		{
-			hud->GameWidget->UpdateSkillCooltime(skillKey, cooltimeInfo);
-		}
-	}
-}
-
-void AJinx::ResetLeftCooltime(ESkillKey skillKey)
-{
-	if (SkillComponent->CoolTimeMap.Contains(skillKey))
-	{
-		auto& cooltimeInfo = SkillComponent->CoolTimeMap[skillKey];
-		cooltimeInfo.LeftCooltime = cooltimeInfo.TotalCooltime;
-	}
 }
 
 void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)

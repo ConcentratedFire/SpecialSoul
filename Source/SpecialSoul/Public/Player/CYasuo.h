@@ -19,6 +19,8 @@ private:
 	ACYasuo();
 
 private:
+	
+	
 	virtual void BeginPlay() override;
 	void PrintNetLog();
 	virtual void Tick(float DeltaTime) override;
@@ -37,7 +39,7 @@ public:
 	virtual void Attack() override;
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	void WindWall();
-	
+
 private:
 	UFUNCTION(Client, Reliable)
 	void CRPC_GetWindWallTransfrom();
@@ -103,4 +105,15 @@ private:
 	void SRPC_PlayAttackAnim();
 	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_PlayAttackAnim();
+
+public:
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MRPC_ChargeCountUI(ESkillKey SkillKey, int32 Count);
+
+	UFUNCTION()
+	void OnChargeCountUIChanged(ESkillKey skillKey, int32 count);
+	
+	UFUNCTION(Client, Reliable)
+	void CRPC_UpdateChargeCountUI(ESkillKey skillKey, int32 count);
 };
+

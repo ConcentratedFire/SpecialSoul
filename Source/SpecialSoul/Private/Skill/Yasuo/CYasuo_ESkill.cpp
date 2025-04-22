@@ -6,6 +6,7 @@
 #include "SpecialSoul.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Player/Components/SkillComponent.h"
 
 UCYasuo_ESkill::UCYasuo_ESkill()
 {
@@ -44,6 +45,7 @@ void UCYasuo_ESkill::UseSkill(ACharacter* Caster)
 
 			DashTime = 0.f;
 			--SkillChargeCount;
+			Yasuo->CRPC_UpdateChargeCountUI(ESkillKey::E, SkillChargeCount);
 			bIsESkillActive = true;
 		}
 
@@ -111,16 +113,32 @@ void UCYasuo_ESkill::StartChargeTimer()
 		float CalcChargeCooldown = Yasuo->CalcHaste(ChargeCooldown);
 		Yasuo->GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle, this, &UCYasuo_ESkill::OnChargeCompleted,
 		                                              CalcChargeCooldown, false);
+
+		// UI
+		Yasuo->SkillComponent->CoolTimeMap[ESkillKey::E].TotalCooltime = CalcChargeCooldown;
+		Yasuo->ResetLeftCooltime(ESkillKey::E);
+		
+		if (SkillChargeCount == 0) // 0개면 blur와 cover이미지를 사용
+		{
+			Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);
+		}
+		else // 1, 2개면 Charge이미지만 사용
+		{
+			Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, true);
+		}
 	}
 }
 
 void UCYasuo_ESkill::OnChargeCompleted()
 {
 	Yasuo->GetWorld()->GetTimerManager().ClearTimer(ChargeTimerHandle);
-
+	Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);
+	
 	if (SkillChargeCount < MaxChargeCount)
 	{
-		SkillChargeCount++; // 누적 개수 증가
+		++SkillChargeCount; // 누적 개수 증가
+		
+		Yasuo->SkillComponent->UpdateChargedCount(ESkillKey::E, SkillChargeCount);
 		// 추가 충전이 필요하면 타이머 재시작
 		StartChargeTimer();
 	}

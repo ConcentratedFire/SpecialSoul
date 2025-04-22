@@ -39,3 +39,13 @@ void UChampionStatusWidget::SetSkillSlotVisuals(ESkillKey skillKey, UObject* InR
 	if (auto slot = SkillSlotMap.Find(skillKey))
 		(*slot)->SetSkillSlotVisuals(skillKey, InResoueceObject);
 }
+
+void UChampionStatusWidget::SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging)
+{
+	SkillSlotMap[skillKey]->SetIsCharging(bIsCharging);
+}
+
+void UChampionStatusWidget::ChangeChargeCount(ESkillKey skillKey, int32 count)
+{
+	SkillSlotMap[skillKey]->SetChargeCount(count);
+}

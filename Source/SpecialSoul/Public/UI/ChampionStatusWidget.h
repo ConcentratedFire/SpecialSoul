@@ -23,13 +23,15 @@ protected:
 public:
 	void UpdateSkillCoolTime(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
 	void SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject);
-
-private:
-	TMap<ESkillKey, USkillSlotWidget*> SkillSlotMap;
+	void SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging);
+	void ChangeChargeCount(ESkillKey skillKey, int32 count);
 
 	UPROPERTY(meta = (BindWidget))
 	class USkillSlotWidget* SkillSlot_E;
 
 	UPROPERTY(meta = (BindWidget))
 	class USkillSlotWidget* SkillSlot_R;
+private:
+	TMap<ESkillKey, USkillSlotWidget*> SkillSlotMap;
+
 };

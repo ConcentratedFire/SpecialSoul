@@ -22,10 +22,13 @@ public:
 
 	void UpdateSkillCooltime(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
 	void SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject);
+	
+	void SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging);
+	void ChangeChargeCount(ESkillKey skillKey, int32 count);
 
-private:
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCKillScoreWidget* WBP_KillScore;
+	
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCTimeWidget* WBP_Timer;
 

@@ -1,31 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Skill/SkillCooltime.h"
 #include "SkillComponent.generated.h"
 
 
-class ACBasePlayer;
 class ISkillStrategy;
 enum class ESkillKey : uint8;
 class UInputAction;
 
-USTRUCT(BlueprintType)
-struct FSkillCooltime
-{
-	GENERATED_BODY()
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float TotalCooltime;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float LeftCooltime;
-};
 
 // 스킬 쿨타임 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCooltimeUpdated, ESkillKey, skillKey, FSkillCooltime, cooltimeInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnChargeCountChanged, ESkillKey, skillKey, int32, count);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPECIALSOUL_API USkillComponent : public UActorComponent
@@ -39,9 +27,11 @@ public:
 
 	bool CanUseSkill(ESkillKey key);
 	bool ResetLeftCooltime(ESkillKey key);
+	void UpdateChargedCount(ESkillKey skillKey, int32 count);
 
 	FOnCooltimeUpdated OnCooltimeUpdated;
-	
+	FOnChargeCountChanged OnChargeCountChanged;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -57,6 +47,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	TMap<ESkillKey, FSkillCooltime> CoolTimeMap; // 쿨타임
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
+	TMap<ESkillKey, int32> ChargedCount;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	TMap<ESkillKey, float> SkillRangeMap; // 스킬 사정거리
 

@@ -40,6 +40,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	int32 MaxChargeCount{3};
+	UPROPERTY(VisibleAnywhere, Category = "Skill")
 	int32 SkillChargeCount{MaxChargeCount};
 	bool bIsESkillActive = false;
 	float ChargeCooldown = 20.f;

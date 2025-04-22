@@ -29,4 +29,13 @@ void UGameWidget::SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObj
 	WBP_ChampionStatusWidget->SetSkillSlotVisuals(skillKey, InResoueceObject);
 }
 
+void UGameWidget::SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging)
+{
+	WBP_ChampionStatusWidget->SetSkillSlotIsCharging(skillKey, bIsCharging);
+}
+
+void UGameWidget::ChangeChargeCount(ESkillKey skillKey, int32 count)
+{
+	WBP_ChampionStatusWidget->ChangeChargeCount(skillKey, count);
+}
 

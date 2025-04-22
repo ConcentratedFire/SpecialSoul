@@ -4,6 +4,7 @@
 #include "Skill/Yasuo/CYasuo_RSkill.h"
 
 #include "Player/CYasuo.h"
+#include "Player/Components/SkillComponent.h"
 
 UCYasuo_RSkill::UCYasuo_RSkill()
 {
@@ -30,7 +31,8 @@ void UCYasuo_RSkill::StartUseSkill()
 {
 	Yasuo->SetSkillUsing(ESkillKey::R, true);
 	Yasuo->RSkill();
-
+	EndUseSkill();
+	
 	float CalcChargeCooldown = Yasuo->CalcHaste(ChargeCooldown);
 	Yasuo->GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle, this, &UCYasuo_RSkill::OnChargeCompleted,
 											   CalcChargeCooldown, false);
@@ -40,4 +42,10 @@ void UCYasuo_RSkill::OnChargeCompleted()
 {
 	Yasuo->GetWorld()->GetTimerManager().ClearTimer(ChargeTimerHandle);
 	bCanSkillActive = true;
+}
+
+void UCYasuo_RSkill::EndUseSkill()
+{
+	Yasuo->ResetLeftCooltime(ESkillKey::R);
+	Yasuo->SkillComponent->CoolTimeMap[ESkillKey::R].TotalCooltime = Yasuo->CalcHaste(ChargeCooldown);
 }

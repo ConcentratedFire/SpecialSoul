@@ -3,10 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SkillComponent.h"
-#include "Data/JinxData.h"
-#include "Interface/SkillStrategy.h"
-#include "Player/CBasePlayer.h"
+#include "CBasePlayer.h"
 #include "Jinx.generated.h"
 
 class ACPlayerController;
@@ -46,11 +43,6 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_PlaySkillMontage(ESkillKey Key);
-
-	UFUNCTION()
-	void OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
-	
-	void ResetLeftCooltime(ESkillKey skillKey);
 
 private:
 	void UpdateJinxAttackStat(int32 PlayerLevel);

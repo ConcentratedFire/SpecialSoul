@@ -25,6 +25,8 @@
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
 #include "Player/Components/SkillComponent.h"
+#include "UI/GameWidget.h"
+#include "UI/HUD/GameHUD.h"
 
 struct FJinxAttackData;
 class UEnhancedInputLocalPlayerSubsystem;
@@ -115,7 +117,10 @@ void ACBasePlayer::BeginPlay()
 	}
 
 	if (IsLocallyControlled())
+	{
 		InitUpgradeUI(); // 업그레이드 UI 생성
+		SkillComponent->OnCooltimeUpdated.AddDynamic(this, &ACBasePlayer::OnCooltimeChanged);
+	}
 }
 
 void ACBasePlayer::PrintNetLog()
@@ -341,6 +346,33 @@ void ACBasePlayer::SetSkillUsing(ESkillKey Key, bool bUseSkill)
 
 	bAttacking = bUseSkill;
 }
+
+void ACBasePlayer::ResetLeftCooltime(ESkillKey skillKey)
+{
+	SkillComponent->ResetLeftCooltime(skillKey);
+}
+
+void ACBasePlayer::CRPC_SetSkillChargingUI_Implementation(ESkillKey skillKey, bool bIsCharging)
+{
+	if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+	{
+		if (hud->GameWidget)
+			hud->GameWidget->SetSkillSlotIsCharging(skillKey, bIsCharging);
+	}
+}
+
+void ACBasePlayer::OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo)
+{
+	if (IsLocallyControlled())
+	{
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			if (hud->GameWidget)
+				hud->GameWidget->UpdateSkillCooltime(skillKey, cooltimeInfo);
+		}
+	}
+}
+
 
 void ACBasePlayer::MyApplyDamage(float Damage, ABaseEnemy* DamagedActor)
 {

@@ -1,11 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/CYasuoData.h"
+#include "Data/JinxData.h"
 #include "Game/CPlayerState.h"
 #include "GameFramework/Character.h"
 #include "CBasePlayer.generated.h"
+
+struct FSkillCooltime;
+class USkillComponent;
 
 UENUM(BlueprintType)
 enum class ESkillKey : uint8
@@ -165,6 +168,13 @@ public:
 
 public:
 	void SetSkillUsing(ESkillKey Key, bool bUseSkill);
+	void ResetLeftCooltime(ESkillKey skillKey);
+	
+	UFUNCTION(Client, Reliable)
+	void CRPC_SetSkillChargingUI(ESkillKey skillKey, bool bIsCharging);
+
+	UFUNCTION()
+	void OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
 
 public:
 	void MyApplyDamage(float Damage, class ABaseEnemy* DamagedActor);

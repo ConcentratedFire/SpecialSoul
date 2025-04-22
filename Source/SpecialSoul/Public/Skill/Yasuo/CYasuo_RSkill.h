@@ -34,4 +34,6 @@ private:
 
 	UFUNCTION()
 	void OnChargeCompleted();
+
+	void EndUseSkill();
 };

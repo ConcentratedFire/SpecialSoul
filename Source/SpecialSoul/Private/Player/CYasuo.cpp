@@ -20,6 +20,10 @@
 #include "Player/Components/SkillComponent.h"
 #include "Skill/Yasuo/CYasuo_ESkill.h"
 #include "Skill/Yasuo/CYasuo_RSkill.h"
+#include "UI/ChampionStatusWidget.h"
+#include "UI/GameWidget.h"
+#include "UI/SkillSlotWidget.h"
+#include "UI/HUD/GameHUD.h"
 #include "Utility/CDataSheetUtility.h"
 
 ACYasuo::ACYasuo()
@@ -33,6 +37,11 @@ void ACYasuo::BeginPlay()
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UCYasuo_ESkill>(this));
 	SkillComponent->BindSkill(ESkillKey::R, NewObject<UCYasuo_RSkill>(this));
 
+	SkillComponent->CoolTimeMap.Add(ESkillKey::E, FSkillCooltime(3.f, 0.f));
+	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(20.f, 0.f));
+
+	SkillComponent->ChargedCount.Add(ESkillKey::E, 3);
+	
 	if (HasAuthority())
 		GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::SRPC_ChargePassiveEnergy_Timer, 1.f,
 		                                true);
@@ -40,6 +49,26 @@ void ACYasuo::BeginPlay()
 	if (HasAuthority() && IsLocallyControlled() && ObjectPoolManager)
 	{
 		ObjectPoolManager->MakeTornadoPool(this);
+	}
+
+	if (IsLocallyControlled())
+	{
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Sweeping_Blade.Sweeping_Blade"));
+			UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Wind_Wall.Wind_Wall"));
+			
+			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
+			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
+
+			CRPC_SetSkillChargingUI(ESkillKey::E, false);
+			
+			CRPC_UpdateChargeCountUI(ESkillKey::E, 3);
+			SkillComponent->UpdateChargedCount(ESkillKey::E, 3);
+			
+
+			SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
+		}
 	}
 }
 
@@ -105,6 +134,8 @@ float ACYasuo::GetDamage(bool& OutbIsCri) const
 	float CalcDamage = PS->CalcDamage(YasuoStat.Damage, OutbIsCri);
 	return CalcDamage;
 }
+
+
 
 void ACYasuo::Attack()
 {
@@ -289,4 +320,19 @@ void ACYasuo::SRPC_PlayAttackAnim_Implementation()
 void ACYasuo::MRPC_PlayAttackAnim_Implementation()
 {
 	Anim->PlayAttackMontage();
+}
+
+
+void ACYasuo::OnChargeCountUIChanged(ESkillKey skillKey, int32 count)
+{
+	CRPC_UpdateChargeCountUI(skillKey, count);
+}
+
+void ACYasuo::CRPC_UpdateChargeCountUI_Implementation(ESkillKey skillKey, int32 count)
+{
+	if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+	{
+		if (hud->GameWidget)
+			hud->GameWidget->ChangeChargeCount(skillKey, count);
+	}
 }

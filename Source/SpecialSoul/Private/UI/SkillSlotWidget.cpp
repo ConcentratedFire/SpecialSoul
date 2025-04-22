@@ -34,8 +34,37 @@ void USkillSlotWidget::UpdateCoolTime(float leftTime, float totalTime)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("USkillSlotWidget::UpdateSkillCooltime"));
 
-	UpdateImages_LeftCooltimePercent(leftTime/totalTime);
-	UpdateText_LeftCooltime(leftTime);
+	if (bCharging)
+	{
+		UpdateChargeImagePercent(leftTime/totalTime);
+	}
+	else
+	{
+		UpdateImages_LeftCooltimePercent(leftTime/totalTime);
+		UpdateText_LeftCooltime(leftTime);
+	}
+}
+
+void USkillSlotWidget::SetIsCharging(bool bIsCharging)
+{
+	bCharging = bIsCharging;
+	
+	if (bCharging)
+	{
+		if (img_Charge)
+			img_Charge->SetOpacity(0.5f);
+	}
+	else
+	{
+		if (img_Charge)
+			img_Charge->SetOpacity(0.f);
+	}
+}
+
+void USkillSlotWidget::SetChargeCount(int32 count)
+{
+	if (txt_ChargeCount)
+		txt_ChargeCount->SetText(FText::AsNumber(count));
 }
 
 // ------ private ------
@@ -52,9 +81,25 @@ void USkillSlotWidget::UpdateImages_LeftCooltimePercent(float leftPercent)
 	}
 }
 
+void USkillSlotWidget::UpdateChargeImagePercent(float leftPercent)
+{
+	SetChargeMaterialScalarParam("Percent", leftPercent);
+	
+	if (leftPercent <= 0.f)
+	{
+		if (img_Charge)
+			img_Charge->SetOpacity(0.f); // 블러X (투명하게)
+	}
+}
+
+
 void USkillSlotWidget::UpdateText_LeftCooltime(float leftTime)
 {
-	FString t = FString::Printf(TEXT("%.1f"), leftTime); // 소수점 1자리까지 표시
+	FString t;
+	if (leftTime > 1.f)
+		t = FString::Printf(TEXT("%.0f"), leftTime); // 소수점 0자리까지 표시
+	else
+		t = FString::Printf(TEXT("%.1f"), leftTime); // 소수점 1자리까지 표시
 	txt_Cooltime->SetText(FText::FromString(t));
 
 	if (t == "0.0")
@@ -82,6 +127,16 @@ void USkillSlotWidget::SetCoverMaterialScalarParam(FName paramName, float value)
 	if (img_Cover)
 	{
 		auto dm = img_Cover->GetDynamicMaterial();
+		if (dm)
+			dm->SetScalarParameterValue(paramName, value);
+	}
+}
+
+void USkillSlotWidget::SetChargeMaterialScalarParam(FName paramName, float value)
+{
+	if (img_Charge)
+	{
+		auto dm = img_Charge->GetDynamicMaterial();
 		if (dm)
 			dm->SetScalarParameterValue(paramName, value);
 	}

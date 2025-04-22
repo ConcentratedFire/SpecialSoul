@@ -80,7 +80,6 @@ void USkillComponent::CRPC_UpdateSkillCooltime_Implementation(ESkillKey skillKey
 	}
 }
 
-
 bool USkillComponent::ResetLeftCooltime(ESkillKey key)
 {
 	if (!CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
@@ -92,18 +91,23 @@ bool USkillComponent::ResetLeftCooltime(ESkillKey key)
 	return true;
 }
 
+void USkillComponent::UpdateChargedCount(ESkillKey skillKey, int32 count)
+{
+	ChargedCount[skillKey] = count;
+	OnChargeCountChanged.Broadcast(skillKey, count);
+}
+
 bool USkillComponent::CanUseSkill(ESkillKey key)
 {
 	if (!CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Can not Use Skill... "));
-		return true; // TODO : false로 바꿔주기!!!
+		return false;
 	}
 
-	return CoolTimeMap[key].LeftCooltime <= 0.f;
+	return CoolTimeMap[key].LeftCooltime <= 0.f || ChargedCount.FindRef(key) > 0;
 }
-
-
+	
 void USkillComponent::CastSkill(ESkillKey Key)
 {
 	if (!OwnerCharacter)
@@ -113,7 +117,7 @@ void USkillComponent::CastSkill(ESkillKey Key)
 	}
 
 	if ((Key == ESkillKey::E || Key == ESkillKey::R) && (bUseESkill || bUseRSkill)) return; // 스킬 사용중에는 다른 스킬 사용 방지
-	
+	UE_LOG(LogTemp, Error, TEXT("UseSkill"));
 	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
 }
 

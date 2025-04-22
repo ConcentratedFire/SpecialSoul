@@ -18,22 +18,15 @@ public:
 	UJinx_RSkill();
 	virtual void UseSkill(ACharacter* Caster) override;
 
+	bool bCasted {false};
+
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	TSubclassOf<AMegaRocketBullet> BulletClass;
-	
-	//UPROPERTY(EditAnywhere, Category = "Skill")
-	//int32 BulletNum = 1;
-	
-	//UPROPERTY(EditAnywhere, Category = "Skill")
-	//float FireDelay = 0.1;
-	
+
 private:
 	void StartUseSkill(AJinx* Jinx);
 	void EndUseSkill(AJinx* Jinx);
 	
-	//FTimerHandle FireTimer;
-	//int32 FiredBulletNum {0};
-
 	FTimerHandle CastingTimer;
 	float CastingTime {0.5f};
 };

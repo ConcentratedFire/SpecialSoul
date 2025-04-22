@@ -48,10 +48,18 @@ void ACPlayerState::SRPC_SetInitialData_Implementation()
 		if (YasuoMoveDataMap.Num() > 0)
 			pc->UpdateYasuoMoveStat(1);
 	}
-	else if (pc && Player->IsA(AJinx::StaticClass()))
+	else if (pc && Player->IsA(AJinx::StaticClass())) /**/
 	{
 		if (JinxAttackDataMap.Num() > 0)
+		{
 			pc->UpgradeWeapon(1);
+			
+		}
+
+		if (auto jinx = Cast<AJinx>(Player))
+		{
+			jinx->SRPC_UseSkill(ESkillKey::Attack);
+		}
 	}
 
 	UpgradeDataMap = GM->UpgradeDataMap;

@@ -21,7 +21,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	//virtual void ApplyLifeTime() override;
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	float MoveAmplitude = 20.f; // 5cm
@@ -31,5 +30,4 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	bool bMoveRight = true;
-	
 };

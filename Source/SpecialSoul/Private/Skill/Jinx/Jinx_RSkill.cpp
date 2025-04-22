@@ -4,6 +4,7 @@
 #include "Skill/Jinx/Jinx_RSkill.h"
 
 #include "Player/Jinx.h"
+#include "Player/Components/SkillComponent.h"
 #include "Projectile/Jinx/MegaRocketBullet.h"
 
 UJinx_RSkill::UJinx_RSkill()
@@ -15,31 +16,30 @@ UJinx_RSkill::UJinx_RSkill()
 	}
 }
 
+// 서버에서 호출된다.
 void UJinx_RSkill::UseSkill(ACharacter* Caster)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Jinx_RSkill"));
 
-	if (!Caster || !BulletClass)
+	AJinx* Jinx = Cast<AJinx>(Caster);
+	if (!Caster || !BulletClass || !Jinx)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Caster or MinigunBullet is nullptr..."));
+		UE_LOG(LogTemp, Warning, TEXT("Caster or MinigunBullet or Jinx is nullptr..."));
 		return;
 	}
 
-	AJinx* Jinx = Cast<AJinx>(Caster);
-	if (Jinx)
+	if (!bCasted)
 	{
-		Jinx->ActivateSkillMovement(true);
-		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
+		Jinx->MRPC_PlaySkillMontage(ESkillKey::R);
+		bCasted = true;
 	}
-	
-	// TODO : 시전시간 동안 Progressbar UI를 띄우고
-	
-	Jinx->GetWorld()->GetTimerManager().SetTimer(CastingTimer, FTimerDelegate::CreateLambda(
-		[this,Jinx]()
-		{
-			this->StartUseSkill(Jinx);
-		}),
-		CastingTime, false, CastingTime);
+	else
+	{
+		// TODO : 시전시간 동안 Progressbar UI를 띄우고
+
+		// 스킬 발동
+		StartUseSkill(Jinx);
+	}
 }
 
 void UJinx_RSkill::StartUseSkill(AJinx* Jinx)
@@ -60,10 +60,12 @@ void UJinx_RSkill::StartUseSkill(AJinx* Jinx)
 	{
 		Bullet->ApplyCasterStat(Jinx); // 공격 데이터 세팅
 	}
+
+	EndUseSkill(Jinx);
 }
 
 void UJinx_RSkill::EndUseSkill(AJinx* Jinx)
 {
-	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
-	Jinx->ActivateSkillMovement(false);
+	bCasted = false;
+	Jinx->ResetLeftCooltime(ESkillKey::R);
 }

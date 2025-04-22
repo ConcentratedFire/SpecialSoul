@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SkillComponent.h"
 #include "Data/JinxData.h"
 #include "Interface/SkillStrategy.h"
 #include "Player/CBasePlayer.h"
@@ -28,36 +29,43 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Attack() override;
+	void UseESkill();
+	void UseRSkill();
 	
-	UFUNCTION()
-	void InitAllData();
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	TObjectPtr<UJinxAnim> Anim;
-	
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	// TObjectPtr<ACPlayerController> PC;
-
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jinx")
-	// TObjectPtr<USkillComponent> SkillComponent;
-	
-	TSharedPtr<TMap<int32, FJinxAttackData>> SafeMap = MakeShared<TMap<int32, FJinxAttackData>>();
-
 	void ActivateSkillMovement(bool bActive); // 스킬 사용 중 캐릭터 회전 관련
+	
+	void StartAttack();
 
 	void RotateToMouseCursor();
 	
+	UFUNCTION(Server, Reliable)
+	void SRPC_UseSkill(ESkillKey Key);
 	
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_PlaySkillMontage(ESkillKey Key);
+
+	UFUNCTION()
+	void OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
+	
+	void ResetLeftCooltime(ESkillKey skillKey);
+
 private:
 	void UpdateJinxAttackStat(int32 PlayerLevel);
 	
 	FTimerHandle AttackTimer;
-	void StartAttack();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> ESkillMontage;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> RSkillMontage;
 	
 };
 

@@ -12,6 +12,21 @@ class ISkillStrategy;
 enum class ESkillKey : uint8;
 class UInputAction;
 
+USTRUCT(BlueprintType)
+struct FSkillCooltime
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float TotalCooltime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float LeftCooltime;
+};
+
+// 스킬 쿨타임 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCooltimeUpdated, ESkillKey, skillKey, FSkillCooltime, cooltimeInfo);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPECIALSOUL_API USkillComponent : public UActorComponent
 {
@@ -24,6 +39,9 @@ public:
 
 	bool CanUseSkill(ESkillKey key);
 	bool ResetLeftCooltime(ESkillKey key);
+
+	FOnCooltimeUpdated OnCooltimeUpdated;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -37,10 +55,7 @@ public:
 	TMap<ESkillKey, TScriptInterface<ISkillStrategy>> SkillMap;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
-	TMap<ESkillKey, float> CoolTimeMap; // 쿨타임
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
-	TMap<ESkillKey, float> LeftCoolTimeMap; // 남은 쿨타임
+	TMap<ESkillKey, FSkillCooltime> CoolTimeMap; // 쿨타임
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	TMap<ESkillKey, float> SkillRangeMap; // 스킬 사정거리
@@ -71,6 +86,9 @@ public:
 	void BindSkill(ESkillKey Key, const TScriptInterface<ISkillStrategy>& Skill);
 
 	void CastSkill(ESkillKey Key);
+
+	UFUNCTION(Client, Reliable)
+	void CRPC_UpdateSkillCooltime(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
 	
 private:
 	UFUNCTION()

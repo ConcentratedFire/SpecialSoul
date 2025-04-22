@@ -30,3 +30,8 @@ void AGameHUD::SetTime(float Time)
 	if (GameWidget)
 		GameWidget->SetTime(Time);
 }
+
+void AGameHUD::UpdateSkillCooltime(ESkillKey skillKey, FSkillCooltime cooltimeInfo)
+{
+	GameWidget->UpdateSkillCooltime(skillKey, cooltimeInfo);
+}

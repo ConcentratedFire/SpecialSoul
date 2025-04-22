@@ -50,52 +50,62 @@ void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// 쿨타임
-	UpdateCooltime(DeltaTime);
+	// 서버에서만 쿨타임 업데이트!
+	if (OwnerCharacter->HasAuthority())
+		UpdateCooltime(DeltaTime);
 }
 
 
 void USkillComponent::UpdateCooltime(float deltaTime)
 {
-	for (auto& timer : LeftCoolTimeMap)
+	for (auto& timer : CoolTimeMap)
 	{
-		if (timer.Value > 0.f)
+		FSkillCooltime& cooldownInfo = timer.Value;
+		if (cooldownInfo.LeftCooltime > 0.f)
 		{
-			timer.Value = FMath::Max(0.f, timer.Value - deltaTime);
+			cooldownInfo.LeftCooltime = FMath::Max(0.f, cooldownInfo.LeftCooltime - deltaTime);
+		}
+
+		CRPC_UpdateSkillCooltime(timer.Key, cooldownInfo);
+	}
+}
+void USkillComponent::CRPC_UpdateSkillCooltime_Implementation(ESkillKey skillKey, FSkillCooltime cooltimeInfo)
+{
+	if (auto controller = OwnerCharacter->GetController())
+	{
+		if (controller->IsLocalController())
+		{
+			OnCooltimeUpdated.Broadcast(skillKey, cooltimeInfo);
 		}
 	}
 }
 
+
 bool USkillComponent::ResetLeftCooltime(ESkillKey key)
 {
-	if (!LeftCoolTimeMap.Contains(key) || !CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
+	if (!CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
 	{
 		return false;
 	}
 	
-	LeftCoolTimeMap[key] = CoolTimeMap[key];
+	CoolTimeMap[key].LeftCooltime = CoolTimeMap[key].TotalCooltime;
 	return true;
 }
 
 bool USkillComponent::CanUseSkill(ESkillKey key)
 {
-	if (!LeftCoolTimeMap.Contains(key) || !CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
+	if (!CoolTimeMap.Contains(key) || !SkillMap.Contains(key))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Can not Use Skill... "));
-		return false;
+		return true; // TODO : false로 바꿔주기!!!
 	}
 
-	return LeftCoolTimeMap[key] <= 0.f;
+	return CoolTimeMap[key].LeftCooltime <= 0.f;
 }
 
 
 void USkillComponent::CastSkill(ESkillKey Key)
 {
-	//if (!CanUseSkill(Key))
-	//{
-	//	return;
-	//}
-	
 	if (!OwnerCharacter)
 	{
 		UE_LOG(LogTemp, Error, TEXT("!OwnerCharacter"));
@@ -119,6 +129,12 @@ void USkillComponent::SRPC_CastSkill_Implementation(ESkillKey Key)
 		UE_LOG(LogTemp, Error, TEXT("!OwnerCharacter"));
 		return;
 	}
+	
+	if (!CanUseSkill(Key))
+	{
+		return;
+	}
+	
 
 	if ((Key == ESkillKey::E || Key == ESkillKey::R) && (bUseESkill || bUseRSkill)) return; // 스킬 사용중에는 다른 스킬 사용 방지
 
@@ -150,12 +166,10 @@ void USkillComponent::Passive()
 
 void USkillComponent::OnESkillPressed()
 {
-	// CastSkill(ESkillKey::E);
 	SRPC_CastSkill(ESkillKey::E);
 }
 
 void USkillComponent::OnRSkillPressed()
 {
-	// CastSkill(ESkillKey::R);
 	SRPC_CastSkill(ESkillKey::R);
 }

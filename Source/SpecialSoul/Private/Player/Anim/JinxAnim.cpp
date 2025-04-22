@@ -2,7 +2,6 @@
 
 
 #include "Player/Anim/JinxAnim.h"
-
 #include "Player/Jinx.h"
 #include "Player/Components/SkillComponent.h"
 
@@ -25,7 +24,42 @@ void UJinxAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 void UJinxAnim::AnimNotify_Attack()
 {
-	Jinx->Attack();
-	
-	// TODO : Jinx->SkillComponent->CastSkill(ESkillKey::Attack);
+	if (Jinx->HasAuthority())
+	{
+		Jinx->Attack();
+	}
+}
+
+void UJinxAnim::AnimNotify_ESkill()
+{
+	if (Jinx->HasAuthority())
+	{
+		Jinx->UseESkill();
+	}
+}
+
+void UJinxAnim::AnimNotify_RSkill()
+{
+	if (Jinx->HasAuthority())
+	{
+		Jinx->UseRSkill();
+	}
+}
+
+void UJinxAnim::AnimNotify_SkillBegin()
+{
+	Jinx->SkillComponent->UseSkillCount++;
+
+	Jinx->ActivateSkillMovement(true);
+}
+
+void UJinxAnim::AnimNotify_SkillEnd()
+{
+	Jinx->SkillComponent->UseSkillCount--;
+
+	if (Jinx->SkillComponent->UseSkillCount <= 0)
+	{
+		Jinx->SkillComponent->UseSkillCount = 0;
+		Jinx->ActivateSkillMovement(false);
+	}
 }

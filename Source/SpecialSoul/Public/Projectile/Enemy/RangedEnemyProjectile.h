@@ -23,6 +23,7 @@ public:
 
 protected:
 	virtual void OnDestroy() override;
+	virtual void BeginPlay() override;
 	
 	UPROPERTY()
 	TObjectPtr<ACObjectPoolManager> ObjectPoolManager;

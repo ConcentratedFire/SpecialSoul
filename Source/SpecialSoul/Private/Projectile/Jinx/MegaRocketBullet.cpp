@@ -17,8 +17,8 @@ AMegaRocketBullet::AMegaRocketBullet()
 		MeshComp->SetRelativeLocation(FVector(60.f, 0.f, 50.f));
 		MeshComp->SetRelativeRotation(FRotator(180.f, 0, 0));
 		MeshComp->SetRelativeScale3D(FVector(2.5f));
+		MeshComp->SetCollisionProfileName("PlayerAttack");
 	}
-	MeshComp->SetCollisionProfileName("PlayerAttack");
 
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempTailVfx(TEXT("/Script/Niagara.NiagaraSystem'/Game/Asset/Jinx/VFX/Particles/Fires/NS_Jinx_R_Tail.NS_Jinx_R_Tail'"));
 	if (TempTailVfx.Succeeded())
@@ -36,18 +36,20 @@ AMegaRocketBullet::AMegaRocketBullet()
 	{
 		HitVfxAsset = TempHitVfx.Object;
 	}
+
+	AttackType = EAttackType::AreaOfEffect;
+	ExplosionRadius = 250.f;
 }
 
 void AMegaRocketBullet::BeginPlay()
 {
 	Super::BeginPlay();
+	InitMoveComp();
+	StartLocation  = GetActorLocation();
+	if (!HasAuthority())
+		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
-// void AMegaRocketBullet::ApplyLifeTime()
-// {
-// 	float LifeSpan = AttackRange / ProjectileMovementComp->InitialSpeed;
-// 	SetLifeSpan(LifeSpan); // 수명 설정
-// }
 
 void AMegaRocketBullet::Tick(float DeltaSeconds)
 {

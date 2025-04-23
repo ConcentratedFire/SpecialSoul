@@ -31,6 +31,10 @@ void UEnemyFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	ElapsedTime += DeltaTime;
+
+	HP = OwnerEnemy->HP;
+	if (HP <= 0)
+		CurrentState = EEnemyState::Die;
 	
 	switch (CurrentState)
 	{
@@ -91,5 +95,6 @@ void UEnemyFSMComponent::AttackTick(float DeltaTime)
 
 void UEnemyFSMComponent::DieTick(float DeltaTime)
 {
-	OwnerEnemy->HandleDie();
+	if (HP > 0)
+		CurrentState = EEnemyState::Move;
 }

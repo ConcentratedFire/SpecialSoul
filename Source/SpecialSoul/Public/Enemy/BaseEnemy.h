@@ -88,6 +88,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, category = "HP")
 	int32 MaxHP{200};
 
+public:
 	UPROPERTY(VisibleAnywhere, Category=HP, Replicated)
 	int32 HP;
 

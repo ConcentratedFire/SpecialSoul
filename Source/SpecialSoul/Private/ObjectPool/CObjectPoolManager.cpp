@@ -53,6 +53,8 @@ void ACObjectPoolManager::ReturnEnemy(ARangedEnemy* Enemy)
 	Enemy->SetActorEnableCollision(false);
 	Enemy->SetActorHiddenInGame(true);
 	Enemy->SetActorTickEnabled(false);
+	
+	RangePool.Push(Enemy);
 }
 
 void ACObjectPoolManager::ReturnTornado(ACTornado* Tornado)

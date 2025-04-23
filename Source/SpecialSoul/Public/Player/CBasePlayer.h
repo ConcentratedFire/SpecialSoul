@@ -44,7 +44,7 @@ protected:
 public:
 	UPROPERTY()
 	class ACPlayerController* PC;
-	
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -75,6 +75,10 @@ private: // Component
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class USceneCaptureComponent2D* MiniMapCam;
+	UPROPERTY(EditDefaultsOnly)
+	class UMaterialInterface* MiniMapSceneMat;
 
 protected: // Actor Component
 	UPROPERTY(EditDefaultsOnly)
@@ -205,4 +209,8 @@ public:
 	void MRPC_UnPause();
 	UFUNCTION(Client, Reliable)
 	void CRPC_UnPause();
+
+private:
+	UFUNCTION(Client, Reliable)
+	void CRPC_SetMinimap();
 };

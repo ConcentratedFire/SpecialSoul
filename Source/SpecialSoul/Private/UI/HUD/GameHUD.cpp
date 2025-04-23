@@ -35,3 +35,8 @@ void AGameHUD::UpdateSkillCooltime(ESkillKey skillKey, FSkillCooltime cooltimeIn
 {
 	GameWidget->UpdateSkillCooltime(skillKey, cooltimeInfo);
 }
+
+void AGameHUD::SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap)
+{
+	GameWidget->SetMiniMapTexture(TX_MiniMap);
+}

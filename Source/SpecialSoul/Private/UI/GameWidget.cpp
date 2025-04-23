@@ -6,6 +6,7 @@
 #include "UI/ChampionStatusWidget.h"
 #include "UI/HUD/CKillScoreWidget.h"
 #include "UI/HUD/CTimeWidget.h"
+#include "UI/MiniMap/CMiniMapWidget.h"
 
 void UGameWidget::SetKillScore(int32 KillScore)
 {
@@ -37,5 +38,10 @@ void UGameWidget::SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging)
 void UGameWidget::ChangeChargeCount(ESkillKey skillKey, int32 count)
 {
 	WBP_ChampionStatusWidget->ChangeChargeCount(skillKey, count);
+}
+
+void UGameWidget::SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap)
+{
+	WBP_MiniMap->SetMiniMapTexture(TX_MiniMap);
 }
 

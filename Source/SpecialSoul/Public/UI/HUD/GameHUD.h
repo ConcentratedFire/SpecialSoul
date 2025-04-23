@@ -22,6 +22,7 @@ public:
 	void SetTime(float Time);
 
 	void UpdateSkillCooltime(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
+	void SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap);
 
 public:
 	//AGameHUD();

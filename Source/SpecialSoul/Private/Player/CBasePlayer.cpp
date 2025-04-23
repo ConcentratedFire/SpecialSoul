@@ -9,6 +9,7 @@
 #include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Components/WidgetComponent.h"
 #include "Game/CGameState.h"
 #include "Game/CPlayerState.h"
@@ -21,6 +22,7 @@
 #include "UI/CSelectUpgradeWidget.h"
 #include "Data/JinxData.h"
 #include "Data/CYasuoData.h"
+#include "Kismet/KismetRenderingLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
@@ -69,6 +71,11 @@ ACBasePlayer::ACBasePlayer()
 	ArrowWidgetComp->SetupAttachment(RootComponent);
 	ArrowWidgetComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), ArrowRotation);
 	ArrowWidgetComp->SetRelativeScale3D(FVector(.2, .35, .35));
+
+	MiniMapCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MiniMapCam"));
+	MiniMapCam->SetupAttachment(RootComponent);
+	MiniMapCam->SetUsingAbsoluteRotation(true);
+	MiniMapCam->SetRelativeLocationAndRotation(FVector(0,0,1000),FRotator(-90 , 0 , 0));
 
 	ConstructorHelpers::FClassFinder<UUserWidget> tempArrowWidget(
 		TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Arrow.WBP_Arrow_C'"));
@@ -121,6 +128,11 @@ void ACBasePlayer::BeginPlay()
 		InitUpgradeUI(); // 업그레이드 UI 생성
 		SkillComponent->OnCooltimeUpdated.AddDynamic(this, &ACBasePlayer::OnCooltimeChanged);
 	}
+
+	if (IsLocallyControlled())
+	{
+		CRPC_SetMinimap();
+	}
 }
 
 void ACBasePlayer::PrintNetLog()
@@ -157,6 +169,9 @@ void ACBasePlayer::Tick(float DeltaTime)
 	}
 	if (!PC)
 		PC = Cast<ACPlayerController>(GetController());
+
+	if (IsLocallyControlled())
+		MiniMapCam->SetRelativeRotation(FRotator(-90, 0, 0));
 }
 
 // Called to bind functionality to input
@@ -406,7 +421,7 @@ void ACBasePlayer::EndUpgrade()
 	MRPC_EndUpgrade();
 	++GS->UpgradeSelectPlayerCount;
 	// if (HasAuthority() && IsLocallyControlled())
-		GS->OnRep_UpgradeSelectPlayerCount();
+	GS->OnRep_UpgradeSelectPlayerCount();
 	// UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
@@ -438,4 +453,35 @@ void ACBasePlayer::MRPC_UnPause_Implementation()
 void ACBasePlayer::CRPC_UnPause_Implementation()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
+}
+
+void ACBasePlayer::CRPC_SetMinimap_Implementation()
+{
+	if (MiniMapCam)
+	{
+		UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>(this);
+		if (RenderTarget)
+		{
+			RenderTarget->InitAutoFormat(1920, 1080); // 해상도 설정
+			RenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8; // 포맷 설정
+			RenderTarget->ClearColor = FLinearColor::Black; // 배경색 설정
+			RenderTarget->UpdateResourceImmediate();
+		}
+
+		// 2. SceneCaptureComponent 설정
+		if (MiniMapCam)
+		{
+			MiniMapCam->TextureTarget = RenderTarget; // RenderTarget 연결
+			MiniMapCam->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR; // 캡처 소스 설정
+			// MiniMapCam->ProjectionType = ECameraProjectionMode::Orthographic; // 직교 투영 설정 (필요 시)
+			// MiniMapCam->OrthoWidth = 1920.0f; // 직교 뷰 크기 설정
+			MiniMapCam->bCaptureEveryFrame = true; // 매 프레임 캡처
+		}
+		
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			if (hud->GameWidget)
+				hud->SetMiniMapTexture(RenderTarget);
+		}
+	}
 }

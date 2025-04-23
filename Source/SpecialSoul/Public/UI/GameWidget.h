@@ -26,6 +26,8 @@ public:
 	void SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging);
 	void ChangeChargeCount(ESkillKey skillKey, int32 count);
 
+	void SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap);
+
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCKillScoreWidget* WBP_KillScore;
 	
@@ -40,4 +42,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UOverheadStatusWidget* WBP_OverheadStatusWidget;
+
+	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
+	class UCMiniMapWidget* WBP_MiniMap;
 };

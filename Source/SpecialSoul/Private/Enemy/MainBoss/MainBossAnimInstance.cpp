@@ -13,6 +13,8 @@ void UMainBossAnimInstance::NativeInitializeAnimation()
 void UMainBossAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
+	OwnerMainBoss = Cast<AMainBoss>(TryGetPawnOwner());
+	bIsUlt = OwnerMainBoss->bIsUlt;
 }
 
 void UMainBossAnimInstance::AnimNotify_EnemyAttack()

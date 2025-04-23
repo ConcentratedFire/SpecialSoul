@@ -8,6 +8,7 @@
 void AMainBossController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	RunBehaviorTree(BT_Enemy);
 }
 
 void AMainBossController::Tick(float DeltaSeconds)

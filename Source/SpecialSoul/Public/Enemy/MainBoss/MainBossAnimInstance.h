@@ -6,6 +6,7 @@
 #include "Enemy/EnemyAnimInstance.h"
 #include "MainBossAnimInstance.generated.h"
 
+class AMainBoss;
 /**
  * 
  */
@@ -19,7 +20,10 @@ public:
 
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
-	TObjectPtr<ABaseEnemy> OwnerMainBoss;
+	TObjectPtr<AMainBoss> OwnerMainBoss;
+
+	UPROPERTY(VisibleAnywhere, Category = "MainBoss")
+	bool bIsUlt {false}; // 궁 쓴 상태
 
 protected:
 	virtual void AnimNotify_EnemyAttack() override;

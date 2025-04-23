@@ -2,6 +2,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Enemy/MainBoss/MainBossController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Player/CBasePlayer.h"
 #include "Player/Components/SkillComponent.h"
 #include "Skill/MainBoss/MainBoss_Attack.h"
@@ -38,15 +39,27 @@ void AMainBoss::BeginPlay()
 	SkillComponent->CoolTimeMap.Add(ESkillKey::Attack, FSkillCooltime(1.5f, 0.f));
 	SkillComponent->CoolTimeMap.Add(ESkillKey::Q, FSkillCooltime(8.f, 0.f));
 	
-	// SkillComponent->LeftCoolTimeMap.Add(ESkillKey::Attack, 1.5f);
-	// SkillComponent->LeftCoolTimeMap.Add(ESkillKey::Q, 8.f);
-	
 	SkillComponent->SkillRangeMap.Add(ESkillKey::Attack, 500.f);
 	SkillComponent->SkillRangeMap.Add(ESkillKey::Q, 500.f);
 
 	// 임시 코드
 	MaxHP = 5000;
+
+	MyController = Cast<AMainBossController>(GetController());
+	
+	GetCharacterMovement()->GravityScale = 1;
 	HP = MaxHP;
+
+	if (auto ai = Cast<AAIController>(GetOwner()))
+		ai->SetActorTickEnabled(true);
+	
+	StartFindingTarget();
+
+	// FVector UpLocation = GetActorLocation();
+	// float halfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	// UpLocation.Z += halfHeight;
+	// SetActorLocation(UpLocation);
+
 }
 
 void AMainBoss::PlayDarkinBladeMontage(float InPlayRate, FName SectionName)

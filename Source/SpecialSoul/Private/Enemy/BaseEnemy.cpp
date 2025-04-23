@@ -125,6 +125,7 @@ void ABaseEnemy::FindTarget()
 	{
 		Target = ClosestPlayer;
 		if (HasAuthority())
+			if ( MyController)
 			MyController->TargetPlayer = Target; // 클라 추가하면 크래시 발생
 	}
 }

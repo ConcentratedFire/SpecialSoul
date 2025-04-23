@@ -19,8 +19,6 @@ private:
 	ACYasuo();
 
 private:
-	
-	
 	virtual void BeginPlay() override;
 	void PrintNetLog();
 	virtual void Tick(float DeltaTime) override;
@@ -115,5 +113,8 @@ public:
 	
 	UFUNCTION(Client, Reliable)
 	void CRPC_UpdateChargeCountUI(ESkillKey skillKey, int32 count);
+
+public:
+	virtual void UpgradeWeapon(const int32 Level) override;
 };
 

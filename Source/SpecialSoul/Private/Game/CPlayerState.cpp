@@ -136,6 +136,7 @@ TArray<FString> ACPlayerState::ChooseUpgradeCardList()
 
 void ACPlayerState::UpgradeStat(const FString& statName)
 {
+	LOG_S(Warning, TEXT("UpgradeStat : %s"), *statName);
 	if (statName == "Weapon")
 	{
 		++CurWeaponGrade;
@@ -222,4 +223,9 @@ void ACPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ACPlayerState, KillScore, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACPlayerState, CurWeaponGrade, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACPlayerState, CurDamageGrade, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACPlayerState, CurAbilityHasteGrade, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACPlayerState, CurProjectilesGrade, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACPlayerState, CurCritChanceGrade, COND_OwnerOnly);
 }

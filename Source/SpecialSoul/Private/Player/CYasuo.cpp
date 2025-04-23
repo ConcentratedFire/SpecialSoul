@@ -41,7 +41,7 @@ void ACYasuo::BeginPlay()
 	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(20.f, 0.f));
 
 	SkillComponent->ChargedCount.Add(ESkillKey::E, 3);
-	
+
 	if (HasAuthority())
 		GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::SRPC_ChargePassiveEnergy_Timer, 1.f,
 		                                true);
@@ -55,17 +55,19 @@ void ACYasuo::BeginPlay()
 	{
 		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 		{
-			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Sweeping_Blade.Sweeping_Blade"));
-			UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Wind_Wall.Wind_Wall"));
-			
+			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr,
+			                              TEXT("/Game/UI/textures/Sweeping_Blade.Sweeping_Blade"));
+			UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr,
+			                              TEXT("/Game/UI/textures/Wind_Wall.Wind_Wall"));
+
 			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
 			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
 
 			CRPC_SetSkillChargingUI(ESkillKey::E, false);
-			
+
 			CRPC_UpdateChargeCountUI(ESkillKey::E, 3);
 			SkillComponent->UpdateChargedCount(ESkillKey::E, 3);
-			
+
 
 			SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
 		}
@@ -136,7 +138,6 @@ float ACYasuo::GetDamage(bool& OutbIsCri) const
 }
 
 
-
 void ACYasuo::Attack()
 {
 	if (!HasAuthority()) return;
@@ -146,7 +147,7 @@ void ACYasuo::Attack()
 void ACYasuo::WindWall()
 {
 	if (!HasAuthority()) return;
-	CRPC_GetWindWallTransfrom();	
+	CRPC_GetWindWallTransfrom();
 }
 
 void ACYasuo::CRPC_GetWindWallTransfrom_Implementation()
@@ -200,8 +201,10 @@ void ACYasuo::OnRep_RotateArrow()
 
 void ACYasuo::CRPC_GetAttackVectors_Implementation()
 {
-	int AttackCnt = YasuoStat.ProjectileCount;
+	int32 AttackCnt = YasuoStat.ProjectileCount;
+	LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
 	AttackCnt = PS->CalcProjectile(AttackCnt);
+	LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
 	float AngleStep = 360.f / static_cast<float>(AttackCnt);
 	TArray<FVector> AttackVectors;
 
@@ -307,7 +310,7 @@ void ACYasuo::UpdatePlayerData(const int32 PlayerLevel)
 	// MoveData는 키값 체크 후 넘기기
 	if (PS->YasuoMoveDataMap.Contains(PlayerLevel))
 		PC->UpdateYasuoMoveStat(PlayerLevel);
-	
+
 	Super::UpdatePlayerData(PlayerLevel);
 }
 
@@ -326,6 +329,11 @@ void ACYasuo::MRPC_PlayAttackAnim_Implementation()
 void ACYasuo::OnChargeCountUIChanged(ESkillKey skillKey, int32 count)
 {
 	CRPC_UpdateChargeCountUI(skillKey, count);
+}
+
+void ACYasuo::UpgradeWeapon(const int32 Level)
+{
+	PC->UpgradeWeapon(Level);
 }
 
 void ACYasuo::CRPC_UpdateChargeCountUI_Implementation(ESkillKey skillKey, int32 count)

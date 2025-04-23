@@ -195,15 +195,15 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Data")
 	TMap<FString, FUpgradeData> UpgradeDataMap;
 
-	UPROPERTY(visibleAnywhere, Category = "Data")
+	UPROPERTY(visibleAnywhere, Category = "Data", Replicated)
 	int32 CurWeaponGrade = 1;
-	UPROPERTY(visibleAnywhere, Category = "Data")
+	UPROPERTY(visibleAnywhere, Category = "Data", Replicated)
 	int32 CurDamageGrade = 0;
-	UPROPERTY(visibleAnywhere, Category = "Data")
+	UPROPERTY(visibleAnywhere, Category = "Data", Replicated)
 	int32 CurAbilityHasteGrade = 0;
-	UPROPERTY(visibleAnywhere, Category = "Data")
+	UPROPERTY(visibleAnywhere, Category = "Data", Replicated)
 	int32 CurProjectilesGrade = 0;
-	UPROPERTY(visibleAnywhere, Category = "Data")
+	UPROPERTY(visibleAnywhere, Category = "Data", Replicated)
 	int32 CurCritChanceGrade = 0;
 
 	TArray<FString> UpgradeData{"Weapon", "Damage", "AbilityHaste", "Projectiles", "CritChance"};

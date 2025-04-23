@@ -125,7 +125,6 @@ void ABaseEnemy::FindTarget()
 	{
 		Target = ClosestPlayer;
 		if (HasAuthority())
-			if ( MyController)
 			MyController->TargetPlayer = Target; // 클라 추가하면 크래시 발생
 	}
 }
@@ -144,6 +143,7 @@ void ABaseEnemy::ResetEnemy()
 {
 	bIsDead = false;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
 }
 
 void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -210,7 +210,8 @@ void ABaseEnemy::SRPC_Damage_Implementation(int32 DamageAmount)
 
 void ABaseEnemy::MRPC_Die_Implementation()
 {
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore); // Player
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore); // PlayerAttack
 	HandleDie();
 }
 

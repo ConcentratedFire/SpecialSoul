@@ -1,5 +1,6 @@
 #include "Enemy/MainBoss/MainBoss.h"
 
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Enemy/MainBoss/MainBossController.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -43,15 +44,15 @@ void AMainBoss::BeginPlay()
 	SkillComponent->SkillRangeMap.Add(ESkillKey::Q, 500.f);
 
 	// 임시 코드
-	MaxHP = 5000;
+	MaxHP = 1000;
 
 	MyController = Cast<AMainBossController>(GetController());
-	
+	MyController->SetActorTickEnabled(true);
 	GetCharacterMovement()->GravityScale = 1;
 	HP = MaxHP;
 
-	if (auto ai = Cast<AAIController>(GetOwner()))
-		ai->SetActorTickEnabled(true);
+	// if (auto ai = Cast<AAIController>(GetOwner()))
+	// 	ai->SetActorTickEnabled(true);
 	
 	StartFindingTarget();
 
@@ -60,6 +61,17 @@ void AMainBoss::BeginPlay()
 	// UpLocation.Z += halfHeight;
 	// SetActorLocation(UpLocation);
 
+}
+
+void AMainBoss::HandleDie()
+{
+	Super::HandleDie();
+	MyController->SetActorTickEnabled(false);
+
+	// BT 중단
+	auto btComp = Cast<UBehaviorTreeComponent>(MyController->GetComponentByClass(UBehaviorTreeComponent::StaticClass()));
+	btComp->StopTree(EBTStopMode::Safe);
+	
 }
 
 void AMainBoss::PlayDarkinBladeMontage(float InPlayRate, FName SectionName)
@@ -89,7 +101,7 @@ void AMainBoss::MyDamage(int32 DamageAmount)
 			if (mbController)
 				mbController->StopMovement();
 			
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore); // PlayerAttack
 
 			HandleDie(); // 사망 애니메이션 
 		}

@@ -28,10 +28,6 @@ void UChampionStatusWidget::UpdateSkillCoolTime(ESkillKey skillKey, FSkillCoolti
 {
 	if (auto slot = SkillSlotMap.Find(skillKey))
 		(*slot)->UpdateCoolTime(cooltimeInfo.LeftCooltime, cooltimeInfo.TotalCooltime);
-	// else
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("UChampionStatusWidget::UpdateSkillCoolTime failed.."));
-	// }
 }
 
 void UChampionStatusWidget::SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject)

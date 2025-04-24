@@ -46,6 +46,8 @@ void UCYasuo_ESkill::UseSkill(ACharacter* Caster)
 			DashTime = 0.f;
 			--SkillChargeCount;
 			Yasuo->CRPC_UpdateChargeCountUI(ESkillKey::E, SkillChargeCount);
+			if (SkillChargeCount == 0)
+				Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);
 			bIsESkillActive = true;
 		}
 
@@ -118,6 +120,7 @@ void UCYasuo_ESkill::StartChargeTimer()
 		Yasuo->SkillComponent->CoolTimeMap[ESkillKey::E].TotalCooltime = CalcChargeCooldown;
 		Yasuo->ResetLeftCooltime(ESkillKey::E);
 		
+		LOG_S(Warning, TEXT("%d"), SkillChargeCount);
 		if (SkillChargeCount == 0) // 0개면 blur와 cover이미지를 사용
 		{
 			Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);

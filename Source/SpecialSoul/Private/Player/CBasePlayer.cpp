@@ -383,7 +383,7 @@ void ACBasePlayer::OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltime
 		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 		{
 			if (hud->GameWidget)
-				hud->GameWidget->UpdateSkillCooltime(skillKey, cooltimeInfo);
+				hud->UpdateSkillCooltime(skillKey, cooltimeInfo);
 		}
 	}
 }

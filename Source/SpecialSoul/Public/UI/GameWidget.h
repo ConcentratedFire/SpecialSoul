@@ -27,7 +27,15 @@ public:
 	void ChangeChargeCount(ESkillKey skillKey, int32 count);
 
 	void SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap);
+	void ChangeHP(float HP, float MaxHP);
+	void ChangeEnergy(float energy, float maxEnergy);
+	void ChangeEXP(float exp, float maxExp);
+	void SetLevel(int32 level);
+	void SetPortrait(UObject* Object);
+	void SetPassiveImage(UObject* Object);
+	void SetPassiveText(int32 count);
 
+private:
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCKillScoreWidget* WBP_KillScore;
 	
@@ -46,3 +54,4 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCMiniMapWidget* WBP_MiniMap;
 };
+

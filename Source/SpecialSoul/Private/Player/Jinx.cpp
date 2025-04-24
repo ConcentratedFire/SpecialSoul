@@ -56,8 +56,14 @@ void AJinx::BeginPlay()
 			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Fishbones.Fishbones"));
 			UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/MegaRocket.MegaRocket"));
 			
-			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
-			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
+			hud->SetSkillSlotVisuals(ESkillKey::E, e);
+			hud->SetSkillSlotVisuals(ESkillKey::R, r);
+
+			UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/jinx_portrait.jinx_portrait"));
+			hud->SetPortrait(portrait);
+
+			UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Get_Excited.Get_Excited"));
+			hud->SetPassiveImage(passiveImg);
 		}
 	}
 }

@@ -3,6 +3,10 @@
 
 #include "UI/ChampionStatusWidget.h"
 
+#include "Components/Border.h"
+#include "Components/Image.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 #include "UI/SkillSlotWidget.h"
 
 void UChampionStatusWidget::NativeConstruct()
@@ -44,4 +48,47 @@ void UChampionStatusWidget::SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsC
 void UChampionStatusWidget::ChangeChargeCount(ESkillKey skillKey, int32 count)
 {
 	SkillSlotMap[skillKey]->SetChargeCount(count);
+}
+
+void UChampionStatusWidget::ChangeHP(float hp, float maxHP)
+{
+	HP_Bar->SetPercent(hp/maxHP);
+	
+}
+
+void UChampionStatusWidget::ChangeEnergy(float energy, float maxEnergy)
+{
+	Energy_Bar->SetPercent(energy/maxEnergy);
+}
+
+void UChampionStatusWidget::ChangeEXP(float exp, float maxExp)
+{
+	Energy_Bar->SetPercent(exp/maxExp);
+}
+
+void UChampionStatusWidget::SetLevel(int32 level)
+{
+	Text_Level->SetText(FText::AsNumber(level));
+}
+
+void UChampionStatusWidget::SetPortrait(UObject* Object)
+{
+	if (Object)
+	{
+		Image_Portrait->SetBrushFromTexture(Cast<UTexture2D>(Object));
+	}
+}
+
+
+void UChampionStatusWidget::SetPassiveImage(UObject* Object)
+{
+	if (Object)
+	{
+		Border_Passive->SetBrushFromTexture(Cast<UTexture2D>(Object));
+	}
+}
+
+void UChampionStatusWidget::SetPassiveText(int32 count)
+{
+	if (Text_KillCount) Text_KillCount->SetText(FText::AsNumber(count));
 }

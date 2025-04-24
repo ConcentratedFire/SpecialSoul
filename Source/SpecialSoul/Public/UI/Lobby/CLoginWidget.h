@@ -18,6 +18,8 @@ private:
 	virtual void NativeConstruct() override;
 
 public:
+	void SetLobbyWidget(class UCLobbyWidget* InLobbyWidget) { LobbyWidget = InLobbyWidget; }
+
 	UFUNCTION()
 	void OnLogin();
 	UFUNCTION()
@@ -32,11 +34,17 @@ private:
 	class UImage* Img_Login;
 
 	FLinearColor OrgBgColor = FLinearColor(.5, .5, .5, 1);
-	FLinearColor OrgImgColor = FLinearColor(.5, .5, .5, 1);
+	FLinearColor OrgImgColor = FLinearColor(.1, .1, .1, 1);
 	FLinearColor ChangeBgColor = FLinearColor(1, 0, 0, 1);
 	FLinearColor ChangeBgHoverColor = FLinearColor(.7, 0, 0, 1);
 	FLinearColor ChangeImgColor = FLinearColor(1, 1, 1, 1);
 
 	FButtonStyle OrgBtnStyle;
 	FButtonStyle ChangeBtnStyle;
+
+private:
+	UPROPERTY()
+	class UCGameInstance* gi;
+	UPROPERTY()
+	class UCLobbyWidget* LobbyWidget;
 };

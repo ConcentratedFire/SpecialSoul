@@ -16,17 +16,23 @@ class SPECIALSOUL_API ACPlayerController : public APlayerController
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<class UCStandbyWidget> SelectPlayerWidgetFactory;
+	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<class UCSelectUpgradeWidget> SelectUpgradeUIWidgetFactory;
 
 	UPROPERTY()
+	class UCStandbyWidget* SelectPlayerWidget;
+	UPROPERTY()
 	class UCSelectUpgradeWidget* SelectUpgradeWidget;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
 private:
 	ACPlayerController();
 
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
-
+	
 private:
 	UPROPERTY()
 	class ACGameState* GS;
@@ -48,4 +54,19 @@ public:
 public:
 	UFUNCTION(Server, Reliable)
 	void SRPC_UpgradeStat(const FString& statName);
+
+public:
+	UPROPERTY(Replicated)
+	bool bPlayYasuo = true;
+	bool bSelectPlayer = false;
+
+	UFUNCTION(Server, Reliable)
+	void SRPC_SelectPlayer(bool _bPlayYasuo);
+	
+	UFUNCTION(Server, Reliable)
+	void SRPC_ReadyToPlay();
+	void ServerRequestSpawn();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_PlayGame();
 };

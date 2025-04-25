@@ -15,8 +15,15 @@ void AGameHUD::BeginPlay()
 			GameWidget->AddToViewport();
 			GameWidget->SetKillScore(0);
 			GameWidget->SetTime(0);
+			GameWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void AGameHUD::ShowWidget()
+{
+	if (GameWidget)
+		GameWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
 void AGameHUD::SetKillScore(int32 KillScore)

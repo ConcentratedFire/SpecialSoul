@@ -111,4 +111,8 @@ public:
 	int32 UpgradeSelectPlayerCount = 0;
 	UFUNCTION()
 	void OnRep_UpgradeSelectPlayerCount();
+
+public:
+	UPROPERTY(Replicated)
+	int32 ReadyPlayer=0;
 };

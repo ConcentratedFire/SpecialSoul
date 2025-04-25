@@ -159,6 +159,7 @@ void ACGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ACGameState, GamePlayTime);
 	DOREPLIFETIME(ACGameState, UpgradeSelectPlayerCount);
+	DOREPLIFETIME(ACGameState, ReadyPlayer);
 }
 
 void ACGameState::OnRep_PlayTime()

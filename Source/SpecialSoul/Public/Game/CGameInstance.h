@@ -42,6 +42,7 @@ public:
 
 	IOnlineSessionPtr sessionInterface;
 	FString MySessionName{"Guest"};
+	FString CurrentRoomName;
 
 	// 방 생성
 public: 

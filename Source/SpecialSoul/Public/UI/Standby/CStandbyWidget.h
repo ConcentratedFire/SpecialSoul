@@ -17,6 +17,7 @@ class SPECIALSOUL_API UCStandbyWidget : public UUserWidget
 private:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))

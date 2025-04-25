@@ -26,6 +26,14 @@ void UCStandbyWidget::NativeConstruct()
 
 	PC = GetOwningPlayer<ACPlayerController>();
 	Txt_PlayerReadyState->SetText(FText::FromString(""));
+
+	if (auto world = GetWorld())
+	{
+		if (auto* gi = Cast<UCGameInstance>(world->GetGameInstance()))
+		{
+			Txt_RoomName->SetText(FText::FromString(gi->CurrentRoomName)); // JoinComplete에서 CurrentRoomName 지정
+		}
+	}
 }
 
 void UCStandbyWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

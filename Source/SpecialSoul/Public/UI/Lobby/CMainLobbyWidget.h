@@ -16,6 +16,7 @@ class SPECIALSOUL_API UCMainLobbyWidget : public UUserWidget
 	GENERATED_BODY()
 
 private:
+	
 	virtual void NativeConstruct() override;
 
 private:
@@ -43,13 +44,20 @@ private:
 	void OnJoinRoomChecked(bool bIsChecked);
 	UFUNCTION()
 	void OnEnterClicked();
-
+	UFUNCTION()
+	void OnFindClicked();
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UCSessionSlotWidget> SessionInfoWidget;
 
+	UFUNCTION()
 	void AddSlotWidget(const struct FSessionInfo& sessionInfo);
+	UFUNCTION()
+	void OnChangeButtonEnable(bool bIsSearching);
 
 public:
 	int32 SessionNumber;
+
+	UPROPERTY()
+	class UCGameInstance* gi;
 };

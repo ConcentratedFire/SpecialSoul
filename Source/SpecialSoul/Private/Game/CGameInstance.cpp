@@ -49,20 +49,20 @@ void UCGameInstance::CreateMySession(FString roomName, int32 playerCount)
 
 	// 6. 세션에 참여할 수 있는 Public Connection 최대 수
 	sessionSettings.NumPublicConnections = playerCount;
+	
+	// 7. 커스텀 룸네임 설정
+	sessionSettings.Set(FName("ROOM_NAME"), StringBase64Encode(roomName), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
-	// 7. 커스텀 RoomName 설정
-	sessionSettings.Set(FName("ROOM_NAME"), roomName, 
-		EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-
-	// 8. 호스트 네임 설정
-	sessionSettings.Set(FName("HOST_NAME"), MySessionName,
-		EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	// 8. 호스트네임 설정
+	sessionSettings.Set(FName("HOST_NAME"), StringBase64Encode(MySessionName), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 	// NetID
 	FUniqueNetIdPtr netId = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
 	
 	LOG_S(Log, TEXT("Create Session Start : %s"), *MySessionName);
 	sessionInterface->CreateSession(*netId, FName(MySessionName), sessionSettings);
+
+	CurrentRoomName = roomName;
 }
 
 void UCGameInstance::OnCreateSessionComplete(FName sessionName, bool bWasSuccessful)
@@ -71,7 +71,7 @@ void UCGameInstance::OnCreateSessionComplete(FName sessionName, bool bWasSuccess
 
 	if( bWasSuccessful == true )
 	{
-		GetWorld()->ServerTravel(TEXT("/Game/Net/Maps/BattleMap?listen")); // TODO: 어떤 맵인지 & ?listen 여부
+		GetWorld()->ServerTravel(TEXT("/Game/Level/StandbyLevel?listen"));
 	}
 }
 
@@ -164,16 +164,25 @@ void UCGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionComp
 {
 	if (result == EOnJoinSessionCompleteResult::Success)
 	{
+		// RoomName 지정
+		FOnlineSessionSettings* sessionSettings = sessionInterface->GetSessionSettings(sessionName);
+		if (sessionSettings)
+		{
+			FString roomName;
+			if (sessionSettings->Get(FName("ROOM_NAME"), roomName))
+			{
+				CurrentRoomName = StringBase64Decode(roomName);
+			}
+		}
+		
 		auto pc = GetWorld()->GetFirstPlayerController();
 		FString url;
 		sessionInterface->GetResolvedConnectString(sessionName, url);
 
 		LOG_S(Log, TEXT("Joined URL : %s"), *url);
 
-		if (url.IsEmpty() == true)
-		{
-			pc->ClientTravel(url, ETravelType::TRAVEL_Absolute);
-		}
+		if (url.IsEmpty()) return;
+		pc->ClientTravel(url, ETravelType::TRAVEL_Absolute);
 	}
 	else
 	{

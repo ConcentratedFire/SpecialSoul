@@ -75,7 +75,7 @@ ACBasePlayer::ACBasePlayer()
 	MiniMapCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MiniMapCam"));
 	MiniMapCam->SetupAttachment(RootComponent);
 	MiniMapCam->SetUsingAbsoluteRotation(true);
-	MiniMapCam->SetRelativeLocationAndRotation(FVector(0,0,1000),FRotator(-90 , 0 , 0));
+	MiniMapCam->SetRelativeLocationAndRotation(FVector(0, 0, 1000), FRotator(-90, 0, 0));
 
 	ConstructorHelpers::FClassFinder<UUserWidget> tempArrowWidget(
 		TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Arrow.WBP_Arrow_C'"));
@@ -166,7 +166,15 @@ void ACBasePlayer::Tick(float DeltaTime)
 		PS = Cast<ACPlayerState>(GetPlayerState());
 	}
 	if (!PC)
+	{
 		PC = Cast<ACPlayerController>(GetController());
+	}
+
+	if (PC && PC->IsLocalController() && !bIsLocalInit)
+	{
+		SetLocalInit(PC);
+		bIsLocalInit = true;
+	}
 
 	if (IsLocallyControlled())
 		MiniMapCam->SetRelativeRotation(FRotator(-90, 0, 0));
@@ -486,7 +494,6 @@ void ACBasePlayer::CRPC_SetMinimap_Implementation(ACPlayerController* InPC)
 }
 
 
-
 void ACBasePlayer::DamageProcess(float damage)
 {
 	HP -= damage; // SetHP setter 호출
@@ -497,7 +504,6 @@ void ACBasePlayer::OnRep_HP()
 	if (HP <= 0.f) // 사망 처리
 	{
 		bIsDead = true;
-		
 	}
 	else
 	{

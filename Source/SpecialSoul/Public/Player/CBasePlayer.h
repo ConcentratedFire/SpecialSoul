@@ -216,6 +216,7 @@ private:
 
 public:
 	virtual void SetLocalInit(class ACPlayerController* InPC);
+	bool bIsLocalInit = false;
 
 public:
 	// HP 체력

@@ -9,7 +9,7 @@
 void UCBTSPlayerInRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
-	UE_LOG(LogTemp, Display, TEXT("Player In Range"));
+	// UE_LOG(LogTemp, Display, TEXT("Player In Range"));
 
 	if (ABaseEnemy* MyEnemy = Cast<ABaseEnemy>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(FName("SelfActor"))))
 	{

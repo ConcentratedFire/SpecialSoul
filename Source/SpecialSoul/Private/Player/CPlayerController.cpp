@@ -57,8 +57,8 @@ void ACPlayerController::OnPossess(APawn* InPawn)
 	if (HasAuthority())
 		MyPlayerState->SetPlayerCharacterInfo(this);
 
-	if (IsLocalController())
-		MyPlayer->SetLocalInit(this);
+	// if (IsLocalController())
+		// MyPlayer->SetLocalInit(this);
 }
 
 void ACPlayerController::UpgradeWeapon(const int32 Level)

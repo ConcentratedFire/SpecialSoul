@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CGameInstance.h"
 #include "Data/CYasuoData.h"
 #include "Data/JinxData.h"
 #include "GameFramework/PlayerState.h"
@@ -222,4 +223,17 @@ public:
 
 private:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetUserName(const FString& name);
+
+public:
+	bool bIsReady = false;
+	void SetPlayerReady(bool _bIsReady) { bIsReady = _bIsReady; }
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_SetPlayerReady(bool _bIsReady);
+
+public:
+	void SetPlayerCharacterInfo(class ACPlayerController* PC);
 };

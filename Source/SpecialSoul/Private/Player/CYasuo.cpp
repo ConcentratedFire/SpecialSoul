@@ -45,40 +45,44 @@ void ACYasuo::BeginPlay()
 	if (HasAuthority())
 		GetWorldTimerManager().SetTimer(ChargePassiveEnergyTimer, this, &ACYasuo::SRPC_ChargePassiveEnergy_Timer, 1.f,
 		                                true);
+}
 
-	if (HasAuthority() && IsLocallyControlled() && ObjectPoolManager)
+void ACYasuo::SetLocalInit(ACPlayerController* InPC)
+{
+	Super::SetLocalInit(InPC);
+
+	if (HasAuthority() && ObjectPoolManager)
 	{
 		ObjectPoolManager->MakeTornadoPool(this);
 	}
 
-	if (IsLocallyControlled())
+	if (AGameHUD* hud = Cast<AGameHUD>(InPC->GetHUD()))
 	{
-		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
-		{
-			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr,
-			                              TEXT("/Game/UI/textures/Sweeping_Blade.Sweeping_Blade"));
-			UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr,
-			                              TEXT("/Game/UI/textures/Wind_Wall.Wind_Wall"));
+		UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr,
+		                              TEXT("/Game/UI/textures/Sweeping_Blade.Sweeping_Blade"));
+		UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr,
+		                              TEXT("/Game/UI/textures/Wind_Wall.Wind_Wall"));
 
-			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
-			hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
+		hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
+		hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
 
-			CRPC_SetSkillChargingUI(ESkillKey::E, false);
+		CRPC_SetSkillChargingUI(ESkillKey::E, false, InPC);
 
-			CRPC_UpdateChargeCountUI(ESkillKey::E, 3);
-			SkillComponent->UpdateChargedCount(ESkillKey::E, 3);
+		CRPC_UpdateChargeCountUI(ESkillKey::E, 3, InPC);
+		SkillComponent->UpdateChargedCount(ESkillKey::E, 3);
 
+		SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
 
-			SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
-			
-			UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/yasuo_portrait.yasuo_portrait"));
-			hud->SetPortrait(portrait);
+		UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr,
+		                                     TEXT("/Game/UI/textures/yasuo_portrait.yasuo_portrait"));
+		hud->SetPortrait(portrait);
 
-			UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Way_of_the_Wanderer.Way_of_the_Wanderer"));
-			hud->SetPassiveImage(passiveImg);
-		}
+		UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr,
+		                                       TEXT("/Game/UI/textures/Way_of_the_Wanderer.Way_of_the_Wanderer"));
+		hud->SetPassiveImage(passiveImg);
 	}
 }
+
 
 void ACYasuo::PrintNetLog()
 {
@@ -102,13 +106,13 @@ void ACYasuo::Tick(float DeltaTime)
 		Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
 	}
 
-	if (IsLocallyControlled())
+	if (PC && PC->IsLocalController())
 		CRPC_SetAttackFrontVector();
 
 	PrintNetLog();
 
 	// 기본 공격
-	if (IsLocallyControlled() && YasuoMoveInfo.ID > 0)
+	if (PC && PC->IsLocalController() && YasuoMoveInfo.ID > 0)
 	{
 		// LOG_S(Warning, TEXT("YasuoMoveInfo.ID : %d"), YasuoMoveInfo.ID);
 		// 이동 거리가 충분하면 기류를 충전
@@ -342,11 +346,24 @@ void ACYasuo::UpgradeWeapon(const int32 Level)
 	PC->UpgradeWeapon(Level);
 }
 
-void ACYasuo::CRPC_UpdateChargeCountUI_Implementation(ESkillKey skillKey, int32 count)
+void ACYasuo::CRPC_UpdateChargeCountUI_Implementation(ESkillKey skillKey, int32 count, ACPlayerController* InPC)
 {
-	if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+	if (!InPC)
 	{
-		if (hud->GameWidget)
-			hud->GameWidget->ChangeChargeCount(skillKey, count);
+		if (!PC) return;
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			if (hud->GameWidget)
+				hud->GameWidget->ChangeChargeCount(skillKey, count);
+		}
+	}
+	else
+	{
+		if (!InPC) return;
+		if (AGameHUD* hud = Cast<AGameHUD>(InPC->GetHUD()))
+		{
+			if (hud->GameWidget)
+				hud->GameWidget->ChangeChargeCount(skillKey, count);
+		}
 	}
 }

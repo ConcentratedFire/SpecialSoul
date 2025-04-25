@@ -19,7 +19,8 @@
 AJinx::AJinx()
 {
 	// 스켈레탈 메시 세팅
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempSkMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/Jinx/jinx__tft_set_13_.jinx__tft_set_13_'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempSkMesh(
+		TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/Jinx/jinx__tft_set_13_.jinx__tft_set_13_'"));
 	if (TempSkMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(TempSkMesh.Object);
@@ -30,7 +31,7 @@ AJinx::AJinx()
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(68.f);
 	GetCapsuleComponent()->SetCapsuleRadius(28.f);
-	
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	MoveComp->SetActive(false);
 }
@@ -47,24 +48,24 @@ void AJinx::BeginPlay()
 
 	SkillComponent->CoolTimeMap.Add(ESkillKey::E, FSkillCooltime(1.5f, 0.f));
 	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(1.5f, 0.f));
+}
 
-
-	if (IsLocallyControlled())
+void AJinx::SetLocalInit(ACPlayerController* InPC)
+{
+	Super::SetLocalInit(InPC);
+	if (AGameHUD* hud = Cast<AGameHUD>(InPC->GetHUD()))
 	{
-		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
-		{
-			UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Fishbones.Fishbones"));
-			UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/MegaRocket.MegaRocket"));
-			
-			hud->SetSkillSlotVisuals(ESkillKey::E, e);
-			hud->SetSkillSlotVisuals(ESkillKey::R, r);
+		UObject* e = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Fishbones.Fishbones"));
+		UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/MegaRocket.MegaRocket"));
 
-			UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/jinx_portrait.jinx_portrait"));
-			hud->SetPortrait(portrait);
+		hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
+		hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
 
-			UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Get_Excited.Get_Excited"));
-			hud->SetPassiveImage(passiveImg);
-		}
+		UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/jinx_portrait.jinx_portrait"));
+		hud->SetPortrait(portrait);
+
+		UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Get_Excited.Get_Excited"));
+		hud->SetPassiveImage(passiveImg);
 	}
 }
 
@@ -97,8 +98,8 @@ void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)
 {
 	// AttackData = PS->JinxAttackDataMap.FindRef(PlayerLevel);
 	PC->UpgradeWeapon(PlayerLevel);
-	
-	 // 업데이트된 데이터로 공격 시작
+
+	// 업데이트된 데이터로 공격 시작
 	SRPC_UseSkill_Implementation(ESkillKey::Attack);
 }
 
@@ -110,29 +111,28 @@ void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 		{
 			// 서버에서 타이머를 돌리며
 			float remainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(AttackTimer);
-	
+
 			GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
-	
+
 			GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this, Key]()
 			{
 				// 모든 클라에서 애니메이션을 재생한다
 				MRPC_PlaySkillMontage(Key);
-		
-			}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime-remainingTime);
+			}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime - remainingTime);
 		}
 		break;
-		
+
 	case ESkillKey::Passive:
 		break;
-		
+
 	case ESkillKey::E:
 		MRPC_PlaySkillMontage_Implementation(ESkillKey::E);
 		break;
-		
+
 	case ESkillKey::R:
 		MRPC_PlaySkillMontage_Implementation(ESkillKey::R);
 		break;
-		
+
 	default:
 		break;
 	}
@@ -141,7 +141,7 @@ void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 {
 	UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage"));
-	
+
 	switch (Key)
 	{
 	case ESkillKey::Attack:
@@ -160,7 +160,7 @@ void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 		//UE_LOG(LogTemp, Warning, TEXT("MRPC_PlaySkillMontage - R"));
 		PlayAnimMontage(RSkillMontage);
 		break;
-		
+
 	default:
 		break;
 	}
@@ -170,7 +170,7 @@ void AJinx::ActivateSkillMovement(bool bActive)
 {
 	if (bActive)
 	{
-		GetCharacterMovement()->bOrientRotationToMovement = false; 
+		GetCharacterMovement()->bOrientRotationToMovement = false;
 		MoveComp->SetActive(true);
 		RotateToMouseCursor();
 		return;
@@ -178,7 +178,7 @@ void AJinx::ActivateSkillMovement(bool bActive)
 
 	if (SkillComponent->UseSkillCount == 0)
 	{
-		GetCharacterMovement()->bOrientRotationToMovement = true; 
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 		MoveComp->SetActive(false);
 	}
 }
@@ -195,12 +195,12 @@ void AJinx::StartAttack()
 void AJinx::RotateToMouseCursor()
 {
 	if (!IsLocallyControlled()) return;
-	
+
 	FHitResult HitResult;
 	bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, true, HitResult);
 	if (bHit)
 	{
-		FVector directionToMouseCursor = HitResult.Location -GetActorLocation();
+		FVector directionToMouseCursor = HitResult.Location - GetActorLocation();
 		directionToMouseCursor.Z = 0;
 		directionToMouseCursor.Normalize();
 

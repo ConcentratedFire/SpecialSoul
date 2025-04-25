@@ -43,16 +43,10 @@ void UCMovementComponent::InitializeComponent()
 void UCMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (!BaseOwnerCharacter || !BaseOwnerCharacter->IsLocallyControlled()) return;
-
-	PC = Cast<ACPlayerController>(BaseOwnerCharacter->GetController());
-
-	YasuoCharacer = Cast<ACYasuo>(PC->GetPawn());
-	if (YasuoCharacer)
-	{
-		BeforeLocation = YasuoCharacer->GetActorLocation();
-	}
+	//
+	// if (!BaseOwnerCharacter || !BaseOwnerCharacter->IsLocallyControlled()) return;
+	//
+	// PC = Cast<ACPlayerController>(BaseOwnerCharacter->GetController());
 }
 
 
@@ -92,6 +86,17 @@ void UCMovementComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UCMovementComponent, BeforeLocation);
+}
+
+void UCMovementComponent::SetController(class ACPlayerController* NewController)
+{
+	PC = NewController;
+
+	YasuoCharacer = Cast<ACYasuo>(PC->GetPawn());
+	if (YasuoCharacer)
+	{
+		BeforeLocation = YasuoCharacer->GetActorLocation();
+	}
 }
 
 void UCMovementComponent::CRPC_RotationToMouseCursor_Implementation()

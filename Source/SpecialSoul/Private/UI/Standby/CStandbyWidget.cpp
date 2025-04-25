@@ -3,8 +3,14 @@
 
 #include "UI/Standby/CStandbyWidget.h"
 
+#include "SpecialSoul.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
+#include "Components/TextBlock.h"
+#include "Game/CPlayerState.h"
+#include "GameFramework/GameState.h"
+#include "GameFramework/GameStateBase.h"
+#include "Player/CPlayerController.h"
 
 void UCStandbyWidget::NativeConstruct()
 {
@@ -18,27 +24,27 @@ void UCStandbyWidget::NativeConstruct()
 	Btn_Yasuo->OnClicked.AddDynamic(this, &UCStandbyWidget::Btn_YasuoPick);
 	Btn_Jinx->OnClicked.AddDynamic(this, &UCStandbyWidget::Btn_JinxPick);
 
-	bHasAuthority = GetWorld()->GetFirstPlayerController()->HasAuthority();
-	if (bHasAuthority)
-	{
-		FButtonStyle Style;
-		Style.Normal.SetResourceObject(ReadyImage[0]);
-		Style.Normal.SetImageSize(FVector2D(252, 66));
-		Style.Normal.DrawAs = ESlateBrushDrawType::Image;
-		Style.Hovered.SetResourceObject(ReadyImage[1]);
-		Style.Hovered.SetImageSize(FVector2D(252, 66));
-		Style.Hovered.DrawAs = ESlateBrushDrawType::Image;
-		Style.Pressed.SetResourceObject(ReadyImage[2]);
-		Style.Pressed.SetImageSize(FVector2D(252, 66));
-		Style.Pressed.DrawAs = ESlateBrushDrawType::Image;
-		
-		Btn_Ready->SetStyle(Style);
-	}
+	PC = GetOwningPlayer<ACPlayerController>();
+	Txt_PlayerReadyState->SetText(FText::FromString(""));
 }
 
 void UCStandbyWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	// 플레이어 리스트 출력
+	TArray<APlayerState*> playerArr = GetWorld()->GetGameState()->PlayerArray;
+	FString name;
+
+	for (APlayerState* pState : playerArr)
+	{
+		if(auto ps=Cast<ACPlayerState>(pState))
+			name.Append(FString::Printf(TEXT("%s : %s\n"), *ps->GetPlayerName(),
+			                            ps->bIsReady ? TEXT("O") : TEXT("X")));
+	}
+
+	// LOG_S(Warning, TEXT("%s"), *name);
+	Txt_PlayerReadyState->SetText(FText::FromString(name));
 }
 
 void UCStandbyWidget::Btn_ExitClick()
@@ -47,8 +53,8 @@ void UCStandbyWidget::Btn_ExitClick()
 
 void UCStandbyWidget::Btn_ReadyClick()
 {
-	if (!bHasAuthority) return;
-		
+	if (PC)
+		PC->SRPC_ReadyToPlay();
 }
 
 void UCStandbyWidget::Btn_ChampionClick()
@@ -59,8 +65,12 @@ void UCStandbyWidget::Btn_ChampionClick()
 
 void UCStandbyWidget::Btn_YasuoPick()
 {
+	if (PC && PC->bSelectPlayer) return;
+	PC->SRPC_SelectPlayer(true);
 }
 
 void UCStandbyWidget::Btn_JinxPick()
 {
+	if (PC && PC->bSelectPlayer) return;
+	PC->SRPC_SelectPlayer(false);
 }

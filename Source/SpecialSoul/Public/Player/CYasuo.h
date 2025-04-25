@@ -112,9 +112,12 @@ public:
 	void OnChargeCountUIChanged(ESkillKey skillKey, int32 count);
 	
 	UFUNCTION(Client, Reliable)
-	void CRPC_UpdateChargeCountUI(ESkillKey skillKey, int32 count);
+	void CRPC_UpdateChargeCountUI(ESkillKey skillKey, int32 count, class ACPlayerController* InPC=nullptr);
 
 public:
 	virtual void UpgradeWeapon(const int32 Level) override;
+
+public:
+	virtual void SetLocalInit(class ACPlayerController* InPC) override;
 };
 

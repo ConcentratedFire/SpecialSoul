@@ -27,7 +27,7 @@ public:
 
 public:
 	bool bCanMove = true;
-	
+
 private:
 	UPROPERTY()
 	class ACBasePlayer* BaseOwnerCharacter;
@@ -52,7 +52,7 @@ private:
 	UFUNCTION(server, Reliable)
 	void SRPC_RotationToMouseCursor(const FVector MouseDirection);
 	UFUNCTION(NetMulticast, Reliable)
-	void MRPC_RotationToMouseCursor(const FRotator NewRotation);	
+	void MRPC_RotationToMouseCursor(const FRotator NewRotation);
 
 private: // Yasuo Move Distance Check
 	UPROPERTY()
@@ -64,6 +64,9 @@ private: // Yasuo Move Distance Check
 	UFUNCTION(Client, Reliable)
 	void CRPC_CheckMoveDistance();
 
-	private:
+private:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+public:
+	void SetController(class ACPlayerController* NewController);
 };

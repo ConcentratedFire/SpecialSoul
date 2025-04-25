@@ -47,7 +47,7 @@ void UCYasuo_ESkill::UseSkill(ACharacter* Caster)
 			--SkillChargeCount;
 			Yasuo->CRPC_UpdateChargeCountUI(ESkillKey::E, SkillChargeCount);
 			if (SkillChargeCount == 0)
-				Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);
+				Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false, Yasuo->PC);
 			bIsESkillActive = true;
 		}
 
@@ -123,11 +123,11 @@ void UCYasuo_ESkill::StartChargeTimer()
 		LOG_S(Warning, TEXT("%d"), SkillChargeCount);
 		if (SkillChargeCount == 0) // 0개면 blur와 cover이미지를 사용
 		{
-			Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);
+			Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false, Yasuo->PC);
 		}
 		else // 1, 2개면 Charge이미지만 사용
 		{
-			Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, true);
+			Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, true, Yasuo->PC);
 		}
 	}
 }
@@ -135,7 +135,7 @@ void UCYasuo_ESkill::StartChargeTimer()
 void UCYasuo_ESkill::OnChargeCompleted()
 {
 	Yasuo->GetWorld()->GetTimerManager().ClearTimer(ChargeTimerHandle);
-	Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);
+	Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false, Yasuo->PC);
 	
 	if (SkillChargeCount < MaxChargeCount)
 	{

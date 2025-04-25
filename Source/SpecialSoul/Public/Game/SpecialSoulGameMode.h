@@ -45,10 +45,10 @@ class ASpecialSoulGameMode : public AGameModeBase
 private:
 	ASpecialSoulGameMode();
 	virtual void BeginPlay() override;
-	
+
 public:
 	void UpdateRegenInfo(int32 Level);
-	
+
 public:
 	UPROPERTY()
 	class UCDataSheetUtility* DataSheetUtility;
@@ -68,11 +68,20 @@ public:
 	TMap<int32, FRegenData> RegenDataMap;
 
 	bool bIsStartRegen = false;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Data|Stat")
 	FRegenData RegenInfo;
 
-	private:
+private:
 	UFUNCTION()
 	void SetData();
+
+public:
+	void SpawnPlayerCharacter();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Class")
+	TSubclassOf<ACBasePlayer> YasuoClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Class")
+	TSubclassOf<ACBasePlayer> JinxClass;
 };

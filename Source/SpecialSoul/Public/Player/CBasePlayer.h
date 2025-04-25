@@ -175,7 +175,7 @@ public:
 	void ResetLeftCooltime(ESkillKey skillKey);
 	
 	UFUNCTION(Client, Reliable)
-	void CRPC_SetSkillChargingUI(ESkillKey skillKey, bool bIsCharging);
+	void CRPC_SetSkillChargingUI(ESkillKey skillKey, bool bIsCharging, class ACPlayerController* InPC);
 
 	UFUNCTION()
 	void OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
@@ -212,7 +212,11 @@ public:
 
 private:
 	UFUNCTION(Client, Reliable)
-	void CRPC_SetMinimap();
+	void CRPC_SetMinimap(class ACPlayerController* InPC);
+
+public:
+	virtual void SetLocalInit(class ACPlayerController* InPC);
+	bool bIsLocalInit = false;
 
 public:
 	// HP 체력

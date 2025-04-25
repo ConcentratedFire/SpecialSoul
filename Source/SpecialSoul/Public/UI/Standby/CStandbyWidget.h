@@ -22,7 +22,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	class UTextBlock* Txt_RoomName;
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
-	class UScrollBox* Scroll_UserList;
+	class UTextBlock* Txt_PlayerReadyState;
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	class UButton* Btn_Exit;
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
@@ -51,10 +51,8 @@ private:
 
 private:
 	bool bShowChampion = false;
-	bool bHasAuthority = false;
-	
 	FString MemberName;
 
-	UPROPERTY(EditDefaultsOnly)
-	TArray<UTexture2D*> ReadyImage;
+	UPROPERTY()
+	class ACPlayerController* PC;
 };

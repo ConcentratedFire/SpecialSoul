@@ -4,6 +4,7 @@
 #include "Game/CPlayerState.h"
 
 #include "SpecialSoul.h"
+#include "Game/CGameInstance.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/CPlayerController.h"
@@ -21,46 +22,36 @@ void ACPlayerState::BeginPlay()
 
 	HUD = Cast<AGameHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	Player = Cast<ACBasePlayer>(GetPawn());
+
+	if (GetPlayerController() && GetPlayerController()->IsLocalController())
+	{
+		auto gi = Cast<UCGameInstance>(GetWorld()->GetGameInstance());
+		ServerRPC_SetUserName(gi->MySessionName);
+	}
 }
 
 void ACPlayerState::SRPC_SetInitialData_Implementation()
 {
-	if (!Player)
-		Player = Cast<ACBasePlayer>(GetPawn());
+	// if (!Player)
+	// 	Player = Cast<ACBasePlayer>(GetPawn());
+	//
+	// if (Player->IsA(ACYasuo::StaticClass()))
+	// {
+	// 	YasuoAttackDataMap = GM->YasuoAttackDataMap;
+	// 	YasuoMoveDataMap = GM->YasuoMoveDataMap;
+	// }
+	// else
+	// {
+	// 	JinxAttackDataMap = GM->JinxAttackDataMap;
+	// }
 
-	if (Player->IsA(ACYasuo::StaticClass()))
-	{
-		YasuoAttackDataMap = GM->YasuoAttackDataMap;
-		YasuoMoveDataMap = GM->YasuoMoveDataMap;
-	}
-	else
-	{
-		JinxAttackDataMap = GM->JinxAttackDataMap;
-	}
+	YasuoAttackDataMap = GM->YasuoAttackDataMap;
+	YasuoMoveDataMap = GM->YasuoMoveDataMap;
+	JinxAttackDataMap = GM->JinxAttackDataMap;
 
 	// 초기 데이터 세팅
 	auto pc = Cast<ACPlayerController>(GetPlayerController());
-	if (pc && Player->IsA(ACYasuo::StaticClass()))
-	{
-		if (YasuoAttackDataMap.Num() > 0)
-			pc->UpgradeWeapon(1);
-
-		if (YasuoMoveDataMap.Num() > 0)
-			pc->UpdateYasuoMoveStat(1);
-	}
-	else if (pc && Player->IsA(AJinx::StaticClass())) /**/
-	{
-		if (JinxAttackDataMap.Num() > 0)
-		{
-			pc->UpgradeWeapon(1);
-			
-		}
-
-		if (auto jinx = Cast<AJinx>(Player))
-		{
-			jinx->SRPC_UseSkill(ESkillKey::Attack);
-		}
-	}
+	SetPlayerCharacterInfo(pc);
 
 	UpgradeDataMap = GM->UpgradeDataMap;
 }
@@ -228,4 +219,41 @@ void ACPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& 
 	DOREPLIFETIME_CONDITION(ACPlayerState, CurAbilityHasteGrade, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACPlayerState, CurProjectilesGrade, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACPlayerState, CurCritChanceGrade, COND_OwnerOnly);
+}
+
+void ACPlayerState::ServerRPC_SetUserName_Implementation(const FString& name)
+{
+	SetPlayerName(name);
+}
+
+void ACPlayerState::MRPC_SetPlayerReady_Implementation(bool _bIsReady)
+{
+	SetPlayerReady(_bIsReady);
+}
+
+void ACPlayerState::SetPlayerCharacterInfo(class ACPlayerController* PC)
+{
+	Player = Cast<ACBasePlayer>(PC->GetPawn());
+	if (!Player) return;
+	
+	if (PC && Player->IsA(ACYasuo::StaticClass()))
+	{
+		if (YasuoAttackDataMap.Num() > 0)
+			PC->UpgradeWeapon(1);
+
+		if (YasuoMoveDataMap.Num() > 0)
+			PC->UpdateYasuoMoveStat(1);
+	}
+	else if (PC && Player->IsA(AJinx::StaticClass()))
+	{
+		if (JinxAttackDataMap.Num() > 0)
+		{
+			PC->UpgradeWeapon(1);
+		}
+
+		if (auto jinx = Cast<AJinx>(Player))
+		{
+			jinx->SRPC_UseSkill(ESkillKey::Attack);
+		}
+	}
 }

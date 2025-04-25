@@ -58,6 +58,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> RSkillMontage;
+
+public:
+	virtual void SetLocalInit(class ACPlayerController* InPC) override;
 	
 };
 

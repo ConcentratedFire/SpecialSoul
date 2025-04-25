@@ -41,4 +41,6 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UGameWidget> GameWidget;
+
+	void ShowWidget();
 };

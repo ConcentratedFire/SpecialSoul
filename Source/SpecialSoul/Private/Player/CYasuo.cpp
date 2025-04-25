@@ -73,8 +73,6 @@ void ACYasuo::SetLocalInit(ACPlayerController* InPC)
 
 		SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
 
-		SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
-
 		UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr,
 		                                     TEXT("/Game/UI/textures/yasuo_portrait.yasuo_portrait"));
 		hud->SetPortrait(portrait);

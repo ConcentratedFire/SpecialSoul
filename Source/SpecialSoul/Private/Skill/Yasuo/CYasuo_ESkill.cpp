@@ -47,7 +47,7 @@ void UCYasuo_ESkill::UseSkill(ACharacter* Caster)
 			--SkillChargeCount;
 			Yasuo->CRPC_UpdateChargeCountUI(ESkillKey::E, SkillChargeCount);
 			if (SkillChargeCount == 0)
-				Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false);
+				Yasuo->CRPC_SetSkillChargingUI(ESkillKey::E, false, Yasuo->PC);
 			bIsESkillActive = true;
 		}
 

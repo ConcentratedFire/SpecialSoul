@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Player/CBasePlayer.h"
 #include "Player/Components/SkillComponent.h"
 #include "GameHUD.generated.h"
 
@@ -23,11 +24,17 @@ public:
 
 	void UpdateSkillCooltime(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
 	void SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap);
+	void SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging);
 
 public:
 	//AGameHUD();
 
 	virtual void BeginPlay() override;
+	void ChangeHP(float HP, float MaxHP);
+	void SetSkillSlotVisuals(ESkillKey SkillKey, UObject* Object);
+	void SetPortrait(UObject* Object);
+	void SetPassiveImage(UObject* Object);
+	void SetPassiveText(int32 count);
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameWidget> GameWidgetClass;

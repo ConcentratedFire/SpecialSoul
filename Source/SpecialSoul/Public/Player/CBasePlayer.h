@@ -216,4 +216,23 @@ private:
 
 public:
 	virtual void SetLocalInit(class ACPlayerController* InPC);
+
+public:
+	// HP 체력
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = HP)
+	float MaxHP {1000.f};
+	
+	UPROPERTY(ReplicatedUsing=OnRep_HP, BlueprintReadWrite, Category = HP)
+	float hp {MaxHP};
+
+	UFUNCTION()
+	void OnRep_HP();
+
+	 // get, set 프로퍼티
+	__declspec(property(get = GetHP, put = SetHP)) float HP;
+	float GetHP();
+	void SetHP(float value);
+
+	void DamageProcess(float damage);
+	bool bIsDead {false};
 };

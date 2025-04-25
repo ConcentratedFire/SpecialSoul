@@ -75,7 +75,7 @@ ACBasePlayer::ACBasePlayer()
 	MiniMapCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MiniMapCam"));
 	MiniMapCam->SetupAttachment(RootComponent);
 	MiniMapCam->SetUsingAbsoluteRotation(true);
-	MiniMapCam->SetRelativeLocationAndRotation(FVector(0, 0, 1000), FRotator(-90, 0, 0));
+	MiniMapCam->SetRelativeLocationAndRotation(FVector(0,0,1000),FRotator(-90 , 0 , 0));
 
 	ConstructorHelpers::FClassFinder<UUserWidget> tempArrowWidget(
 		TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Arrow.WBP_Arrow_C'"));
@@ -370,8 +370,8 @@ void ACBasePlayer::CRPC_SetSkillChargingUI_Implementation(ESkillKey skillKey, bo
 {
 	if (AGameHUD* hud = Cast<AGameHUD>(InPC->GetHUD()))
 	{
-		if (hud->GameWidget)
-			hud->GameWidget->SetSkillSlotIsCharging(skillKey, bIsCharging);
+		if (hud)
+			hud->SetSkillSlotIsCharging(skillKey, bIsCharging);
 	}
 }
 
@@ -381,8 +381,8 @@ void ACBasePlayer::OnCooltimeChanged(ESkillKey skillKey, FSkillCooltime cooltime
 	{
 		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 		{
-			if (hud->GameWidget)
-				hud->GameWidget->UpdateSkillCooltime(skillKey, cooltimeInfo);
+			if (hud)
+				hud->UpdateSkillCooltime(skillKey, cooltimeInfo);
 		}
 	}
 }
@@ -483,4 +483,42 @@ void ACBasePlayer::CRPC_SetMinimap_Implementation(ACPlayerController* InPC)
 				hud->SetMiniMapTexture(RenderTarget);
 		}
 	}
+}
+
+
+
+void ACBasePlayer::DamageProcess(float damage)
+{
+	HP -= damage; // SetHP setter 호출
+}
+
+void ACBasePlayer::OnRep_HP()
+{
+	if (HP <= 0.f) // 사망 처리
+	{
+		bIsDead = true;
+		
+	}
+	else
+	{
+		if (IsLocallyControlled())
+		{
+			if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+			{
+				if (hud)
+					hud->ChangeHP(HP, MaxHP);
+			}
+		}
+	}
+}
+
+float ACBasePlayer::GetHP()
+{
+	return hp;
+}
+
+void ACBasePlayer::SetHP(float value)
+{
+	hp = value;
+	OnRep_HP(); // 서버에서는 바로 갱신
 }

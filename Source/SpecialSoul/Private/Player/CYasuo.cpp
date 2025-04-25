@@ -72,8 +72,19 @@ void ACYasuo::SetLocalInit(ACPlayerController* InPC)
 		SkillComponent->UpdateChargedCount(ESkillKey::E, 3);
 
 		SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
+
+		SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
+
+		UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr,
+		                                     TEXT("/Game/UI/textures/yasuo_portrait.yasuo_portrait"));
+		hud->SetPortrait(portrait);
+
+		UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr,
+		                                       TEXT("/Game/UI/textures/Way_of_the_Wanderer.Way_of_the_Wanderer"));
+		hud->SetPassiveImage(passiveImg);
 	}
 }
+
 
 void ACYasuo::PrintNetLog()
 {

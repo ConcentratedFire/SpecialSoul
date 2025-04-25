@@ -70,10 +70,10 @@ void UCDataSheetUtility::FetchGoogleSheetData(const FString& SheetName, const FS
 template<typename T, typename Y>
 void UCDataSheetUtility::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful, TMap<Y, T>& OutDataMap)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived start"));
+	// UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived start"));
 	if (bWasSuccessful && Response.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived valid"));
+		// UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived valid"));
 		FString ResponseString = Response->GetContentAsString();
 		
 
@@ -83,13 +83,13 @@ void UCDataSheetUtility::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived deserialized"));
+			// UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager OnResponseReceived deserialized"));
 			const TArray<TSharedPtr<FJsonValue>>* Rows; // Json배열 형태 [ ["ID", "ProjectileCount"], ["int32", "int32"], ["1", "2"], ... ] 구조
 
 			if (JsonObject->TryGetArrayField(TEXT("values"), Rows))
 			{
 
-				UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager getarrayfield"));
+				// UE_LOG(LogTemp, Warning, TEXT("UPAHttpDownloadManager getarrayfield"));
 
 				PaserSheetRowsToStructArray(Rows, OutDataMap); // 행 데이터들로 구조체를 만들어 저장한다
             

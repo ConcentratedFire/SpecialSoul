@@ -233,4 +233,7 @@ public:
 	void SetPlayerReady(bool _bIsReady) { bIsReady = _bIsReady; }
 	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_SetPlayerReady(bool _bIsReady);
+
+public:
+	void SetPlayerCharacterInfo(class ACPlayerController* PC);
 };

@@ -51,8 +51,14 @@ void ACPlayerController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 	MyPlayer = Cast<ACBasePlayer>(InPawn);
 
-	if (HasAuthority() && !IsLocalController())
+	if (HasAuthority()/* && !IsLocalController()*/)
 		MyPlayerState->SRPC_SetInitialData();
+
+	if (HasAuthority())
+		MyPlayerState->SetPlayerCharacterInfo(this);
+
+	if (IsLocalController())
+		MyPlayer->SetLocalInit(this);
 }
 
 void ACPlayerController::UpgradeWeapon(const int32 Level)

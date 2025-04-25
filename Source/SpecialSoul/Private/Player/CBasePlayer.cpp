@@ -75,7 +75,7 @@ ACBasePlayer::ACBasePlayer()
 	MiniMapCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MiniMapCam"));
 	MiniMapCam->SetupAttachment(RootComponent);
 	MiniMapCam->SetUsingAbsoluteRotation(true);
-	MiniMapCam->SetRelativeLocationAndRotation(FVector(0,0,1000),FRotator(-90 , 0 , 0));
+	MiniMapCam->SetRelativeLocationAndRotation(FVector(0, 0, 1000), FRotator(-90, 0, 0));
 
 	ConstructorHelpers::FClassFinder<UUserWidget> tempArrowWidget(
 		TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Arrow.WBP_Arrow_C'"));
@@ -122,17 +122,15 @@ void ACBasePlayer::BeginPlay()
 			ObjectPoolManager = *It;
 		}
 	}
+}
 
-	if (IsLocallyControlled())
-	{
-		InitUpgradeUI(); // 업그레이드 UI 생성
-		SkillComponent->OnCooltimeUpdated.AddDynamic(this, &ACBasePlayer::OnCooltimeChanged);
-	}
+void ACBasePlayer::SetLocalInit(class ACPlayerController* InPC)
+{
+	MoveComp->SetController(InPC);
+	InitUpgradeUI(); // 업그레이드 UI 생성
+	SkillComponent->OnCooltimeUpdated.AddDynamic(this, &ACBasePlayer::OnCooltimeChanged);
 
-	if (IsLocallyControlled())
-	{
-		CRPC_SetMinimap();
-	}
+	CRPC_SetMinimap(InPC);
 }
 
 void ACBasePlayer::PrintNetLog()
@@ -367,9 +365,10 @@ void ACBasePlayer::ResetLeftCooltime(ESkillKey skillKey)
 	SkillComponent->ResetLeftCooltime(skillKey);
 }
 
-void ACBasePlayer::CRPC_SetSkillChargingUI_Implementation(ESkillKey skillKey, bool bIsCharging)
+void ACBasePlayer::CRPC_SetSkillChargingUI_Implementation(ESkillKey skillKey, bool bIsCharging,
+                                                          ACPlayerController* InPC)
 {
-	if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+	if (AGameHUD* hud = Cast<AGameHUD>(InPC->GetHUD()))
 	{
 		if (hud->GameWidget)
 			hud->GameWidget->SetSkillSlotIsCharging(skillKey, bIsCharging);
@@ -455,7 +454,7 @@ void ACBasePlayer::CRPC_UnPause_Implementation()
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
-void ACBasePlayer::CRPC_SetMinimap_Implementation()
+void ACBasePlayer::CRPC_SetMinimap_Implementation(ACPlayerController* InPC)
 {
 	if (MiniMapCam)
 	{
@@ -477,8 +476,8 @@ void ACBasePlayer::CRPC_SetMinimap_Implementation()
 			// MiniMapCam->OrthoWidth = 1920.0f; // 직교 뷰 크기 설정
 			MiniMapCam->bCaptureEveryFrame = true; // 매 프레임 캡처
 		}
-		
-		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+
+		if (AGameHUD* hud = Cast<AGameHUD>(InPC->GetHUD()))
 		{
 			if (hud->GameWidget)
 				hud->SetMiniMapTexture(RenderTarget);

@@ -70,6 +70,12 @@ void ACYasuo::BeginPlay()
 
 
 			SkillComponent->OnChargeCountChanged.AddDynamic(this, &ACYasuo::OnChargeCountUIChanged);
+			
+			UObject* portrait = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/yasuo_portrait.yasuo_portrait"));
+			hud->SetPortrait(portrait);
+
+			UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Way_of_the_Wanderer.Way_of_the_Wanderer"));
+			hud->SetPassiveImage(passiveImg);
 		}
 	}
 }

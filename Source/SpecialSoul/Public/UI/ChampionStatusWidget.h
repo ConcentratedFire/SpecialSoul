@@ -25,12 +25,51 @@ public:
 	void SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject);
 	void SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging);
 	void ChangeChargeCount(ESkillKey skillKey, int32 count);
+	void ChangeHP(float hp, float maxHP);
+	void ChangeEnergy(float energy, float maxEnergy);
+	void ChangeEXP(float exp, float maxExp);
+	void SetLevel(int32 level);
+	void SetPortrait(UObject* Object);
+	void SetPassiveImage(UObject* Object);
+	void SetPassiveText(int32 count);
 
+private:
 	UPROPERTY(meta = (BindWidget))
 	class USkillSlotWidget* SkillSlot_E;
 
 	UPROPERTY(meta = (BindWidget))
 	class USkillSlotWidget* SkillSlot_R;
+
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* HP_Bar;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_HP;
+
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* Energy_Bar;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_Energy;
+
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* EXP_Bar;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Image_Level;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_Level;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Image_Portrait;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_Passive;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_KillCount;
+	
 private:
 	TMap<ESkillKey, USkillSlotWidget*> SkillSlotMap;
 

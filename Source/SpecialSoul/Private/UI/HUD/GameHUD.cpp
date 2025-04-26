@@ -56,6 +56,25 @@ void AGameHUD::SetPassiveText(int32 count)
 		GameWidget->SetPassiveText(count);
 }
 
+void AGameHUD::SetLevel(int32 level)
+{
+	if (GameWidget)
+		GameWidget->SetLevel(level);
+}
+
+void AGameHUD::SetEnergy(float energy, float maxEnergy)
+{
+	if (GameWidget)
+		GameWidget->SetEnergy(energy, maxEnergy);
+	
+}
+
+void AGameHUD::SetEXP(float exp, float maxExp)
+{
+	if (GameWidget)
+		GameWidget->SetEXP(exp, maxExp);
+}
+
 void AGameHUD::SetKillScore(int32 KillScore)
 {
 	if (GameWidget)
@@ -85,3 +104,4 @@ void AGameHUD::SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging)
 	if (GameWidget)
 		GameWidget->SetSkillSlotIsCharging(skillKey, bIsCharging);
 }
+

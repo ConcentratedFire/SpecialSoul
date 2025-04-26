@@ -22,6 +22,7 @@
 #include "Skill/Yasuo/CYasuo_RSkill.h"
 #include "UI/ChampionStatusWidget.h"
 #include "UI/GameWidget.h"
+#include "UI/OverheadStatusWidget.h"
 #include "UI/SkillSlotWidget.h"
 #include "UI/HUD/GameHUD.h"
 #include "Utility/CDataSheetUtility.h"
@@ -250,6 +251,11 @@ void ACYasuo::MRPC_EndDefaultAttack_Implementation()
 {
 	// 회오리가 나가고 기류를 깍아주기 위해 옮김
 	PassiveEnergy -= 100;
+
+	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+	{
+		overheadUI->SetEnergy(PassiveEnergy, 100);
+	}
 }
 
 void ACYasuo::SRPC_ChargePassiveEnergy_Implementation()
@@ -274,6 +280,12 @@ void ACYasuo::SRPC_ChargePassiveEnergy_Timer_Implementation()
 void ACYasuo::MRPC_ChargePassiveEnergy_Implementation(const int32 NewEnergy)
 {
 	PassiveEnergy = NewEnergy;
+	
+	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+	{
+		LOG_S(Error, TEXT("overheadUI->SetEnergy %f"), PassiveEnergy/100.f);
+		overheadUI->SetEnergy(PassiveEnergy, 100.f);
+	}
 }
 
 void ACYasuo::ESkill(const bool bAnimStart)

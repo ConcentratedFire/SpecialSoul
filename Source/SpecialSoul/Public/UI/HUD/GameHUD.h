@@ -35,7 +35,10 @@ public:
 	void SetPortrait(UObject* Object);
 	void SetPassiveImage(UObject* Object);
 	void SetPassiveText(int32 count);
-
+	void SetLevel(int32 level);
+	void SetEnergy(float energy, float maxEnergy);
+	void SetEXP(float exp, float maxExp);
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameWidget> GameWidgetClass;
 

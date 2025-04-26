@@ -107,9 +107,11 @@ ACBasePlayer::ACBasePlayer()
 	OverheadUIComp->SetDrawAtDesiredSize(true);
 	OverheadUIComp->SetIsReplicated(true);
 	OverheadUIComp->SetRelativeLocation(FVector(800.f, 0.f, 90.f));
+	OverheadUIComp->SetRelativeRotation(FRotator(0,180,0));
+	OverheadUIComp->SetRelativeScale3D(FVector(0.7f));
 	OverheadUIComp->SetCastShadow(false);
-	OverheadUIComp->SetRenderInMainPass(true);
-	OverheadUIComp->SetTranslucentSortPriority(10);
+	//OverheadUIComp->SetRenderInMainPass(true);
+	//OverheadUIComp->SetTranslucentSortPriority(10);
 	OverheadUIComp->SetDepthPriorityGroup(SDPG_Foreground); 
 }
 
@@ -139,16 +141,24 @@ void ACBasePlayer::BeginPlay()
 			ObjectPoolManager = *It;
 		}
 	}
-
-	// 서버나 클라이언트 구분 없이, 위젯 인스턴스 보장
-	if (OverheadUIComp && OverheadUIComp->GetWidget() == nullptr)
+	
+	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
 	{
-		if (UClass* WidgetClass = OverheadUIComp->GetWidgetClass())
-		{
-			UUserWidget* newWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-			OverheadUIComp->SetWidget(newWidget);
-		}
+		overheadUI->SetHP(HP, MaxHP);
+		overheadUI->SetEnergy(0, 100);
+		overheadUI->SetLevel(1);
 	}
+
+	// if (IsLocallyControlled())
+	// {
+	// 	if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+	// 	{
+	// 		hud->SetHP(HP, MaxHP);
+	// 		hud->SetEnergy(0, 100);
+	// 		hud->SetLevel(1);
+	// 		hud->SetEXP(0, 1);
+	// 	}
+	// }
 }
 
 void ACBasePlayer::SetLocalInit(class ACPlayerController* InPC)
@@ -164,6 +174,9 @@ void ACBasePlayer::SetLocalInit(class ACPlayerController* InPC)
 	if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 	{
 		hud->SetHP(HP, MaxHP);
+		hud->SetEnergy(0, 100);
+		hud->SetLevel(1);
+		hud->SetEXP(0, 1);
 	}
 	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
 	{
@@ -213,6 +226,7 @@ void ACBasePlayer::Tick(float DeltaTime)
 	{
 		SetLocalInit(PC);
 		bIsLocalInit = true;
+		
 	}
 
 	if (IsLocallyControlled())
@@ -273,6 +287,19 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 	if (this->IsA(ACYasuo::StaticClass()))
 	{
 		PC->GetNextLevelYasuoMoveStat();
+	}
+
+	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+	{
+		overheadUI->SetLevel(PlayerLevel);
+	}
+	if (IsLocallyControlled())
+	{
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			hud->SetLevel(PlayerLevel);
+			//hud->SetEXP(0, data)
+		}
 	}
 }
 

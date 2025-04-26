@@ -68,7 +68,7 @@ void UChampionStatusWidget::SetEnergy(float energy, float maxEnergy)
 
 void UChampionStatusWidget::SetEXP(float exp, float maxExp)
 {
-	Energy_Bar->SetPercent(exp/maxExp);
+	EXP_Bar->SetPercent(exp/maxExp);
 }
 
 void UChampionStatusWidget::SetLevel(int32 level)

@@ -5,29 +5,6 @@
 
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "Components/WidgetComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-
-void UOverheadStatusWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	// Super::NativeTick(MyGeometry, InDeltaTime);
-	//
-	// APawn* OwnerPawn = Cast<APawn>(GetOwningPlayerPawn());
-	// if (!OwnerPawn) return;
-	//
-	//
-	// USpringArmComponent* CameraBoom = OwnerPawn->FindComponentByClass<USpringArmComponent>();
-	// if (!CameraBoom) return;
-	//
-	// UWidgetComponent* OverheadUIComp = OwnerPawn->FindComponentByClass<UWidgetComponent>();
-	// if (!OverheadUIComp) return;
-	//
-	// // 카메라 붐 방향 기준으로 빌보딩
-	// FRotator CameraRotation = CameraBoom->GetComponentRotation();
-	// FRotator NewRotation(0.f, CameraRotation.Yaw, 0.f); // 수평만 유지
-	//
-	// OverheadUIComp->SetWorldRotation(NewRotation);
-}
 
 void UOverheadStatusWidget::SetHP(float hp, float maxHP)
 {

@@ -28,6 +28,7 @@
 #include "Player/Jinx.h"
 #include "Player/Components/SkillComponent.h"
 #include "UI/GameWidget.h"
+#include "UI/OverheadStatusWidget.h"
 #include "UI/HUD/GameHUD.h"
 
 struct FJinxAttackData;
@@ -94,6 +95,22 @@ ACBasePlayer::ACBasePlayer()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
+
+	OverheadUIComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadUIComp"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/UI/WBP_OverheadStatusWidget.WBP_OverheadStatusWidget_C"));
+	if (WidgetClass.Succeeded())
+	{
+		OverheadUIComp->SetWidgetClass(WidgetClass.Class);
+	}
+	OverheadUIComp->SetupAttachment(GetCameraBoom());
+	OverheadUIComp->SetWidgetSpace(EWidgetSpace::World);
+	OverheadUIComp->SetDrawAtDesiredSize(true);
+	OverheadUIComp->SetIsReplicated(true);
+	OverheadUIComp->SetRelativeLocation(FVector(800.f, 0.f, 90.f));
+	OverheadUIComp->SetCastShadow(false);
+	OverheadUIComp->SetRenderInMainPass(true);
+	OverheadUIComp->SetTranslucentSortPriority(10);
+	OverheadUIComp->SetDepthPriorityGroup(SDPG_Foreground); 
 }
 
 // Called when the game starts or when spawned
@@ -122,6 +139,16 @@ void ACBasePlayer::BeginPlay()
 			ObjectPoolManager = *It;
 		}
 	}
+
+	// 서버나 클라이언트 구분 없이, 위젯 인스턴스 보장
+	if (OverheadUIComp && OverheadUIComp->GetWidget() == nullptr)
+	{
+		if (UClass* WidgetClass = OverheadUIComp->GetWidgetClass())
+		{
+			UUserWidget* newWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+			OverheadUIComp->SetWidget(newWidget);
+		}
+	}
 }
 
 void ACBasePlayer::SetLocalInit(class ACPlayerController* InPC)
@@ -129,8 +156,20 @@ void ACBasePlayer::SetLocalInit(class ACPlayerController* InPC)
 	MoveComp->SetController(InPC);
 	InitUpgradeUI(); // 업그레이드 UI 생성
 	SkillComponent->OnCooltimeUpdated.AddDynamic(this, &ACBasePlayer::OnCooltimeChanged);
-
+	
 	CRPC_SetMinimap(InPC);
+	
+	//if (IsLocallyControlled())
+	//{
+	if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+	{
+		hud->SetHP(HP, MaxHP);
+	}
+	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+	{
+		overheadUI->SetHP(HP, MaxHP);
+	}
+	//}
 }
 
 void ACBasePlayer::PrintNetLog()
@@ -178,6 +217,20 @@ void ACBasePlayer::Tick(float DeltaTime)
 
 	if (IsLocallyControlled())
 		MiniMapCam->SetRelativeRotation(FRotator(-90, 0, 0));
+	
+	// if (OverheadUIComp)
+	// {
+	// 	APlayerCameraManager* cm = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	// 	if (cm)
+	// 	{
+	// 		FVector CamLocation = cm->GetCameraLocation();
+	// 		FVector ToCamera = CamLocation - OverheadUIComp->GetComponentLocation();
+	// 		ToCamera.Z = 180;
+	// 		FRotator LookAtRotation = FRotationMatrix::MakeFromX(ToCamera).Rotator();
+	//
+	// 		OverheadUIComp->SetWorldRotation(LookAtRotation);
+	// 	}
+	// }
 }
 
 // Called to bind functionality to input
@@ -421,6 +474,7 @@ void ACBasePlayer::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& O
 	DOREPLIFETIME(ACBasePlayer, YasuoMoveInfo);
 	DOREPLIFETIME(ACBasePlayer, JinxAttackData);
 	DOREPLIFETIME(ACBasePlayer, bAttacking);
+	DOREPLIFETIME(ACBasePlayer, hp);
 }
 
 void ACBasePlayer::EndUpgrade()
@@ -496,7 +550,15 @@ void ACBasePlayer::CRPC_SetMinimap_Implementation(ACPlayerController* InPC)
 
 void ACBasePlayer::DamageProcess(float damage)
 {
-	HP -= damage; // SetHP setter 호출
+	if (HasAuthority())
+	{
+		HP -= damage; // SetHP setter 호출
+		//OnRep_HP();
+	}
+	else
+	{
+		LOG_S(Warning, TEXT("DamageProcess"));
+	}
 }
 
 void ACBasePlayer::OnRep_HP()
@@ -511,9 +573,13 @@ void ACBasePlayer::OnRep_HP()
 		{
 			if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 			{
-				if (hud)
-					hud->ChangeHP(HP, MaxHP);
+				hud->SetHP(HP, MaxHP);
 			}
+		}
+		
+		if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+		{
+			overheadUI->SetHP(HP, MaxHP);
 		}
 	}
 }
@@ -526,5 +592,5 @@ float ACBasePlayer::GetHP()
 void ACBasePlayer::SetHP(float value)
 {
 	hp = value;
-	OnRep_HP(); // 서버에서는 바로 갱신
+	OnRep_HP();
 }

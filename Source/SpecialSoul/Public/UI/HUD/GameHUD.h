@@ -30,7 +30,7 @@ public:
 	//AGameHUD();
 
 	virtual void BeginPlay() override;
-	void ChangeHP(float HP, float MaxHP);
+	void SetHP(float HP, float MaxHP);
 	void SetSkillSlotVisuals(ESkillKey SkillKey, UObject* Object);
 	void SetPortrait(UObject* Object);
 	void SetPassiveImage(UObject* Object);

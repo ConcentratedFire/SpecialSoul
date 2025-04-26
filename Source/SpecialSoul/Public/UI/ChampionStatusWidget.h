@@ -24,10 +24,10 @@ public:
 	void UpdateSkillCoolTime(ESkillKey skillKey, FSkillCooltime cooltimeInfo);
 	void SetSkillSlotVisuals(ESkillKey skillKey, UObject* InResoueceObject);
 	void SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging);
-	void ChangeChargeCount(ESkillKey skillKey, int32 count);
-	void ChangeHP(float hp, float maxHP);
-	void ChangeEnergy(float energy, float maxEnergy);
-	void ChangeEXP(float exp, float maxExp);
+	void SetChargeCount(ESkillKey skillKey, int32 count);
+	void SetHP(float hp, float maxHP);
+	void SetEnergy(float energy, float maxEnergy);
+	void SetEXP(float exp, float maxExp);
 	void SetLevel(int32 level);
 	void SetPortrait(UObject* Object);
 	void SetPassiveImage(UObject* Object);

@@ -117,7 +117,7 @@ void USkillComponent::CastSkill(ESkillKey Key)
 	}
 
 	if ((Key == ESkillKey::E || Key == ESkillKey::R) && (bUseESkill || bUseRSkill)) return; // 스킬 사용중에는 다른 스킬 사용 방지
-	UE_LOG(LogTemp, Error, TEXT("UseSkill"));
+	//UE_LOG(LogTemp, Error, TEXT("UseSkill"));
 	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
 }
 

@@ -15,13 +15,13 @@ class SPECIALSOUL_API UOverheadStatusWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = HP)
 	float HP {1.f};
-	void ChangeHP(float hp, float maxHP);
-	void ChangeEnergy(float energy, float maxEnergy);
-	
+	void SetHP(float hp, float maxHP);
+	void SetEnergy(float energy, float maxEnergy);
 	void SetLevel(int32 level);
-	void ChangeEXP(float Exp, float MaxExp);
 
 private:
 	UPROPERTY(meta = (BindWidget))

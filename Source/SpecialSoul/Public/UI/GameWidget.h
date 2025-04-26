@@ -27,9 +27,9 @@ public:
 	void ChangeChargeCount(ESkillKey skillKey, int32 count);
 
 	void SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap);
-	void ChangeHP(float HP, float MaxHP);
-	void ChangeEnergy(float energy, float maxEnergy);
-	void ChangeEXP(float exp, float maxExp);
+	void SetHP(float HP, float MaxHP);
+	void SetEnergy(float energy, float maxEnergy);
+	void SetEXP(float exp, float maxExp);
 	void SetLevel(int32 level);
 	void SetPortrait(UObject* Object);
 	void SetPassiveImage(UObject* Object);
@@ -47,9 +47,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UChampionStatWidget* WBP_ChampionStatWidget;
-
-	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
-	class UOverheadStatusWidget* WBP_OverheadStatusWidget;
 
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCMiniMapWidget* WBP_MiniMap;

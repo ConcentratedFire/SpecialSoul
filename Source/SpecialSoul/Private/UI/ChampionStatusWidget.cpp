@@ -45,23 +45,28 @@ void UChampionStatusWidget::SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsC
 	SkillSlotMap[skillKey]->SetIsCharging(bIsCharging);
 }
 
-void UChampionStatusWidget::ChangeChargeCount(ESkillKey skillKey, int32 count)
+void UChampionStatusWidget::SetChargeCount(ESkillKey skillKey, int32 count)
 {
 	SkillSlotMap[skillKey]->SetChargeCount(count);
 }
 
-void UChampionStatusWidget::ChangeHP(float hp, float maxHP)
+void UChampionStatusWidget::SetHP(float hp, float maxHP)
 {
 	HP_Bar->SetPercent(hp/maxHP);
-	
+
+	FString hpText = FString::Printf(TEXT("%.0f / %.0f"), hp, maxHP);
+	Text_HP->SetText(FText::FromString(hpText));
 }
 
-void UChampionStatusWidget::ChangeEnergy(float energy, float maxEnergy)
+void UChampionStatusWidget::SetEnergy(float energy, float maxEnergy)
 {
 	Energy_Bar->SetPercent(energy/maxEnergy);
+	
+	FString energyText = FString::Printf(TEXT("%.0f / %.0f"), energy, maxEnergy);
+	Text_Energy->SetText(FText::FromString(energyText));
 }
 
-void UChampionStatusWidget::ChangeEXP(float exp, float maxExp)
+void UChampionStatusWidget::SetEXP(float exp, float maxExp)
 {
 	Energy_Bar->SetPercent(exp/maxExp);
 }

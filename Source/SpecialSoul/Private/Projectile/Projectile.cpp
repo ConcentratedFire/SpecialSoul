@@ -84,6 +84,10 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 			if (Item->GetActorNameOrLabel().Contains("ItemBox"))
 				Item->ActiveItem();
 		}
+		else if (auto player = Cast<ACBasePlayer>(OtherActor))
+		{
+			player->DamageProcess(Damage);
+		}
 	}
 	else // 범위공격 AOE
 	{
@@ -109,6 +113,10 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 			{
 				if (Item->GetActorNameOrLabel().Contains("ItemBox"))
 					Item->ActiveItem();
+			}
+			else if (auto player = Cast<ACBasePlayer>(hitActor))
+			{
+				player->DamageProcess(Damage);
 			}
 		}
 	}

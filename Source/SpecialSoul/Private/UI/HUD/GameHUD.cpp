@@ -26,10 +26,10 @@ void AGameHUD::ShowWidget()
 		GameWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
-void AGameHUD::ChangeHP(float HP, float MaxHP)
+void AGameHUD::SetHP(float HP, float MaxHP)
 {
 	if (GameWidget)
-		GameWidget->ChangeHP(HP, MaxHP);
+		GameWidget->SetHP(HP, MaxHP);
 }
 
 void AGameHUD::SetSkillSlotVisuals(ESkillKey SkillKey, UObject* Object)

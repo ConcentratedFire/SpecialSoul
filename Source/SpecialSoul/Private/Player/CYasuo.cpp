@@ -63,8 +63,8 @@ void ACYasuo::SetLocalInit(ACPlayerController* InPC)
 		UObject* r = StaticLoadObject(UObject::StaticClass(), nullptr,
 		                              TEXT("/Game/UI/textures/Wind_Wall.Wind_Wall"));
 
-		hud->GameWidget->SetSkillSlotVisuals(ESkillKey::E, e);
-		hud->GameWidget->SetSkillSlotVisuals(ESkillKey::R, r);
+		hud->SetSkillSlotVisuals(ESkillKey::E, e);
+		hud->SetSkillSlotVisuals(ESkillKey::R, r);
 
 		CRPC_SetSkillChargingUI(ESkillKey::E, false, InPC);
 

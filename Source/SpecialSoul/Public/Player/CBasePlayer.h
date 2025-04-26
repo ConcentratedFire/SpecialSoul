@@ -220,10 +220,10 @@ public:
 
 public:
 	// HP 체력
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = HP)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HP)
 	float MaxHP {1000.f};
 	
-	UPROPERTY(ReplicatedUsing=OnRep_HP, BlueprintReadWrite, Category = HP)
+	UPROPERTY(ReplicatedUsing=OnRep_HP, EditAnywhere, BlueprintReadWrite, Category = HP)
 	float hp {MaxHP};
 
 	UFUNCTION()
@@ -236,4 +236,8 @@ public:
 
 	void DamageProcess(float damage);
 	bool bIsDead {false};
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI)
+	class UWidgetComponent* OverheadUIComp;
 };

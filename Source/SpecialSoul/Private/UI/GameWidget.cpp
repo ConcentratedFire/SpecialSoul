@@ -42,7 +42,7 @@ void UGameWidget::SetSkillSlotIsCharging(ESkillKey skillKey, bool bIsCharging)
 void UGameWidget::ChangeChargeCount(ESkillKey skillKey, int32 count)
 {
 	if (WBP_ChampionStatusWidget)
-		WBP_ChampionStatusWidget->ChangeChargeCount(skillKey, count);
+		WBP_ChampionStatusWidget->SetChargeCount(skillKey, count);
 }
 
 void UGameWidget::SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap)
@@ -50,36 +50,28 @@ void UGameWidget::SetMiniMapTexture(UTextureRenderTarget2D* TX_MiniMap)
 	WBP_MiniMap->SetMiniMapTexture(TX_MiniMap);
 }
 
-void UGameWidget::ChangeHP(float HP, float MaxHP)
+void UGameWidget::SetHP(float HP, float MaxHP)
 {
-	if (WBP_OverheadStatusWidget)
-		WBP_OverheadStatusWidget->ChangeHP(HP, MaxHP);
 	if (WBP_ChampionStatusWidget)
-		WBP_ChampionStatusWidget->ChangeHP(HP, MaxHP);
+		WBP_ChampionStatusWidget->SetHP(HP, MaxHP);
 }
 
-void UGameWidget::ChangeEnergy(float energy, float maxEnergy)
+void UGameWidget::SetEnergy(float energy, float maxEnergy)
 {
 	if (WBP_ChampionStatusWidget)
-		WBP_ChampionStatusWidget->ChangeEnergy(energy, maxEnergy);
-
-	if (WBP_OverheadStatusWidget)
-		WBP_OverheadStatusWidget->ChangeEnergy(energy, maxEnergy);
+		WBP_ChampionStatusWidget->SetEnergy(energy, maxEnergy);
 }
 
-void UGameWidget::ChangeEXP(float exp, float maxExp)
+void UGameWidget::SetEXP(float exp, float maxExp)
 {
 	if (WBP_ChampionStatusWidget)
-		WBP_ChampionStatusWidget->ChangeEXP(exp, maxExp);
+		WBP_ChampionStatusWidget->SetEXP(exp, maxExp);
 }
 
 void UGameWidget::SetLevel(int32 level)
 {
 	if (WBP_ChampionStatusWidget)
 		WBP_ChampionStatusWidget->SetLevel(level);
-	
-	if (WBP_OverheadStatusWidget)
-		WBP_OverheadStatusWidget->SetLevel(level);
 }
 
 

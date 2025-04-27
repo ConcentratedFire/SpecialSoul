@@ -115,4 +115,8 @@ public:
 public:
 	UPROPERTY(Replicated)
 	int32 ReadyPlayer=0;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "MainBoss")
+	TSubclassOf<AActor> MainBossClass;
 };

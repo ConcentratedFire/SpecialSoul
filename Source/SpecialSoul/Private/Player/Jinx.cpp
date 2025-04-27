@@ -99,7 +99,7 @@ void AJinx::UpdatePlayerData(const int32 PlayerLevel)
 		UpdateJinxAttackStat(PlayerLevel);
 	}
 
-	//Super::UpdatePlayerData(PlayerLevel);
+	Super::UpdatePlayerData(PlayerLevel);
 }
 
 void AJinx::UpdateJinxAttackStat(int32 PlayerLevel)

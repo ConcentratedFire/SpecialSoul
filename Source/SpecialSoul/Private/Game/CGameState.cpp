@@ -5,6 +5,7 @@
 
 #include "EngineUtils.h"
 #include "SpecialSoul.h"
+#include "Enemy/MainBoss/MainBoss.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -17,6 +18,12 @@
 ACGameState::ACGameState()
 {
 	PrimaryActorTick.bCanEverTick = true;
+ 
+	static ConstructorHelpers::FClassFinder<AActor> MainBossClassFinder(TEXT("/Game/Enemy/MainBoss/BP_MainBoss.BP_MainBoss_C"));
+	if (MainBossClassFinder.Succeeded())
+	{
+		MainBossClass = MainBossClassFinder.Class;
+	}
 }
 
 void ACGameState::BeginPlay()
@@ -81,7 +88,19 @@ void ACGameState::Tick(float DeltaSeconds)
 
 			if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
 			{
-				// (X=2064.554874,Y=-2316.554872,Z=115.000000)
+				// 스폰
+				FVector SpawnLocation(2064.554874f, -2316.554872f, 115.0f);
+				FRotator SpawnRotation(0.0f, 0.0f, 0.0f); // 기본 회전
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				if (MainBossClass)
+				{
+					AMainBoss* SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
+					if (SpawnedBoss == nullptr)
+					{
+						UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
+					}
+				}
 			}
 
 			if (CurStageTime >= StageTime)

@@ -26,7 +26,7 @@ AJinx::AJinx()
 		GetMesh()->SetSkeletalMesh(TempSkMesh.Object);
 	}
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -68.f));
-	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetRelativeRotation(FRotator(0.f,  -90.f, 0.f));
 	GetMesh()->SetCollisionProfileName(TEXT("Player"));
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(68.f);
@@ -34,20 +34,21 @@ AJinx::AJinx()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	MoveComp->SetActive(false);
+
 }
 
 void AJinx::BeginPlay()
 {
 	Super::BeginPlay();
-	//Anim = Cast<UJinxAnim>(GetMesh()->GetAnimInstance());
+	AnimInstance = GetMesh()->GetAnimInstance();
 
 	SkillComponent->BindSkill(ESkillKey::Attack, NewObject<UJinx_Attack>());
 	SkillComponent->BindSkill(ESkillKey::Passive, NewObject<UJinx_Passive>());
 	SkillComponent->BindSkill(ESkillKey::E, NewObject<UJinx_ESkill>());
 	SkillComponent->BindSkill(ESkillKey::R, NewObject<UJinx_RSkill>());
 
-	SkillComponent->CoolTimeMap.Add(ESkillKey::E, FSkillCooltime(1.5f, 0.f));
-	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(1.5f, 0.f));
+	SkillComponent->CoolTimeMap.Add(ESkillKey::E, FSkillCooltime(1.f, 0.f));
+	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(2.f, 0.f));
 }
 
 void AJinx::SetLocalInit(ACPlayerController* InPC)
@@ -84,12 +85,20 @@ void AJinx::Attack()
 
 void AJinx::UseESkill()
 {
-	SkillComponent->CastSkill(ESkillKey::E);
+	// if (!SkillComponent->bUsingSkill)
+	// {
+	// 	SkillComponent->bUsingSkill = true;
+		SkillComponent->SRPC_CastSkill_Implementation(ESkillKey::E);
+	// }
 }
 
 void AJinx::UseRSkill()
 {
-	SkillComponent->CastSkill(ESkillKey::R);
+	// if (!SkillComponent->bUsingSkill)
+	// {
+	// 	SkillComponent->bUsingSkill = true;
+		SkillComponent->SRPC_CastSkill_Implementation(ESkillKey::R);
+	// }
 }
 
 void AJinx::UpdatePlayerData(const int32 PlayerLevel)
@@ -124,8 +133,19 @@ void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 
 			GetWorld()->GetTimerManager().SetTimer(AttackTimer, FTimerDelegate::CreateLambda([this, Key]()
 			{
-				// 모든 클라에서 애니메이션을 재생한다
-				MRPC_PlaySkillMontage(Key);
+				if (!bUsingSkill
+					&& !AnimInstance->Montage_IsPlaying(ESkillMontage)
+					&& !AnimInstance->Montage_IsPlaying(RSkillMontage))
+				{
+					MRPC_PlaySkillMontage(Key); // 모든 클라에서 애니메이션을 재생한다
+				}
+				
+				// 0.3초 후 Attack()
+				FTimerHandle AttackDelayTimer;
+				GetWorld()->GetTimerManager().SetTimer(AttackDelayTimer, FTimerDelegate::CreateLambda([this]()
+				{
+					Attack();
+				}), 0.3f, false);
 			}), JinxAttackData.Cooltime, true, JinxAttackData.Cooltime - remainingTime);
 		}
 		break;
@@ -134,11 +154,17 @@ void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 		break;
 
 	case ESkillKey::E:
-		MRPC_PlaySkillMontage_Implementation(ESkillKey::E);
+		{
+			bUsingSkill = true;
+			MRPC_PlaySkillMontage_Implementation(ESkillKey::E);
+		}
 		break;
 
 	case ESkillKey::R:
-		MRPC_PlaySkillMontage_Implementation(ESkillKey::R);
+		{
+			bUsingSkill = true;
+			MRPC_PlaySkillMontage_Implementation(ESkillKey::R);
+		}
 		break;
 
 	default:
@@ -174,21 +200,22 @@ void AJinx::MRPC_PlaySkillMontage_Implementation(ESkillKey Key)
 	}
 }
 
-void AJinx::ActivateSkillMovement(bool bActive)
+void AJinx::ActivateSkillMovement(bool bActive, bool bAttack)
 {
 	if (bActive)
 	{
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 		MoveComp->SetActive(true);
 		RotateToMouseCursor();
+		if (!bAttack)
+			MoveComp->bCanMove = false;
 		return;
 	}
 
-	if (SkillComponent->UseSkillCount == 0)
-	{
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-		MoveComp->SetActive(false);
-	}
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	MoveComp->SetActive(false);
+	if (!bAttack)
+		MoveComp->bCanMove = true;
 }
 
 void AJinx::StartAttack()

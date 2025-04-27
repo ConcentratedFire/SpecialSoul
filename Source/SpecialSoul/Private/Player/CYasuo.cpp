@@ -285,7 +285,7 @@ void ACYasuo::MRPC_ChargePassiveEnergy_Implementation(const int32 NewEnergy)
 	
 	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
 	{
-		LOG_S(Error, TEXT("overheadUI->SetEnergy %f"), PassiveEnergy/100.f);
+		//LOG_S(Error, TEXT("overheadUI->SetEnergy %f"), PassiveEnergy/100.f);
 		overheadUI->SetEnergy(PassiveEnergy, 100.f);
 	}
 	

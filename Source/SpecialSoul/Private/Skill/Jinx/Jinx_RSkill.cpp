@@ -19,8 +19,6 @@ UJinx_RSkill::UJinx_RSkill()
 // 서버에서 호출된다.
 void UJinx_RSkill::UseSkill(ACharacter* Caster)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Jinx_RSkill"));
-
 	AJinx* Jinx = Cast<AJinx>(Caster);
 	if (!Caster || !BulletClass || !Jinx)
 	{
@@ -35,9 +33,6 @@ void UJinx_RSkill::UseSkill(ACharacter* Caster)
 	}
 	else
 	{
-		// TODO : 시전시간 동안 Progressbar UI를 띄우고
-
-		// 스킬 발동
 		StartUseSkill(Jinx);
 	}
 }

@@ -35,7 +35,13 @@ public:
 	UFUNCTION()
 	void AnimNotify_RSkill();
 
+	UFUNCTION()
+	void AnimNotify_AttackBegin();
 	
+	UFUNCTION()
+	void AnimNotify_AttackEnd();
+
+
 	UFUNCTION()
 	void AnimNotify_SkillBegin();
 

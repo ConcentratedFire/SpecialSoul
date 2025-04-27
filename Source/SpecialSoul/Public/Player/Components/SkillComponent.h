@@ -52,13 +52,7 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	TMap<ESkillKey, float> SkillRangeMap; // 스킬 사정거리
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
-	int32 UseSkillCount {0};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
-	bool bUsingSkill {false};
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Skills")
 	bool bUseESkill {false};
 

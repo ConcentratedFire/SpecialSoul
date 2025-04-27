@@ -30,9 +30,14 @@ public:
 	void UseRSkill();
 	
 	virtual void UpdatePlayerData(const int32 PlayerLevel) override;
+
+	UPROPERTY()
+	class UAnimInstance* AnimInstance;
 	
 public:
-	void ActivateSkillMovement(bool bActive); // 스킬 사용 중 캐릭터 회전 관련
+	bool bUsingSkill {false};
+	
+	void ActivateSkillMovement(bool bActive, bool bAttack); // 스킬 사용 중 캐릭터 회전 관련
 	
 	void StartAttack();
 

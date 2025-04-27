@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Interface/SkillStrategy.h"
 #include "Player/CBasePlayer.h"
+#include "Player/Jinx.h"
 
 // Sets default values for this component's properties
 USkillComponent::USkillComponent()
@@ -123,6 +124,7 @@ void USkillComponent::CastSkill(ESkillKey Key)
 
 void USkillComponent::SRPC_CastSkill_Implementation(ESkillKey Key)
 {
+	//UE_LOG(LogTemp, Error, TEXT("SRPC_CastSkill_Implementation"));
 	if (!SkillMap.Contains(Key))
 	{
 		UE_LOG(LogTemp, Error, TEXT("!SkillMap.Contains(Key) "));
@@ -139,9 +141,8 @@ void USkillComponent::SRPC_CastSkill_Implementation(ESkillKey Key)
 		return;
 	}
 	
-
 	if ((Key == ESkillKey::E || Key == ESkillKey::R) && (bUseESkill || bUseRSkill)) return; // 스킬 사용중에는 다른 스킬 사용 방지
-
+	
 	SkillMap[Key]->UseSkill(OwnerCharacter); // OwnerCharacter데이터를 반영해서 스킬 사용
 }
 
@@ -165,7 +166,7 @@ void USkillComponent::Attack()
 
 void USkillComponent::Passive()
 {
-	CastSkill(ESkillKey::Passive);
+	//CastSkill(ESkillKey::Passive);
 }
 
 void USkillComponent::OnESkillPressed()

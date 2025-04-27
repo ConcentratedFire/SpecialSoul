@@ -26,7 +26,7 @@ void UJinxAnim::AnimNotify_Attack()
 {
 	if (Jinx->HasAuthority())
 	{
-		Jinx->Attack();
+	// 	Jinx->Attack();
 	}
 }
 
@@ -46,20 +46,28 @@ void UJinxAnim::AnimNotify_RSkill()
 	}
 }
 
+
+void UJinxAnim::AnimNotify_AttackBegin()
+{
+	//LOG_S(Error, TEXT("AnimNotify_AttackBegin"));
+	Jinx->ActivateSkillMovement(true, true);
+}
+
+void UJinxAnim::AnimNotify_AttackEnd()
+{
+	//LOG_S(Error, TEXT("AnimNotify_AttackEnd"));
+	Jinx->ActivateSkillMovement(false, true);
+}
+
 void UJinxAnim::AnimNotify_SkillBegin()
 {
-	Jinx->SkillComponent->UseSkillCount++;
-
-	Jinx->ActivateSkillMovement(true);
+	//LOG_S(Error, TEXT("AnimNotify_SkillBegin"));
+	Jinx->ActivateSkillMovement(true, false);
 }
 
 void UJinxAnim::AnimNotify_SkillEnd()
 {
-	Jinx->SkillComponent->UseSkillCount--;
-
-	if (Jinx->SkillComponent->UseSkillCount <= 0)
-	{
-		Jinx->SkillComponent->UseSkillCount = 0;
-		Jinx->ActivateSkillMovement(false);
-	}
+	//LOG_S(Error, TEXT("AnimNotify_SkillEnd"));
+	Jinx->ActivateSkillMovement(false, false);
+	Jinx->bUsingSkill = false;
 }

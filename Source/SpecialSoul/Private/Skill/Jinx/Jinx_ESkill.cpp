@@ -5,6 +5,7 @@
 
 #include "Player/CBasePlayer.h"
 #include "Player/Jinx.h"
+#include "Player/Components/SkillComponent.h"
 #include "Projectile/Jinx/RocketLauncherBullet.h"
 
 UJinx_ESkill::UJinx_ESkill()
@@ -36,9 +37,7 @@ void UJinx_ESkill::UseSkill(ACharacter* Caster)
 	else
 	{
 		Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
-	
-		// TODO : CastingTime 시간 동안 Progressbar UI를 띄우고
-		
+			
 		// 스킬 발동
 		StartUseSkill(Jinx);
 	}

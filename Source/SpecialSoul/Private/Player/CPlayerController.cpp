@@ -154,6 +154,7 @@ void ACPlayerController::ServerRequestSpawn()
 	}
 }
 
+
 void ACPlayerController::MRPC_PlayGame_Implementation()
 {
 	if (IsLocalController() && SelectPlayerWidget)
@@ -164,4 +165,9 @@ void ACPlayerController::MRPC_PlayGame_Implementation()
 	}
 
 	SetPause(false);
+}
+
+void ACPlayerController::UpdateStatUI()
+{
+	
 }

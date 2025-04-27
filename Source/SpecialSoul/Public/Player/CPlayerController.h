@@ -69,4 +69,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_PlayGame();
+
+public:
+	void UpdateStatUI();
 };

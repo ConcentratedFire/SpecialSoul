@@ -8,6 +8,7 @@
 #include "Player/Components/SkillComponent.h"
 #include "ChampionStatusWidget.generated.h"
 
+class UUpgradeSlotWidget;
 class USkillSlotWidget;
 /**
  * 
@@ -16,7 +17,7 @@ UCLASS()
 class SPECIALSOUL_API UChampionStatusWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
+	UChampionStatusWidget(const FObjectInitializer& ObjectInitializer);
 protected:
 	virtual void NativeConstruct() override;
 	
@@ -32,6 +33,9 @@ public:
 	void SetPortrait(UObject* Object);
 	void SetPassiveImage(UObject* Object);
 	void SetPassiveText(int32 count);
+
+	void SetUpgradeSlot(FString upgradeName, int32 upgradeCount);
+	void SetDefaultWeaponUI(ACBasePlayer* player);
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -69,8 +73,36 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_KillCount;
+
+	UPROPERTY(meta = (BindWidget))
+	class UUpgradeSlotWidget* WBP_UpgradeSlotWidget_0;
+	UPROPERTY(meta = (BindWidget))
+	class UUpgradeSlotWidget* WBP_UpgradeSlotWidget_1;
+	UPROPERTY(meta = (BindWidget))
+	class UUpgradeSlotWidget* WBP_UpgradeSlotWidget_2;
+	UPROPERTY(meta = (BindWidget))
+	class UUpgradeSlotWidget* WBP_UpgradeSlotWidget_3;
+	UPROPERTY(meta = (BindWidget))
+	class UUpgradeSlotWidget* WBP_UpgradeSlotWidget_4;
+	UPROPERTY(meta = (BindWidget))
+	class UUpgradeSlotWidget* WBP_UpgradeSlotWidget_5;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Image_Weapon;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_WeaponUpgradeCount;
 	
 private:
 	TMap<ESkillKey, USkillSlotWidget*> SkillSlotMap;
+
+	UPROPERTY()
+	TMap<FString, UTexture2D*> UpgradeIcons;
+	
+	int32 occupiedUpgradeSlotCount;
+	TArray<UUpgradeSlotWidget*> UpgradeSlots;
+
+	TSet<FString> UpgradeCountSet;
+	TMap<FString, int32> UpgradeSlotIndex;
 
 };

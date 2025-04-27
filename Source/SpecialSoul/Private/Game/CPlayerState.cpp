@@ -136,6 +136,19 @@ void ACPlayerState::UpgradeStat(const FString& statName)
 		{
 			RemoveArrayElement(statName);
 		}
+
+		if (HUD)
+		{
+			if (Player->IsA<ACYasuo>())
+			{
+				HUD->SetUpgradeSlot("YasuoWeapon", CurWeaponGrade);
+			}
+			else if (Player->IsA<AJinx>())
+			{
+				HUD->SetUpgradeSlot("JinxWeapon", CurWeaponGrade);
+			}
+		}
+			
 	}
 	else if (statName == "Damage")
 	{
@@ -144,6 +157,8 @@ void ACPlayerState::UpgradeStat(const FString& statName)
 		{
 			RemoveArrayElement(statName);
 		}
+		if (HUD)
+			HUD->SetUpgradeSlot(statName, CurDamageGrade);
 	}
 	else if (statName == "AbilityHaste")
 	{
@@ -152,6 +167,8 @@ void ACPlayerState::UpgradeStat(const FString& statName)
 		{
 			RemoveArrayElement(statName);
 		}
+		if (HUD)
+			HUD->SetUpgradeSlot(statName, CurAbilityHasteGrade);
 	}
 	else if (statName == "Projectiles")
 	{
@@ -160,6 +177,8 @@ void ACPlayerState::UpgradeStat(const FString& statName)
 		{
 			RemoveArrayElement(statName);
 		}
+		if (HUD)
+			HUD->SetUpgradeSlot(statName, CurProjectilesGrade);
 	}
 	else if (statName == "CritChance")
 	{
@@ -168,6 +187,8 @@ void ACPlayerState::UpgradeStat(const FString& statName)
 		{
 			RemoveArrayElement(statName);
 		}
+		if (HUD)
+			HUD->SetUpgradeSlot(statName, CurCritChanceGrade);
 	}
 
 	Player->EndUpgrade();

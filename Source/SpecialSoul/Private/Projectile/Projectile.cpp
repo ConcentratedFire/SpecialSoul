@@ -147,8 +147,9 @@ void AProjectile::OnDestroy()
 
 void AProjectile::ApplyCasterStat(ACharacter* Caster)
 {
-	// TODO: BasePlayer의 공통 스탯을 this에게 적용하기!!
-	// Caster에서 호출된다.
-	if ( Cast<AJinx>(Caster))
-		Damage = Cast<AJinx>(Caster)->JinxAttackData.Damage;
+	if (auto jinx = Cast<AJinx>(Caster))
+	{
+		bool bIsCri;
+		Damage = jinx->GetDamage(bIsCri);
+	}
 }

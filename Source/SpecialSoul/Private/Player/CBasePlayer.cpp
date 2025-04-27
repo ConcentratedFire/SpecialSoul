@@ -273,7 +273,7 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 	// 서버에서 업그레이드할 카드를 정해서 넘겨줌
 	TArray<FString> cardList = PS->ChooseUpgradeCardList();
 	if (cardList.Num() == 0) return;
-	// LOG_S(Warning, TEXT("Player Name : %s"), *GetName());
+	//LOG_S(Warning, TEXT("Player Name : %s"), *GetName());
 	// for (auto& card : cardList)
 	// {
 	// 	LOG_S(Warning, TEXT("card : %s"), *card);
@@ -298,7 +298,9 @@ void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 		{
 			hud->SetLevel(PlayerLevel);
-			//hud->SetEXP(0, data)
+			hud->SetEXP(0, 100);
+
+			// TODO : hud->SetStatData();
 		}
 	}
 }
@@ -516,7 +518,14 @@ void ACBasePlayer::EndUpgrade()
 void ACBasePlayer::MRPC_EndUpgrade_Implementation()
 {
 	if (IsLocallyControlled())
+	{
 		CRPC_EndUpgrade();
+		// TODO : 업그레이드 UI (ChampionStatusWidget) 반영
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
+		{
+			hud->SetHP(HP, MaxHP);
+		}
+	}
 }
 
 void ACBasePlayer::CRPC_EndUpgrade_Implementation()

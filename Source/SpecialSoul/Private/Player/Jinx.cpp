@@ -66,7 +66,15 @@ void AJinx::SetLocalInit(ACPlayerController* InPC)
 
 		UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/UI/textures/Get_Excited.Get_Excited"));
 		hud->SetPassiveImage(passiveImg);
+
+		hud->SetDefaultWeaponUI(this);
 	}
+}
+
+float AJinx::GetDamage(bool& OutbIsCri) const
+{
+	float CalcDamage = PS->CalcDamage(JinxAttackData.Damage, OutbIsCri);
+	return CalcDamage;
 }
 
 void AJinx::Attack()

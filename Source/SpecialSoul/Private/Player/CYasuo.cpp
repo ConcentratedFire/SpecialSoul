@@ -81,6 +81,8 @@ void ACYasuo::SetLocalInit(ACPlayerController* InPC)
 		UObject* passiveImg = StaticLoadObject(UObject::StaticClass(), nullptr,
 		                                       TEXT("/Game/UI/textures/Way_of_the_Wanderer.Way_of_the_Wanderer"));
 		hud->SetPassiveImage(passiveImg);
+
+		hud->SetDefaultWeaponUI(this);
 	}
 }
 
@@ -285,6 +287,19 @@ void ACYasuo::MRPC_ChargePassiveEnergy_Implementation(const int32 NewEnergy)
 	{
 		LOG_S(Error, TEXT("overheadUI->SetEnergy %f"), PassiveEnergy/100.f);
 		overheadUI->SetEnergy(PassiveEnergy, 100.f);
+	}
+	
+	if (IsLocallyControlled())
+	{
+		APlayerController* playerController = Cast<APlayerController>(GetController());
+		if (playerController)
+		{
+			AGameHUD* hud = Cast<AGameHUD>(playerController->GetHUD());
+			if (hud)
+			{
+				hud->SetEnergy(PassiveEnergy, 100.f);
+			}
+		}
 	}
 }
 

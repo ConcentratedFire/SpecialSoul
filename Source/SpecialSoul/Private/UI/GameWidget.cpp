@@ -92,3 +92,37 @@ void UGameWidget::SetPassiveText(int32 count)
 	if (WBP_ChampionStatusWidget)
 		WBP_ChampionStatusWidget->SetPassiveText(count);
 }
+
+void UGameWidget::SetUpgradeSlot(FString upgradeName, int32 upgradeCount)
+{
+	if (WBP_ChampionStatusWidget)
+		WBP_ChampionStatusWidget->SetUpgradeSlot(upgradeName, upgradeCount);
+}
+
+void UGameWidget::SetDefaultWeaponUI(ACBasePlayer* player)
+{
+	if (WBP_ChampionStatusWidget)
+		WBP_ChampionStatusWidget->SetDefaultWeaponUI(player);
+}
+
+
+// ==== 스탯 UI ====
+void UGameWidget::SetStat_DamageUpgrade(int32 damageUpgrade)
+{
+	WBP_ChampionStatWidget->SetDamageUpgrade(damageUpgrade);
+}
+
+void UGameWidget::SetStat_CooltimeUpgrade(int32 cooltimeUpgrade)
+{
+	WBP_ChampionStatWidget->SetCooltimeUpgrade(cooltimeUpgrade);
+}
+
+void UGameWidget::SetStat_CriticalPercent(int32 criticalPercent)
+{
+	WBP_ChampionStatWidget->SetCriticalPercent(criticalPercent);
+}
+
+void UGameWidget::SetStat_ProjectileCount(int32 projectileCount)
+{
+	WBP_ChampionStatWidget->SetProjectileCount(projectileCount);
+}

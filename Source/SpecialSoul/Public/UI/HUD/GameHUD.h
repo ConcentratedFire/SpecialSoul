@@ -38,7 +38,8 @@ public:
 	void SetLevel(int32 level);
 	void SetEnergy(float energy, float maxEnergy);
 	void SetEXP(float exp, float maxExp);
-	
+	void SetDefaultWeaponUI(ACBasePlayer* player);
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameWidget> GameWidgetClass;
 
@@ -46,4 +47,6 @@ public:
 	TObjectPtr<UGameWidget> GameWidget;
 
 	void ShowWidget();
+
+	void SetUpgradeSlot(FString upgradeName, int32 upgradeCount);
 };

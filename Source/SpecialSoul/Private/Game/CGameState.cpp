@@ -81,6 +81,7 @@ void ACGameState::Tick(float DeltaSeconds)
 
 			if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
 			{
+				// (X=2064.554874,Y=-2316.554872,Z=115.000000)
 			}
 
 			if (CurStageTime >= StageTime)
@@ -96,6 +97,7 @@ void ACGameState::Tick(float DeltaSeconds)
 		++curLevel;
 		curExp -= ExpInfo.XP;
 		UpdateExpInfo(ExpInfo.ID + 1);
+		HUD->SetEXP(0, ExpInfo.XP);
 	}
 }
 
@@ -109,6 +111,7 @@ void ACGameState::PrintExpDataMap()
 void ACGameState::AddExp(const int32 exp)
 {
 	curExp += exp;
+	HUD->SetEXP(curExp, ExpInfo.XP);
 }
 
 void ACGameState::NextStage()

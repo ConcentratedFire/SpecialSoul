@@ -7,7 +7,34 @@
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Player/CYasuo.h"
+#include "Player/Jinx.h"
 #include "UI/SkillSlotWidget.h"
+#include "UI/UpgradeSlotWidget.h"
+
+UChampionStatusWidget::UChampionStatusWidget(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	// 생성자에서 아이콘 로드
+	ConstructorHelpers::FObjectFinder<UTexture2D> YasuoNormalWeaponIcon(TEXT("/Game/Asset/UI/Resource/YasuoNormalWeapon.YasuoNormalWeapon"));
+	ConstructorHelpers::FObjectFinder<UTexture2D> YasuoUpgradeWeaponIcon(TEXT("/Game/Asset/UI/Resource/YasuoUpgradeWeapon.YasuoUpgradeWeapon"));
+	ConstructorHelpers::FObjectFinder<UTexture2D> JinxNormalWeaponIcon(TEXT("/Game/Asset/UI/Resource/JinxNormalWeapon.JinxNormalWeapon"));
+	ConstructorHelpers::FObjectFinder<UTexture2D> JinxUpgradeWeaponIcon(TEXT("/Game/Asset/UI/Resource/JinxUpgradeWeapon.JinxUpgradeWeapon"));
+	ConstructorHelpers::FObjectFinder<UTexture2D> DamageIcon(TEXT("/Game/Asset/UI/Resource/DamageUpgrade.DamageUpgrade"));
+	ConstructorHelpers::FObjectFinder<UTexture2D> AbilityHasteIcon(TEXT("/Game/Asset/UI/Resource/CoolTimeUpgrade.CoolTimeUpgrade"));
+	ConstructorHelpers::FObjectFinder<UTexture2D> ProjectileIcon(TEXT("/Game/Asset/UI/Resource/ProjectileUpgrade.ProjectileUpgrade"));
+	ConstructorHelpers::FObjectFinder<UTexture2D> CritChanceIcon(TEXT("/Game/Asset/UI/Resource/CriticalUpgrade.CriticalUpgrade"));
+
+	if (YasuoNormalWeaponIcon.Succeeded()) UpgradeIcons.Add("YasuoNormalWeapon", YasuoNormalWeaponIcon.Object);
+	if (YasuoUpgradeWeaponIcon.Succeeded()) UpgradeIcons.Add("YasuoUpgradeWeapon", YasuoUpgradeWeaponIcon.Object);
+	if (JinxNormalWeaponIcon.Succeeded()) UpgradeIcons.Add("JinxNormalWeapon", JinxNormalWeaponIcon.Object);
+	if (JinxUpgradeWeaponIcon.Succeeded()) UpgradeIcons.Add("JinxUpgradeWeapon", JinxUpgradeWeaponIcon.Object);
+	
+	if (DamageIcon.Succeeded()) UpgradeIcons.Add("Damage", DamageIcon.Object);
+	if (AbilityHasteIcon.Succeeded()) UpgradeIcons.Add("AbilityHaste", AbilityHasteIcon.Object);
+	if (ProjectileIcon.Succeeded()) UpgradeIcons.Add("Projectiles", ProjectileIcon.Object);
+	if (CritChanceIcon.Succeeded()) UpgradeIcons.Add("CritChance", CritChanceIcon.Object);
+}
 
 void UChampionStatusWidget::NativeConstruct()
 {
@@ -26,6 +53,14 @@ void UChampionStatusWidget::NativeConstruct()
 	
 	SkillSlotMap.Add(ESkillKey::E, SkillSlot_E);
 	SkillSlotMap.Add(ESkillKey::R, SkillSlot_R);
+
+	UpgradeSlots.Add(WBP_UpgradeSlotWidget_0);
+	UpgradeSlots.Add(WBP_UpgradeSlotWidget_1);
+	UpgradeSlots.Add(WBP_UpgradeSlotWidget_2);
+	UpgradeSlots.Add(WBP_UpgradeSlotWidget_3);
+	UpgradeSlots.Add(WBP_UpgradeSlotWidget_4);
+	UpgradeSlots.Add(WBP_UpgradeSlotWidget_5);
+
 }
 
 void UChampionStatusWidget::UpdateSkillCoolTime(ESkillKey skillKey, FSkillCooltime cooltimeInfo)
@@ -96,4 +131,73 @@ void UChampionStatusWidget::SetPassiveImage(UObject* Object)
 void UChampionStatusWidget::SetPassiveText(int32 count)
 {
 	if (Text_KillCount) Text_KillCount->SetText(FText::AsNumber(count));
+}
+
+void UChampionStatusWidget::SetUpgradeSlot(FString upgradeName, int32 upgradeCount)
+{
+	if (upgradeName == "YasuoWeapon" )
+	{
+		Text_WeaponUpgradeCount->SetText(FText::FromString(FString::FromInt(upgradeCount)));
+		if (upgradeCount == 6)
+		{
+			UTexture2D* img = *UpgradeIcons.Find("YasuoUpgradeWeapon");
+			if (img)
+			{
+				Image_Weapon->SetBrushFromTexture(Cast<UTexture2D>(img), false);
+				//Image_Weapon->SetColorAndOpacity(FLinearColor(1,1,1,1)); 
+			}
+		}
+	}
+	else if (upgradeName == "JinxWeapon")
+	{
+		Text_WeaponUpgradeCount->SetText(FText::FromString(FString::FromInt(upgradeCount)));
+		if (upgradeCount == 6)
+		{
+			UTexture2D* img = *UpgradeIcons.Find("JinxUpgradeWeapon");
+			if (img)
+			{
+				Image_Weapon->SetBrushFromTexture(Cast<UTexture2D>(img), false);
+				//Image_Weapon->SetColorAndOpacity(FLinearColor(1,1,1,1)); 
+			}
+		}
+	}
+	else
+	{
+		if (!UpgradeCountSet.Find(upgradeName))
+		{
+			UpgradeCountSet.Add(upgradeName);
+			
+			UTexture2D* img = *UpgradeIcons.Find(upgradeName);
+			if (img)
+			{
+				UpgradeSlots[occupiedUpgradeSlotCount]->SetUpgradeCount(upgradeCount);
+				UpgradeSlots[occupiedUpgradeSlotCount]->SetImageIcon(img);
+				UpgradeSlotIndex.Add(upgradeName, occupiedUpgradeSlotCount);
+				occupiedUpgradeSlotCount++;
+			}
+		}
+		else
+		{
+			int32 slotIndex = UpgradeSlotIndex[upgradeName];
+			UpgradeSlots[slotIndex]->SetUpgradeCount(upgradeCount);
+		}
+	}
+}
+
+void UChampionStatusWidget::SetDefaultWeaponUI(ACBasePlayer* player)
+{
+	if (player->IsA<ACYasuo>())
+	{
+		UTexture2D* img = *UpgradeIcons.Find("YasuoNormalWeapon");
+		Image_Weapon->SetBrushFromTexture(Cast<UTexture2D>(img), false);
+		Image_Weapon->SetColorAndOpacity(FLinearColor(1,1,1,1)); 
+		Text_WeaponUpgradeCount->SetText(FText::FromString(FString::FromInt(1)));
+	}
+	else if (player->IsA<AJinx>())
+	{
+		UTexture2D* img = *UpgradeIcons.Find("JinxNormalWeapon");
+		Image_Weapon->SetBrushFromTexture(Cast<UTexture2D>(img), false);
+		Image_Weapon->SetColorAndOpacity(FLinearColor(1,1,1,1)); 
+		Text_WeaponUpgradeCount->SetText(FText::FromString(FString::FromInt(1)));
+	}
 }

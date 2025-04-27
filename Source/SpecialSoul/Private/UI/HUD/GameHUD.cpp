@@ -26,6 +26,12 @@ void AGameHUD::ShowWidget()
 		GameWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
+void AGameHUD::SetUpgradeSlot(FString upgradeName, int32 upgradeCount)
+{
+	if (GameWidget)
+		GameWidget->SetUpgradeSlot(upgradeName, upgradeCount);
+}
+
 void AGameHUD::SetHP(float HP, float MaxHP)
 {
 	if (GameWidget)
@@ -73,6 +79,12 @@ void AGameHUD::SetEXP(float exp, float maxExp)
 {
 	if (GameWidget)
 		GameWidget->SetEXP(exp, maxExp);
+}
+
+void AGameHUD::SetDefaultWeaponUI(ACBasePlayer* player)
+{
+	if (GameWidget)
+		GameWidget->SetDefaultWeaponUI(player);
 }
 
 void AGameHUD::SetKillScore(int32 KillScore)

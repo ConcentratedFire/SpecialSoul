@@ -13,5 +13,21 @@ UCLASS()
 class SPECIALSOUL_API UChampionStatWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	void SetDamageUpgrade(int32 damageUpgrade);
+	void SetCooltimeUpgrade(int32 cooltimeUpgrade);
+	void SetCriticalPercent(int32 criticalPercent);
+	void SetProjectileCount(int32 projectileCount);
+
+private:
 	
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* txt_DamageUpgrade;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* txt_CooltimeUpgrade;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* txt_CriticalPercent;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* txt_ProjectileCount;
 };

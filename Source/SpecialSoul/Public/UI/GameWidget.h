@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ChampionStatWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Player/Components/SkillComponent.h"
 #include "GameWidget.generated.h"
 
+class ACBasePlayer;
 enum class ESkillKey : uint8;
 /**
  * 
@@ -35,6 +37,16 @@ public:
 	void SetPassiveImage(UObject* Object);
 	void SetPassiveText(int32 count);
 
+public:
+	void SetUpgradeSlot(FString upgradeName, int32 upgradeCount);
+
+public:
+	void SetStat_DamageUpgrade(int32 damageUpgrade);
+	void SetStat_CooltimeUpgrade(int32 cooltimeUpgrade);
+	void SetStat_CriticalPercent(int32 criticalPercent);
+	void SetStat_ProjectileCount(int32 projectileCount);
+	void SetDefaultWeaponUI(ACBasePlayer* player);
+
 private:
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCKillScoreWidget* WBP_KillScore;
@@ -51,4 +63,3 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCMiniMapWidget* WBP_MiniMap;
 };
-

@@ -43,24 +43,17 @@ void AMainBoss::BeginPlay()
 	SkillComponent->SkillRangeMap.Add(ESkillKey::Attack, 500.f);
 	SkillComponent->SkillRangeMap.Add(ESkillKey::Q, 500.f);
 
-	// 임시 코드
-	MaxHP = 1000;
-
-	MyController = Cast<AMainBossController>(GetController());
-	MyController->SetActorTickEnabled(true);
 	GetCharacterMovement()->GravityScale = 1;
 	HP = MaxHP;
 
-	// if (auto ai = Cast<AAIController>(GetOwner()))
-	// 	ai->SetActorTickEnabled(true);
-	
 	StartFindingTarget();
+}
 
-	// FVector UpLocation = GetActorLocation();
-	// float halfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	// UpLocation.Z += halfHeight;
-	// SetActorLocation(UpLocation);
+void AMainBoss::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
 
+	MyController = Cast<AMainBossController>(NewController);
 }
 
 void AMainBoss::HandleDie()

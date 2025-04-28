@@ -73,8 +73,7 @@ void ACEnemyController::SetActorTickEnabled(bool bEnabled)
 {
 	Super::SetActorTickEnabled(bEnabled);
 
-	if (MyPawn->IsA(ACMeleeEnemy::StaticClass()) || MyPawn->IsA(ACMiddleBoss::StaticClass())
-			|| MyPawn->IsA(AMainBoss::StaticClass()))
+	if (MyPawn->IsA(ACMeleeEnemy::StaticClass()) || MyPawn->IsA(ACMiddleBoss::StaticClass()))
 	{
 		RunBehaviorTree(bEnabled ? BT_Enemy : nullptr);
 		bUsingBT = bEnabled;

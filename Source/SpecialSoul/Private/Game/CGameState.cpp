@@ -96,11 +96,12 @@ void ACGameState::Tick(float DeltaSeconds)
 				if (MainBossClass)
 				{
 					AMainBoss* SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
-					if (SpawnedBoss == nullptr)
-					{
+					if (SpawnedBoss)
+						--FinalBossCount;
+					else
 						UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
-					}
 				}
+				
 			}
 
 			if (CurStageTime >= StageTime)

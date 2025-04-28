@@ -18,5 +18,5 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;
 
-	
+	virtual void SetActorTickEnabled(bool bEnabled) override;
 };

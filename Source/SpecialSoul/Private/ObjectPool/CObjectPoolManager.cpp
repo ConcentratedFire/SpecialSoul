@@ -168,6 +168,7 @@ void ACObjectPoolManager::MagnetSpawn(FTransform SpawnTransform)
 
 void ACObjectPoolManager::RangedEnemyProjectileSpawn(FTransform SpawnTransform)
 {
+	//LOG_S(Error, TEXT("RangedEnemyProjectileSpawn"));
 	PlaceActorSetPlace(RangedEnemyProjectilePool, AppendRangedMinionProjectileSize, RangedEnemyProjectileActor,
 	                   SpawnTransform);
 }

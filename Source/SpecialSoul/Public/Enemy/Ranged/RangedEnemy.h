@@ -22,7 +22,7 @@ class SPECIALSOUL_API ARangedEnemy : public ABaseEnemy
 public:
 	ARangedEnemy();
 	virtual void Tick(float DeltaTime) override;
-
+virtual void SetActorHiddenInGame(bool bNewHidden) override;
 	virtual void DieEndAction() override;
 protected:
 	virtual void BeginPlay() override;

@@ -103,6 +103,9 @@ void ARangedEnemyProjectile::Tick(float DeltaTime)
 void ARangedEnemyProjectile::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
+
+	if (!HasAuthority()) return;
+	
 	if (bNewHidden) // 풀 넣기 전 초기화
 	{
 		ProjectileMovementComp->Deactivate();
@@ -125,10 +128,13 @@ void ARangedEnemyProjectile::SetActorHiddenInGame(bool bNewHidden)
 		TailVfx->SetVisibility(true);
 		TailVfx->SetHiddenInGame(false);
 	}
+	//LOG_S(Error, TEXT("%d"), bNewHidden);
 }
 
 void ARangedEnemyProjectile::OnDestroy()
 {
+	if (!HasAuthority()) return;
+	
 	if (!ObjectPoolManager)
 	{
 		Destroy();

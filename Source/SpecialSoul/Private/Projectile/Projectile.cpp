@@ -56,6 +56,7 @@ void AProjectile::Tick(float DeltaTime)
 
 void AProjectile::InitMoveComp()
 {
+	//LOG_S(Warning, TEXT("AProjectile::InitMoveComp"));
 	ProjectileMovementComp->InitialSpeed = 1500.f;
 	ProjectileMovementComp->MaxSpeed = 1500.f;
 	ProjectileMovementComp->ProjectileGravityScale = 0.f; // 직선운동

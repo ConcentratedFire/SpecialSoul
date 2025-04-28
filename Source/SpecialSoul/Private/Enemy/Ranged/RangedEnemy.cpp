@@ -1,6 +1,7 @@
 #include "Enemy/Ranged/RangedEnemy.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Enemy/EnemyAnimInstance.h"
 #include "Enemy/Components/EnemyFSMComponent.h"
 #include "Enemy/Ranged/RangedEnemyAIController.h"
 #include "ObjectPool/CObjectPoolManager.h"
@@ -39,6 +40,12 @@ ARangedEnemy::ARangedEnemy()
 void ARangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(0.f);
+		AnimInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+		GetMesh()->bPauseAnims = true;
+	}
 }
 
 void ARangedEnemy::FindTarget()
@@ -60,4 +67,23 @@ void ARangedEnemy::DieEndAction()
 void ARangedEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ARangedEnemy::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+	if (AnimInstance)
+	{
+		if (bNewHidden)
+		{
+			AnimInstance->StopAllMontages(0.f);
+			AnimInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+			GetMesh()->bPauseAnims = true;
+		}
+		else
+		{
+			GetMesh()->bPauseAnims = false;
+			AnimInstance->SetRootMotionMode(ERootMotionMode::RootMotionFromMontagesOnly);
+		}
+	}
 }

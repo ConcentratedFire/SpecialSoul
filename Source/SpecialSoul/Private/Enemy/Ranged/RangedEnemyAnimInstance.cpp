@@ -27,7 +27,7 @@ void URangedEnemyAnimInstance::AnimNotify_EnemyAttack()
 		UE_LOG(LogTemp, Warning, TEXT("OwnerEnemy->ProjectileActor is nulltpr..."));
 		return;
 	}
-	
+	//LOG_S(Warning, TEXT("AnimNotify_EnemyAttack"));
 	// 투사체 발사
 	FVector SpawnPoint = RangedEnemy->GetActorLocation();
 	SpawnPoint += RangedEnemy->GetActorForwardVector() * 30;

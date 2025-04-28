@@ -5,6 +5,7 @@
 
 #include "EngineUtils.h"
 #include "SpecialSoul.h"
+#include "Components/WidgetComponent.h"
 #include "Enemy/MainBoss/MainBoss.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,6 +13,7 @@
 #include "ObjectPool/CObjectPoolManager.h"
 #include "Player/CYasuo.h"
 #include "Player/Jinx.h"
+#include "UI/OverheadStatusWidget.h"
 #include "UI/HUD/GameHUD.h"
 #include "Utility/CDataSheetUtility.h"
 
@@ -117,7 +119,7 @@ void ACGameState::Tick(float DeltaSeconds)
 		++curLevel;
 		curExp -= ExpInfo.XP;
 		UpdateExpInfo(ExpInfo.ID + 1);
-		HUD->SetEXP(0, ExpInfo.XP);
+		UpdateExpUI();
 	}
 }
 
@@ -128,10 +130,32 @@ void ACGameState::PrintExpDataMap()
 		UpdateExpInfo(1);
 }
 
+void ACGameState::UpdateExpUI()
+{
+	if (IsValid(HUD))
+	{
+		HUD->SetEXP(curExp, ExpInfo.XP); // 리슨서버 직접 갱신
+	}
+	
+	if (HasAuthority())
+	{
+		for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			if (ACPlayerController* PC = Cast<ACPlayerController>(It->Get()))
+			{
+				if (!PC->IsLocalController()) //서버의 로컬컨트롤러 아니면 (즉, 클라들) 갱신
+				{
+					PC->CRPC_UpdateExpUI(curExp, ExpInfo.XP);
+				}
+			}
+		}
+	}
+}
+
 void ACGameState::AddExp(const int32 exp)
 {
 	curExp += exp;
-	HUD->SetEXP(curExp, ExpInfo.XP);
+	UpdateExpUI();
 }
 
 void ACGameState::NextStage()
@@ -171,9 +195,47 @@ void ACGameState::UpdateExpInfo(const int32 Level)
 
 	if (Level == 1) return;
 	LOG_S(Warning, TEXT("UpdateExpInfo : %d, %d"), ExpInfo.ID, ExpInfo.XP);
+
+	// 서버에서 모든 캐릭터를 갱신
 	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
 	{
 		(*It)->UpdatePlayerData(Level);
+	}
+
+	if (IsValid(HUD))
+	{
+		HUD->SetLevel(Level); // 리슨서버 직접 갱신
+	}
+	if (HasAuthority())
+	{
+		for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			if (ACPlayerController* PC = Cast<ACPlayerController>(It->Get()))
+			{
+				if (!PC->IsLocalController()) //서버의 로컬컨트롤러 아니면 (즉, 클라들) 갱신
+				{
+					PC->CRPC_UpdateLevelUI(Level);
+				}
+			}
+		}
+	}
+
+	MRPC_UpdateLevelUI(Level);
+}
+
+void ACGameState::MRPC_UpdateLevelUI_Implementation(int32 Level)
+{
+	// 모든 클라이언트에서 Overhead UI 갱신
+	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
+	{
+		ACBasePlayer* Player = *It;
+		if (Player/* && Player->IsLocallyControlled()*/)  // 각 클라이언트에서 갱신
+		{
+			if (auto OverheadUI = Cast<UOverheadStatusWidget>(Player->OverheadUIComp->GetWidget()))
+			{
+				OverheadUI->SetLevel(Level);  // 레벨 갱신
+			}
+		}
 	}
 }
 

@@ -73,6 +73,7 @@ public:
 
 	UFUNCTION()
 	void PrintExpDataMap();
+	void UpdateExpUI();
 	int32 GetCurLevel() const { return curLevel; }
 
 	void AddExp(const int32 exp);
@@ -95,6 +96,8 @@ private:
 
 	void UpdateExpInfo(int32 Level);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_UpdateLevelUI(int32 INT32);
 private:
 	UPROPERTY()
 	class AGameHUD* HUD;

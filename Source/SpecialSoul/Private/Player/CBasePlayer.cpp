@@ -267,6 +267,14 @@ void ACBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		OnInputBindingDel.Broadcast(input);
 }
 
+void ACBasePlayer::UpdateLevelUI(int32 Level)
+{
+	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+	{
+		overheadUI->SetLevel(Level);
+	}
+}
+
 void ACBasePlayer::UpdatePlayerData(const int32 PlayerLevel)
 {
 	// 이 함수를 호출하는 위치가 서버임

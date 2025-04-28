@@ -58,6 +58,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SRPC_UpgradeStat(const FString& statName);
 	
+	UFUNCTION(Client, Reliable)
+	void CRPC_UpdateExpUI(float Exp, float MaxExp);
+
+	UFUNCTION(Client, Reliable)
+	void CRPC_UpdateLevelUI(int32 PlayerLevel);
+	
 public:
 	UPROPERTY(Replicated)
 	bool bPlayYasuo = true;

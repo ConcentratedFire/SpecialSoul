@@ -27,12 +27,6 @@ void ACPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 	DOREPLIFETIME(ACPlayerController, bPlayYasuo);
 }
 
-void ACPlayerController::CRPC_UpdateUpgradeSlot_Implementation(const FString& StatName, int32 Grade)
-{
-	if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
-		hud->SetUpgradeSlot(StatName, Grade);
-}
-
 void ACPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -122,9 +116,46 @@ float ACPlayerController::CalcHaste(float CurHaste)
 	return MyPlayerState->CalcAbilityHaste(CurHaste);
 }
 
+void ACPlayerController::CRPC_UpdateLevelUI_Implementation(int32 PlayerLevel)
+{
+	if (!IsLocalController()) return;
+
+	if (auto gameHUD = Cast<AGameHUD>(GetHUD()))
+	{
+		gameHUD->SetLevel(PlayerLevel);
+	}
+	
+	
+	// if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+	// {
+	// 	overheadUI->SetLevel(PlayerLevel);
+	// }
+
+	// if (IsLocallyControlled())
+	// {
+	// 	if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
+	// 	{
+	// 		hud->SetLevel(PlayerLevel);
+	// 		hud->SetEXP(ExpPercentage, 100);
+	// 	}
+	// }
+}
+
+void ACPlayerController::CRPC_UpdateExpUI_Implementation(float Exp, float MaxExp)
+{
+	if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
+		hud->SetEXP(Exp, MaxExp);
+}
+
 void ACPlayerController::SRPC_UpgradeStat_Implementation(const FString& statName)
 {
 	MyPlayerState->UpgradeStat(statName);
+}
+
+void ACPlayerController::CRPC_UpdateUpgradeSlot_Implementation(const FString& StatName, int32 Grade)
+{
+	if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
+		hud->SetUpgradeSlot(StatName, Grade);
 }
 
 void ACPlayerController::SRPC_ReadyToPlay_Implementation()

@@ -15,6 +15,7 @@ void UMainBoss_Attack::UseSkill(ACharacter* Caster)
 	AMainBoss* mainBoss = Cast<AMainBoss>(Caster);
 	if (mainBoss)
 	{
+		mainBoss->Damage = AttackDamage;
 		mainBoss->HandleAttack();
 	}
 }

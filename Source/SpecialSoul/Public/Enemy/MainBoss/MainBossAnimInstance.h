@@ -18,7 +18,7 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	TObjectPtr<AMainBoss> OwnerMainBoss;
 
@@ -26,7 +26,9 @@ public:
 	bool bIsUlt {false}; // 궁 쓴 상태
 
 protected:
-	virtual void AnimNotify_EnemyAttack() override;
-
 	virtual void AnimNotify_DieEnd() override;
+	UFUNCTION()
+	void AnimNotify_BeginAttack();
+	UFUNCTION()
+	void AnimNotify_EndAttack();
 };

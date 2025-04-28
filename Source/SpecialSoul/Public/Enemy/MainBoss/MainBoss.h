@@ -6,6 +6,7 @@
 #include "Enemy/BaseEnemy.h"
 #include "MainBoss.generated.h"
 
+class UBoxComponent;
 class USkillComponent;
 /**
  * 
@@ -26,8 +27,22 @@ protected:
 	virtual void HandleDie() override;
 
 public:
+	UPROPERTY(EditDefaultsOnly, Category = Hitbox)
+	UBoxComponent* BladeHitbox;
+	//int32 curDarkinBladeComboCount;
+
 	UFUNCTION()
-	void PlayDarkinBladeMontage(float InPlayRate, FName SectionName);
+	void OnBladeHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
+	float Damage {100.f}; // 데미지
+	
+public:
+	UFUNCTION(Server, Reliable)
+	void SRPC_PlayDarkinBladeMontage(float InPlayRate, FName SectionName);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_PlayDarkinBladeMontage(float InPlayRate, FName SectionName);
 
 public: // ==== 몽타쥬 ===========
 	UPROPERTY(EditDefaultsOnly, Category = "MainBoss")

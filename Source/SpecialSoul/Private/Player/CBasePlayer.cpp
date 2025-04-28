@@ -589,7 +589,6 @@ void ACBasePlayer::DamageProcess(float damage)
 	if (HasAuthority())
 	{
 		HP -= damage; // SetHP setter 호출
-		//OnRep_HP();
 	}
 	else
 	{
@@ -601,22 +600,21 @@ void ACBasePlayer::OnRep_HP()
 {
 	if (HP <= 0.f) // 사망 처리
 	{
+		hp = 0.f;
 		bIsDead = true;
 	}
-	else
+	
+	if (IsLocallyControlled())
 	{
-		if (IsLocallyControlled())
+		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 		{
-			if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
-			{
-				hud->SetHP(HP, MaxHP);
-			}
+			hud->SetHP(HP, MaxHP);
 		}
-		
-		if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
-		{
-			overheadUI->SetHP(HP, MaxHP);
-		}
+	}
+	
+	if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
+	{
+		overheadUI->SetHP(HP, MaxHP);
 	}
 }
 

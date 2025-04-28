@@ -1,6 +1,7 @@
 #include "Enemy/MainBoss/MainBoss.h"
 
 #include "BehaviorTree/BehaviorTreeComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Enemy/MainBoss/MainBossController.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -25,9 +26,21 @@ AMainBoss::AMainBoss()
 	TEXT("/Script/Engine.AnimMontage'/Game/Enemy/MainBoss/Anim/AM_MainBoss_DarkinBlade.AM_MainBoss_DarkinBlade'"));
 	if (tmpMontage.Succeeded())
 		DarkinBlade_Montage = tmpMontage.Object;
-
+ 
 	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 	MoveDistance = 400.f;
+
+	// 칼 히트박스
+	BladeHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("BladeHitbox"));
+	BladeHitbox->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_Blade5"));
+	BladeHitbox->SetRelativeLocation(FVector(-2000, 0, 0));
+	BladeHitbox->SetBoxExtent(FVector(7000, 4000, 2000));
+	BladeHitbox->SetCollisionProfileName("Enemy");
+	BladeHitbox->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECR_Overlap);
+	BladeHitbox->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECR_Ignore); 
+	if (HasAuthority()) 
+		BladeHitbox->OnComponentBeginOverlap.AddDynamic(this, &AMainBoss::OnBladeHitboxOverlap);
+	BladeHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AMainBoss::BeginPlay()
@@ -67,9 +80,24 @@ void AMainBoss::HandleDie()
 	
 }
 
-void AMainBoss::PlayDarkinBladeMontage(float InPlayRate, FName SectionName)
+void AMainBoss::OnBladeHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Log, TEXT("%s"), *(OtherActor->GetName()));
+	if (auto player = Cast<ACBasePlayer>(OtherActor))
+	{
+		player->DamageProcess(Damage);
+	}
+}
+
+void AMainBoss::SRPC_PlayDarkinBladeMontage_Implementation(float InPlayRate, FName SectionName)
 {
 	// Attack0 .. Attack2
+	MRPC_PlayDarkinBladeMontage(InPlayRate, SectionName);
+}
+
+void AMainBoss::MRPC_PlayDarkinBladeMontage_Implementation(float InPlayRate, FName SectionName)
+{
 	PlayAnimMontage(DarkinBlade_Montage, InPlayRate, SectionName);
 }
 
@@ -111,6 +139,7 @@ void AMainBoss::ChangePhase()
 void AMainBoss::DieEndAction()
 {
 	// TODO : 미션 클리어 && 게임 종료
+	
 }
 
 void AMainBoss::ResetLeftCooltime_DarkinBlade()

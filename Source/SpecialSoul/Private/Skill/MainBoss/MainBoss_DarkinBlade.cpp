@@ -18,10 +18,11 @@ void UMainBoss_DarkinBlade::UseSkill(ACharacter* Caster)
 	AMainBoss* mainBoss = Cast<AMainBoss>(Caster);
 	if (mainBoss)
 	{
-		mainBoss->PlayDarkinBladeMontage(0.7f, *FString::Printf(TEXT("Attack%d"), ComboCount));
-		UE_LOG(LogTemp, Warning,  TEXT("Attack%d"), ComboCount);
-		ComboCount = (ComboCount+1) % 3;
+		mainBoss->SRPC_PlayDarkinBladeMontage(0.7f, *FString::Printf(TEXT("Attack%d"), ComboCount));
+		mainBoss->Damage = Damages[ComboCount]; 
+		//UE_LOG(LogTemp, Warning,  TEXT("Attack%d"), ComboCount);
 
+		ComboCount = (ComboCount+1) % 3;
 		if (ComboCount == 0)
 		{
 			mainBoss->ResetLeftCooltime_DarkinBlade();

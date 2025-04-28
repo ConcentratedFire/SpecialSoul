@@ -18,6 +18,7 @@ public:
 	virtual void UseSkill(ACharacter* Caster) override;
 
 	int32 ComboCount {0};
+	TArray<float> Damages {120, 150, 200};
 
 	// VFX
 

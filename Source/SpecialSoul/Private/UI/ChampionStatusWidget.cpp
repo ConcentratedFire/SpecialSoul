@@ -140,11 +140,12 @@ void UChampionStatusWidget::SetUpgradeSlot(FString upgradeName, int32 upgradeCou
 		Text_WeaponUpgradeCount->SetText(FText::FromString(FString::FromInt(upgradeCount)));
 		if (upgradeCount == 6)
 		{
-			UTexture2D* img = *UpgradeIcons.Find("YasuoUpgradeWeapon");
-			if (img)
+			if (UTexture2D** imgPtr = UpgradeIcons.Find("YasuoUpgradeWeapon"))
 			{
-				Image_Weapon->SetBrushFromTexture(Cast<UTexture2D>(img), false);
-				//Image_Weapon->SetColorAndOpacity(FLinearColor(1,1,1,1)); 
+				if (*imgPtr)
+				{
+					Image_Weapon->SetBrushFromTexture(*imgPtr, false);
+				}
 			}
 		}
 	}
@@ -153,11 +154,12 @@ void UChampionStatusWidget::SetUpgradeSlot(FString upgradeName, int32 upgradeCou
 		Text_WeaponUpgradeCount->SetText(FText::FromString(FString::FromInt(upgradeCount)));
 		if (upgradeCount == 6)
 		{
-			UTexture2D* img = *UpgradeIcons.Find("JinxUpgradeWeapon");
-			if (img)
+			if (UTexture2D** imgPtr = UpgradeIcons.Find("JinxUpgradeWeapon"))
 			{
-				Image_Weapon->SetBrushFromTexture(Cast<UTexture2D>(img), false);
-				//Image_Weapon->SetColorAndOpacity(FLinearColor(1,1,1,1)); 
+				if (*imgPtr)
+				{
+					Image_Weapon->SetBrushFromTexture(*imgPtr, false);
+				}
 			}
 		}
 	}
@@ -167,19 +169,45 @@ void UChampionStatusWidget::SetUpgradeSlot(FString upgradeName, int32 upgradeCou
 		{
 			UpgradeCountSet.Add(upgradeName);
 			
-			UTexture2D* img = *UpgradeIcons.Find(upgradeName);
-			if (img)
+			if (UTexture2D** imgPtr = UpgradeIcons.Find(upgradeName))
 			{
-				UpgradeSlots[occupiedUpgradeSlotCount]->SetUpgradeCount(upgradeCount);
-				UpgradeSlots[occupiedUpgradeSlotCount]->SetImageIcon(img);
-				UpgradeSlotIndex.Add(upgradeName, occupiedUpgradeSlotCount);
-				occupiedUpgradeSlotCount++;
+				if (*imgPtr)
+				{
+					if (UpgradeSlots.IsValidIndex(occupiedUpgradeSlotCount))
+					{
+						UpgradeSlots[occupiedUpgradeSlotCount]->SetUpgradeCount(upgradeCount);
+						UpgradeSlots[occupiedUpgradeSlotCount]->SetImageIcon(*imgPtr);
+						UpgradeSlotIndex.Add(upgradeName, occupiedUpgradeSlotCount);
+						occupiedUpgradeSlotCount++;
+					}
+					else
+					{
+						LOG_S(Error, TEXT("UpgradeSlots out of range! occupiedUpgradeSlotCount: %d"), occupiedUpgradeSlotCount);
+					}
+				}
+				else
+				{
+					LOG_S(Error, TEXT("UpgradeIcons image pointer is null for key: %s"), *upgradeName);
+				}
 			}
 		}
 		else
 		{
-			int32 slotIndex = UpgradeSlotIndex[upgradeName];
-			UpgradeSlots[slotIndex]->SetUpgradeCount(upgradeCount);
+			if (int32* slotIndexPtr = UpgradeSlotIndex.Find(upgradeName))
+			{
+				if (UpgradeSlots.IsValidIndex(*slotIndexPtr))
+				{
+					UpgradeSlots[*slotIndexPtr]->SetUpgradeCount(upgradeCount);
+				}
+				else
+				{
+					LOG_S(Error, TEXT("Invalid UpgradeSlotIndex for key: %s"), *upgradeName);
+				}
+			}
+			else
+			{
+				LOG_S(Error, TEXT("UpgradeSlotIndex missing key: %s"), *upgradeName);
+			}
 		}
 	}
 }

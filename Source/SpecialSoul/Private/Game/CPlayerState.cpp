@@ -127,72 +127,96 @@ TArray<FString> ACPlayerState::ChooseUpgradeCardList()
 
 void ACPlayerState::UpgradeStat(const FString& statName)
 {
+	if (!IsValid(Player))
+	{
+		LOG_S(Error, TEXT("Player is INVALID in UpgradeStat!"));
+		return;
+	}
+
 	LOG_S(Warning, TEXT("UpgradeStat : %s"), *statName);
+
+	bool bNeedHUDUpdate = false;
+	int32 NewGrade = 0;
+
 	if (statName == "Weapon")
 	{
 		++CurWeaponGrade;
-		Player->UpgradeWeapon(CurWeaponGrade); // 플레이어 공통 함수를 통해서 업그레이드 처리
+		Player->UpgradeWeapon(CurWeaponGrade);
+		NewGrade = CurWeaponGrade;
+		bNeedHUDUpdate = true;
+
 		if (IsMaxUpgrade_Weapon())
 		{
 			RemoveArrayElement(statName);
 		}
-
-		if (HUD)
-		{
-			if (Player->IsA<ACYasuo>())
-			{
-				HUD->SetUpgradeSlot("YasuoWeapon", CurWeaponGrade);
-			}
-			else if (Player->IsA<AJinx>())
-			{
-				HUD->SetUpgradeSlot("JinxWeapon", CurWeaponGrade);
-			}
-		}
-			
 	}
 	else if (statName == "Damage")
 	{
 		++CurDamageGrade;
+		NewGrade = CurDamageGrade;
+		bNeedHUDUpdate = true;
+
 		if (IsMaxUpgrade_Damage())
 		{
 			RemoveArrayElement(statName);
 		}
-		if (HUD)
-			HUD->SetUpgradeSlot(statName, CurDamageGrade);
 	}
 	else if (statName == "AbilityHaste")
 	{
 		++CurAbilityHasteGrade;
+		NewGrade = CurAbilityHasteGrade;
+		bNeedHUDUpdate = true;
+
 		if (IsMaxUpgrade_AbilityHaste())
 		{
 			RemoveArrayElement(statName);
 		}
-		if (HUD)
-			HUD->SetUpgradeSlot(statName, CurAbilityHasteGrade);
 	}
 	else if (statName == "Projectiles")
 	{
 		++CurProjectilesGrade;
+		NewGrade = CurProjectilesGrade;
+		bNeedHUDUpdate = true;
+
 		if (IsMaxUpgrade_Projectile())
 		{
 			RemoveArrayElement(statName);
 		}
-		if (HUD)
-			HUD->SetUpgradeSlot(statName, CurProjectilesGrade);
 	}
 	else if (statName == "CritChance")
 	{
 		++CurCritChanceGrade;
+		NewGrade = CurCritChanceGrade;
+		bNeedHUDUpdate = true;
+
 		if (IsMaxUpgrade_CritChance())
 		{
 			RemoveArrayElement(statName);
 		}
-		if (HUD)
-			HUD->SetUpgradeSlot(statName, CurCritChanceGrade);
 	}
 
+	// 여기까지 서버에서 상태 업데이트 완료
 	Player->EndUpgrade();
+
+	// HUD 갱신은 클라이언트 RPC
+	if (bNeedHUDUpdate && GetPlayerController())
+	{
+		ACPlayerController* pc = Cast<ACPlayerController>(GetPlayerController());
+		if (pc)
+		{
+			if (statName == "Weapon")
+			{
+				if (Player->IsA<ACYasuo>())
+					pc->CRPC_UpdateUpgradeSlot("YasuoWeapon", NewGrade);
+				else if (Player->IsA<AJinx>())
+					pc->CRPC_UpdateUpgradeSlot("JinxWeapon", NewGrade);
+			}
+			else
+				pc->CRPC_UpdateUpgradeSlot(statName, NewGrade);
+		}
+	}
 }
+
 
 bool ACPlayerState::IsMaxUpgrade_Weapon()
 {

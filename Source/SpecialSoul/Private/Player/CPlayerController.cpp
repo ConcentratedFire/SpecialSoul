@@ -27,6 +27,12 @@ void ACPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 	DOREPLIFETIME(ACPlayerController, bPlayYasuo);
 }
 
+void ACPlayerController::CRPC_UpdateUpgradeSlot_Implementation(const FString& StatName, int32 Grade)
+{
+	if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
+		hud->SetUpgradeSlot(StatName, Grade);
+}
+
 void ACPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

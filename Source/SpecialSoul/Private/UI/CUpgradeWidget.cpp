@@ -8,6 +8,7 @@
 #include "Game/CPlayerState.h"
 #include "Player/CBasePlayer.h"
 #include "Player/CPlayerController.h"
+#include "UI/HUD/GameHUD.h"
 
 void UCUpgradeWidget::NativeConstruct()
 {

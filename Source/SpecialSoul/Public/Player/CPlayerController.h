@@ -26,7 +26,10 @@ public:
 	class UCSelectUpgradeWidget* SelectUpgradeWidget;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
+	UFUNCTION(Client, Reliable)
+	void CRPC_UpdateUpgradeSlot(const FString& StatName, int32 Grade);
+
 private:
 	ACPlayerController();
 
@@ -54,7 +57,7 @@ public:
 public:
 	UFUNCTION(Server, Reliable)
 	void SRPC_UpgradeStat(const FString& statName);
-
+	
 public:
 	UPROPERTY(Replicated)
 	bool bPlayYasuo = true;

@@ -44,10 +44,14 @@ AMegaRocketBullet::AMegaRocketBullet()
 void AMegaRocketBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	InitMoveComp();
-	StartLocation  = GetActorLocation();
+
 	if (!HasAuthority())
 		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	else
+	{
+		InitMoveComp();
+		StartLocation  = GetActorLocation();
+	}
 }
 
 

@@ -40,11 +40,14 @@ AMinigunBullet::AMinigunBullet()
 void AMinigunBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	InitMoveComp();
-	StartLocation  = GetActorLocation();
 
 	if (!HasAuthority())
 		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	else
+	{
+		InitMoveComp();
+		StartLocation  = GetActorLocation();
+	}
 }
 
 void AMinigunBullet::Tick(float DeltaSeconds)

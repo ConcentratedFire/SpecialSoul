@@ -32,7 +32,6 @@ AMainBoss::AMainBoss()
 
 	// 칼 히트박스
 	BladeHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("BladeHitbox"));
-	BladeHitbox->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_Blade5"));
 	BladeHitbox->SetRelativeLocation(FVector(-2000, 0, 0));
 	BladeHitbox->SetBoxExtent(FVector(7000, 4000, 2000));
 	BladeHitbox->SetCollisionProfileName("Enemy");
@@ -46,6 +45,8 @@ AMainBoss::AMainBoss()
 void AMainBoss::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	BladeHitbox->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_Blade5"));
 	
 	SkillComponent->BindSkill(ESkillKey::Attack, NewObject<UMainBoss_Attack>());
 	SkillComponent->BindSkill(ESkillKey::Q, NewObject<UMainBoss_DarkinBlade>());

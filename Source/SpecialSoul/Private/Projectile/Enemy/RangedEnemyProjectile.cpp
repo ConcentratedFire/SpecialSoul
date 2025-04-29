@@ -21,9 +21,16 @@ ARangedEnemyProjectile::ARangedEnemyProjectile()
 		MeshComp->SetStaticMesh(TempMesh.Object);
 		MeshComp->SetVisibility(false);
 		if (HasAuthority())
+		{
 			MeshComp->SetCollisionProfileName("Enemy");
+			MeshComp->SetNotifyRigidBodyCollision(true);
+		}
 		else
 			MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+		
+		MeshComp->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap); // Player
+		MeshComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore); // PlayerAttack
+		MeshComp->SetCollisionResponseToChannel(ECC_GameTraceChannel5, ECR_Overlap); // Level
 	}
 
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempTailVfx(TEXT("/Script/Niagara.NiagaraSystem'/Game/Asset/RangeMinion/NS_RangedEnemy_Attack.NS_RangedEnemy_Attack'"));
@@ -31,10 +38,12 @@ ARangedEnemyProjectile::ARangedEnemyProjectile()
 	{
 		TailVfxAsset = TempTailVfx.Object;
 		TailVfx->SetAsset(TailVfxAsset);
-		TailVfx->bAutoActivate = false;
-		TailVfx->SetVisibility(false);
-		TailVfx->SetHiddenInGame(true);
-		TailVfx->SetActive(false);
+		TailVfx->bAutoActivate = true;
+		TailVfx->Activate();
+		TailVfx->SetActive(true);
+		// TailVfx->SetVisibility(false);
+		// TailVfx->SetHiddenInGame(true);
+		// TailVfx->Deactivate();
 	}
 
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempHitVfx(TEXT("/Script/Niagara.NiagaraSystem'/Game/Asset/Jinx/VFX/Particles/Projectiles/Hits/NS_RangedEnemy_Attack_Hit.NS_RangedEnemy_Attack_Hit'"));
@@ -104,7 +113,7 @@ void ARangedEnemyProjectile::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
 
-	if (!HasAuthority()) return;
+	//if (!HasAuthority()) return;
 	
 	if (bNewHidden) // 풀 넣기 전 초기화
 	{
@@ -113,6 +122,7 @@ void ARangedEnemyProjectile::SetActorHiddenInGame(bool bNewHidden)
 		ProjectileMovementComp->StopMovementImmediately();
 		
 		TailVfx->Deactivate();
+		TailVfx->SetActive(false);
 		TailVfx->SetVisibility(false);
 		TailVfx->SetHiddenInGame(true);
 	}
@@ -125,6 +135,7 @@ void ARangedEnemyProjectile::SetActorHiddenInGame(bool bNewHidden)
 		ProjectileMovementComp->Velocity = GetActorForwardVector() * ProjectileMovementComp->InitialSpeed;
 
 		TailVfx->Activate();
+		TailVfx->SetActive(true);
 		TailVfx->SetVisibility(true);
 		TailVfx->SetHiddenInGame(false);
 	}

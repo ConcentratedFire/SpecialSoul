@@ -33,7 +33,7 @@ AProjectile::AProjectile()
 	//  이벤트 세팅
 	if (HasAuthority())
 	{
-		MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::Hit);
+		MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnOverlap);
 	}
 }
 
@@ -66,7 +66,7 @@ void AProjectile::InitMoveComp()
 	ProjectileMovementComp->Activate(true);
 }
 
-void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+void AProjectile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                       int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (HitVfxAsset)
@@ -103,7 +103,7 @@ void AProjectile::Hit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 			//UE_LOG(LogTemp, Error, TEXT("hitResults.Num() = %d"), hitResults.Num());
 			FVector hitLocation = hitResult.ImpactPoint; // 충돌지점
 
-			DrawDebugSphere(GetWorld(), hitLocation, ExplosionRadius, 20, FColor::Yellow, false, 0.1f);
+			// DrawDebugSphere(GetWorld(), hitLocation, ExplosionRadius, 20, FColor::Yellow, false, 0.1f);
 			
 			AActor* hitActor = hitResult.GetActor();
 			if (auto Enemy = Cast<ABaseEnemy>(hitActor))

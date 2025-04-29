@@ -8,6 +8,7 @@
 #include "CGameState.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FNextStage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMainBossSpawn);
 
 USTRUCT(BlueprintType)
 struct FEXPData // 레벨업에 필요한 경험치 테이블
@@ -70,7 +71,8 @@ public:
 	TMap<int32, FEXPData> EXPDataMap;
 
 	FNextStage OnNextStage;
-
+	FOnMainBossSpawn OnMainBossSpawn;
+	
 	UFUNCTION()
 	void PrintExpDataMap();
 	void UpdateExpUI();
@@ -122,4 +124,14 @@ public:
 private:
 	UPROPERTY(EditAnywhere, Category = "MainBoss")
 	TSubclassOf<AActor> MainBossClass;
+
+	bool bMainBossSpawned {false};
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_ShowMainBossUI(AMainBoss* spawnedBoss);
+
+	UFUNCTION()
+	void OnMainBossDie();
+	void SpawnMainBoss(int32& finalBossCount);
+	
 };

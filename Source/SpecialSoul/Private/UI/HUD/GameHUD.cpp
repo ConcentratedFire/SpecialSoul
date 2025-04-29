@@ -87,6 +87,18 @@ void AGameHUD::SetDefaultWeaponUI(ACBasePlayer* player)
 		GameWidget->SetDefaultWeaponUI(player);
 }
 
+void AGameHUD::SetBossHPBarPercent(float hpPercent)
+{
+	if (GameWidget)
+		GameWidget->SetBossHPBar(hpPercent);
+}
+
+void AGameHUD::ShowBossUI(AMainBoss* mainBoss, bool bShow)
+{
+	if (GameWidget)
+		GameWidget->ShowBossUI(mainBoss, bShow);
+}
+
 void AGameHUD::SetKillScore(int32 KillScore)
 {
 	if (GameWidget)

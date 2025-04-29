@@ -6,9 +6,11 @@
 #include "Enemy/MainBoss/MainBossController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/CBasePlayer.h"
+#include "Player/CPlayerController.h"
 #include "Player/Components/SkillComponent.h"
 #include "Skill/MainBoss/MainBoss_Attack.h"
 #include "Skill/MainBoss/MainBoss_DarkinBlade.h"
+#include "UI/HUD/GameHUD.h"
 
 AMainBoss::AMainBoss()
 {
@@ -29,6 +31,8 @@ AMainBoss::AMainBoss()
  
 	SkillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("SkillComponent"));
 	MoveDistance = 400.f;
+	GetCapsuleComponent()->SetCapsuleRadius(67.f);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel7, ECR_Ignore); // WindWall
 
 	// 칼 히트박스
 	BladeHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("BladeHitbox"));
@@ -75,14 +79,23 @@ void AMainBoss::HandleDie()
 	Super::HandleDie();
 	MyController->SetActorTickEnabled(false);
 
-	// BT 중단
+	 // BT 중단
 	auto btComp = Cast<UBehaviorTreeComponent>(MyController->GetComponentByClass(UBehaviorTreeComponent::StaticClass()));
 	btComp->StopTree(EBTStopMode::Safe);
-	
+
+	 // 이동 중단
+	AMainBossController* mbController = Cast<AMainBossController>(GetOwner());
+	if (mbController)
+		mbController->StopMovement();
+
+	 // 충돌 설정
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore); // PlayerAttack
+
+	OnMainBossDie.Broadcast();
 }
 
 void AMainBoss::OnBladeHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Log, TEXT("%s"), *(OtherActor->GetName()));
 	if (auto player = Cast<ACBasePlayer>(OtherActor))
@@ -102,32 +115,32 @@ void AMainBoss::MRPC_PlayDarkinBladeMontage_Implementation(float InPlayRate, FNa
 	PlayAnimMontage(DarkinBlade_Montage, InPlayRate, SectionName);
 }
 
+void AMainBoss::MRPC_UpdateMainBossHPBar_Implementation()
+{
+	auto pc = GetWorld()->GetFirstPlayerController();
+	if (!pc) return;
+	if (!pc->IsLocalController()) return;
+
+	if (auto myPC = Cast<ACPlayerController>(pc))
+	{
+		LOG_S(Log, TEXT("MRPC_UpdateMainBossHPBar %d/%d"), HP, MaxHP);
+		myPC->SetBossHPPercent(static_cast<float>(HP)/MaxHP);
+	}
+}
+
 void AMainBoss::MyDamage(int32 DamageAmount)
 {
-	HP -= DamageAmount;
-	// LOG_S(Warning, TEXT("Name:%s, HP : %d"), *GetName(), HP);
+	if (!HasAuthority()) return; // 서버에서만 데미지 처리
 	
+	HP -= DamageAmount;
 	if (HP <= 0)
 	{
-		if (!bIsUlt)
-		{
-			HP = 1;
-			ChangePhase();
-
-		}
-		else
-		{
-			// 사망 + 게임종료
-			bIsDead = true;
-			AMainBossController* mbController = Cast<AMainBossController>(GetOwner());
-			if (mbController)
-				mbController->StopMovement();
-			
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore); // PlayerAttack
-
-			HandleDie(); // 사망 애니메이션 
-		}
+		HP = 0.f;
+		
+		bIsDead = true;
+		HandleDie(); 
 	}
+	MRPC_UpdateMainBossHPBar();
 }
 
 void AMainBoss::ChangePhase()

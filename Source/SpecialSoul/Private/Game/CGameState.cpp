@@ -90,20 +90,8 @@ void ACGameState::Tick(float DeltaSeconds)
 
 			if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
 			{
-				// 스폰
-				FVector SpawnLocation(2064.554874f, -2316.554872f, 115.0f);
-				FRotator SpawnRotation(0.0f, 0.0f, 0.0f); // 기본 회전
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-				if (MainBossClass)
-				{
-					AMainBoss* SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
-					if (SpawnedBoss)
-						--FinalBossCount;
-					else
-						UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
-				}
-				
+				if (!bMainBossSpawned)
+					SpawnMainBoss(FinalBossCount);
 			}
 
 			if (CurStageTime >= StageTime)
@@ -260,4 +248,53 @@ void ACGameState::OnRep_UpgradeSelectPlayerCount()
 		(*It)->SRPC_UnPause();
 	}
 	UpgradeSelectPlayerCount = 0;
+}
+
+
+void ACGameState::SpawnMainBoss(int32& finalBossCount)
+{
+	if (bMainBossSpawned) return;
+	
+	FVector SpawnLocation(2064.554874f, -2316.554872f, 115.0f);
+	FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	if (MainBossClass)
+	{
+		AMainBoss* SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
+		if (SpawnedBoss)
+		{
+			--FinalBossCount;
+			bMainBossSpawned = true;
+
+			MRPC_ShowMainBossUI(SpawnedBoss);
+			SpawnedBoss->OnMainBossDie.AddDynamic(this, &ACGameState::OnMainBossDie);
+		}
+		else
+			UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
+	}
+}
+
+void ACGameState::OnMainBossDie()
+{
+	// 천천히 시간 늦추기
+	
+	// n초 후에 게임종료 UI 띄우기
+}
+
+
+// 모든 클라가 메인보스 UI를 띄우도록 요청한다
+void ACGameState::MRPC_ShowMainBossUI_Implementation(AMainBoss* spawnedBoss)
+{
+	auto pc = GetWorld()->GetFirstPlayerController();
+	if (!pc) return;
+	if (!pc->IsLocalController()) return;
+
+	if (auto myPC = Cast<ACPlayerController>(pc))
+	{
+		LOG_S(Log, TEXT("MRPC_ShowMainBossUI"));
+		
+		myPC->ShowBossUI(spawnedBoss, true);
+		myPC->SetBossHPPercent(1.f); // progress bar 꽉 채우기
+	}
 }

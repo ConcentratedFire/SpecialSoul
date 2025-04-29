@@ -11,6 +11,10 @@ class USkillComponent;
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMainBossDie);
+
+
 UCLASS()
 class SPECIALSOUL_API AMainBoss : public ABaseEnemy
 {
@@ -25,8 +29,10 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HandleDie() override;
-
+	
 public:
+	FOnMainBossDie OnMainBossDie;
+	
 	UPROPERTY(EditDefaultsOnly, Category = Hitbox)
 	UBoxComponent* BladeHitbox;
 	//int32 curDarkinBladeComboCount;
@@ -51,6 +57,8 @@ public: // ==== 몽타쥬 ===========
 	UPROPERTY(VisibleAnywhere, Category = "MainBoss")
 	TObjectPtr<USkillComponent> SkillComponent;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_UpdateMainBossHPBar();
 	virtual void MyDamage(int32 DamageAmount) override;
 	
 	void ChangePhase();

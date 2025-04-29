@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enemy/MainBoss/MainBoss.h"
 #include "GameFramework/PlayerController.h"
 #include "CPlayerController.generated.h"
 
@@ -29,6 +30,9 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void CRPC_UpdateUpgradeSlot(const FString& StatName, int32 Grade);
+	
+	void ShowBossUI(AMainBoss* mainBoss, bool bShow);
+	void SetBossHPPercent(float percent);
 
 private:
 	ACPlayerController();

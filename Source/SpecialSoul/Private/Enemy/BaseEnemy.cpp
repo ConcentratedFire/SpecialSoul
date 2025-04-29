@@ -146,6 +146,7 @@ void ABaseEnemy::ResetEnemy()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
 }
 
+
 void ABaseEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (!HasAuthority()) return;

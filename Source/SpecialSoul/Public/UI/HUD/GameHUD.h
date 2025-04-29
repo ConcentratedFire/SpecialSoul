@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enemy/MainBoss/MainBoss.h"
 #include "GameFramework/HUD.h"
 #include "Player/CBasePlayer.h"
 #include "Player/Components/SkillComponent.h"
@@ -39,6 +40,8 @@ public:
 	void SetEnergy(float energy, float maxEnergy);
 	void SetEXP(float exp, float maxExp);
 	void SetDefaultWeaponUI(ACBasePlayer* player);
+	void SetBossHPBarPercent(float GetHpPercent);
+	void ShowBossUI(AMainBoss* mainBoss, bool bShow);
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameWidget> GameWidgetClass;

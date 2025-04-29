@@ -3,6 +3,7 @@
 
 #include "UI/GameWidget.h"
 
+#include "UI/BossWidget.h"
 #include "UI/ChampionStatusWidget.h"
 #include "UI/OverheadStatusWidget.h"
 #include "UI/HUD/CKillScoreWidget.h"
@@ -103,6 +104,18 @@ void UGameWidget::SetDefaultWeaponUI(ACBasePlayer* player)
 {
 	if (WBP_ChampionStatusWidget)
 		WBP_ChampionStatusWidget->SetDefaultWeaponUI(player);
+}
+
+void UGameWidget::SetBossHPBar(float hpPercent)
+{
+	if (WBP_BossWidget)
+		WBP_BossWidget->SetHPBar(hpPercent);
+}
+
+void UGameWidget::ShowBossUI(AMainBoss* mainBoss, bool bShow)
+{
+	if (WBP_BossWidget)
+		WBP_BossWidget->ShowBossUI(mainBoss, bShow);
 }
 
 

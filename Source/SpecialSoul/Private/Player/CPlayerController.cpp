@@ -15,6 +15,7 @@
 #include "UI/HUD/GameHUD.h"
 #include "UI/Standby/CStandbyWidget.h"
 
+
 ACPlayerController::ACPlayerController()
 {
 	bShowMouseCursor = true;
@@ -205,6 +206,20 @@ void ACPlayerController::MRPC_PlayGame_Implementation()
 }
 
 void ACPlayerController::UpdateStatUI()
+{}
+
+void ACPlayerController::ShowBossUI(AMainBoss* mainBoss, bool bShow)
 {
-	
+	if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
+	{
+		hud->ShowBossUI(mainBoss, bShow);
+	}
+}
+
+void ACPlayerController::SetBossHPPercent(float percent)
+{
+	if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
+	{
+		hud->SetBossHPBarPercent(percent);
+	}
 }

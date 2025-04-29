@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ChampionStatWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Enemy/MainBoss/MainBoss.h"
 #include "Player/Components/SkillComponent.h"
 #include "GameWidget.generated.h"
 
@@ -46,6 +47,8 @@ public:
 	void SetStat_CriticalPercent(int32 criticalPercent);
 	void SetStat_ProjectileCount(int32 projectileCount);
 	void SetDefaultWeaponUI(ACBasePlayer* player);
+	void SetBossHPBar(float hpPercent);
+	void ShowBossUI(AMainBoss* mainBoss, bool bShow);
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
@@ -62,4 +65,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
 	class UCMiniMapWidget* WBP_MiniMap;
+
+	UPROPERTY(EditDefaultsOnly, meta=(bindwidget))
+	class UBossWidget* WBP_BossWidget;
 };

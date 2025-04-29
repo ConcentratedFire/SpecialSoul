@@ -2,12 +2,26 @@
 
 
 #include "Enemy/AttackActors/CMiddleBossBullet.h"
+
+#include "Components/SphereComponent.h"
+#include "GameFramework/DefaultPawn.h"
 #include "ObjectPool/CObjectPoolManager.h"
 
 // Sets default values
 ACMiddleBossBullet::ACMiddleBossBullet()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ACMiddleBossBullet::OnMyOverlap);
+	SphereComp->SetSphereRadius(55.f);
+	SphereComp->SetCollisionProfileName(FName("Enemy"));
+
+	SphereComp->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+	SphereComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+	SphereComp->SetCollisionResponseToChannel(ECC_GameTraceChannel7, ECR_Overlap);
+	RootComponent = SphereComp;
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -37,6 +51,7 @@ void ACMiddleBossBullet::SetActorHiddenInGame(bool bNewHidden)
 		StartLocation = GetActorLocation();
 		TargetLocation = GetActorLocation() + GetActorForwardVector() * 500;
 		CurrentTime = 0.f;
+		bReturnPool = false;
 	}
 }
 
@@ -62,5 +77,26 @@ void ACMiddleBossBullet::SRPC_MoveBullet_Implementation()
 		CurrentTime += GetWorld()->GetDeltaSeconds();
 	}
 	else
+	{
+		if (bReturnPool) return;
 		ObjectPoolManager->ReturnMiddleBossBullet(this);
+	}
+}
+
+void ACMiddleBossBullet::OnMyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!HasAuthority()) return;
+
+	if (auto player = Cast<ACBasePlayer>(OtherActor))
+	{
+		//LOG_S(Warning, TEXT("Middle Boss Bullet Damage"));
+		player->DamageProcess(Damage);
+	}
+	else if (OtherActor->IsA(ACWindWall::StaticClass()))
+	{
+		//LOG_S(Warning, TEXT("Middle Boss Bullet Return"));
+		ObjectPoolManager->ReturnMiddleBossBullet(this);
+		bReturnPool = true;
+	}
 }

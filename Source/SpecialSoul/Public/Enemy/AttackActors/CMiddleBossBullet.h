@@ -49,4 +49,17 @@ private:
 private:
 	UFUNCTION(Server, Unreliable)
 	void SRPC_MoveBullet();
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	class USphereComponent* SphereComp;
+
+	UFUNCTION()
+	void OnMyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(VisibleAnywhere, Category = "Projectile")
+	float Damage{ 30.f }; // µ¥¹ÌÁö
+
+	bool bReturnPool=false;
 };

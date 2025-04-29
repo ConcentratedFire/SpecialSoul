@@ -214,7 +214,7 @@ void ACPlayerController::UpdateStatUI()
 void ACPlayerController::SRPC_EndDieProcess_Implementation()
 {
 	// 관전자가 플레이어의 위치에 생성될 수 있도록 플레이어 정보를 가져온다.
-	auto player = GetPawn();
+	auto player = Cast<ACBasePlayer>(GetPawn());
 
 	if (player)
 	{
@@ -224,7 +224,7 @@ void ACPlayerController::SRPC_EndDieProcess_Implementation()
 			// 관전자 생성
 			FActorSpawnParameters params;
 			params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			APawn* spectator = GetWorld()->SpawnActor<APawn>(gm->SpectatorClass, player->GetActorTransform(), params);
+			APawn* spectator = GetWorld()->SpawnActor<APawn>(gm->SpectatorClass, player->GetCamTransform(), params);
 
 			// 빙의(Possess)
 			Possess(spectator);

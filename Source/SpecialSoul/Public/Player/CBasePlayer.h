@@ -1,10 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "Data/CYasuoData.h"
 #include "Data/JinxData.h"
 #include "Game/CPlayerState.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "CBasePlayer.generated.h"
 
 struct FSkillCooltime;
@@ -61,6 +63,7 @@ public: // Return Component
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE FTransform GetCamTransform() const { return TopDownCameraComponent->GetComponentTransform(); }
 
 	virtual void Attack() PURE_VIRTUAL(); // Attack 기본 함수
 
@@ -76,7 +79,7 @@ private: // Component
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	class USceneCaptureComponent2D* MiniMapCam;
 	UPROPERTY(EditDefaultsOnly)
 	class UMaterialInterface* MiniMapSceneMat;
@@ -111,7 +114,7 @@ public:
 	TObjectPtr<class USkillComponent> SkillComponent;
 
 protected: // Arrow UI
-	FRotator ArrowRotation{90, 0, -45};
+	FRotator ArrowRotation{ 90, 0, -45 };
 
 	virtual void RotateArrow()
 	{
@@ -138,8 +141,8 @@ public:
 	}
 
 	FORCEINLINE void GetCurGrade(int32& WeaponGrade, int32& DamageGrade, int32& AbilityHasteGrade,
-	                             int32& ProjectilesGrade,
-	                             int32& CritChanceGrade)
+		int32& ProjectilesGrade,
+		int32& CritChanceGrade)
 	{
 		PS->GetCurrentUpgradeGrade(WeaponGrade, DamageGrade, AbilityHasteGrade, ProjectilesGrade, CritChanceGrade);
 	}
@@ -153,7 +156,7 @@ public:
 	}
 
 	FORCEINLINE void GetCurProjectileNextProjectile(int32 level, int32& CurProjectile, int32& NextProjectile,
-	                                                bool bYasuoType)
+		bool bYasuoType)
 	{
 		if (bYasuoType)
 			PS->GetWeaponProjectile_Yasuo(level, CurProjectile, NextProjectile);
@@ -174,7 +177,7 @@ public:
 public:
 	void SetSkillUsing(ESkillKey Key, bool bUseSkill);
 	void ResetLeftCooltime(ESkillKey skillKey);
-	
+
 	UFUNCTION(Client, Reliable)
 	void CRPC_SetSkillChargingUI(ESkillKey skillKey, bool bIsCharging, class ACPlayerController* InPC);
 
@@ -222,21 +225,21 @@ public:
 public:
 	// HP 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HP)
-	float MaxHP {1000.f};
-	
-	UPROPERTY(ReplicatedUsing=OnRep_HP, EditAnywhere, BlueprintReadWrite, Category = HP)
-	float hp {MaxHP};
+	float MaxHP{ 1000.f };
+
+	UPROPERTY(ReplicatedUsing = OnRep_HP, EditAnywhere, BlueprintReadWrite, Category = HP)
+	float hp{ MaxHP };
 
 	UFUNCTION()
 	void OnRep_HP();
 
-	 // get, set 프로퍼티
+	// get, set 프로퍼티
 	__declspec(property(get = GetHP, put = SetHP)) float HP;
 	float GetHP();
 	void SetHP(float value);
 
 	void DamageProcess(float damage);
-	bool bIsDead {false};
+	bool bIsDead{ false };
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI)

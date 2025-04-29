@@ -610,6 +610,7 @@ void ACBasePlayer::OnRep_HP()
 	{
 		hp = 0.f;
 		bIsDead = true;
+		DieProcess();
 	}
 	
 	if (IsLocallyControlled())
@@ -624,6 +625,13 @@ void ACBasePlayer::OnRep_HP()
 	{
 		overheadUI->SetHP(HP, MaxHP);
 	}
+}
+
+void ACBasePlayer::DieProcess()
+{
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
+	if (IsLocallyControlled())
+		PC->SRPC_EndDieProcess();
 }
 
 float ACBasePlayer::GetHP()

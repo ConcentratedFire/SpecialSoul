@@ -14,6 +14,8 @@
 #include "UI/GameWidget.h"
 #include "UI/HUD/GameHUD.h"
 #include "UI/Standby/CStandbyWidget.h"
+#include "Game/SpecialSoulGameMode.h"
+#include "GameFramework/SpectatorPawn.h"
 
 ACPlayerController::ACPlayerController()
 {
@@ -207,4 +209,28 @@ void ACPlayerController::MRPC_PlayGame_Implementation()
 void ACPlayerController::UpdateStatUI()
 {
 	
+}
+
+void ACPlayerController::SRPC_EndDieProcess_Implementation()
+{
+	// 관전자가 플레이어의 위치에 생성될 수 있도록 플레이어 정보를 가져온다.
+	auto player = GetPawn();
+
+	if (player)
+	{
+		auto gm = Cast<ASpecialSoulGameMode>(GetWorld()->GetAuthGameMode());
+		if (gm && gm->SpectatorClass)
+		{
+			// 관전자 생성
+			FActorSpawnParameters params;
+			params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			APawn* spectator = GetWorld()->SpawnActor<APawn>(gm->SpectatorClass, player->GetActorTransform(), params);
+
+			// 빙의(Possess)
+			Possess(spectator);
+
+			// 이전 플레이어 제거
+			player->Destroy();
+		}		
+	}
 }

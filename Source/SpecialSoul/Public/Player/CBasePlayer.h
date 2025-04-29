@@ -241,4 +241,7 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI)
 	class UWidgetComponent* OverheadUIComp;
+
+protected:
+	virtual void DieProcess();
 };

@@ -22,6 +22,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "JinxAnim")
 	TObjectPtr<AJinx> Jinx;
 
+	UPROPERTY(EditDefaultsOnly,Category= JinxAnim)
+	class UAnimMontage* DieAnim;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "JinxAnim")
 	float Speed;
 
@@ -47,4 +50,6 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_SkillEnd();
+
+	void PlayDieAnimation();
 };

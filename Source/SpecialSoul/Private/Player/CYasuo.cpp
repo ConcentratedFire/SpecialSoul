@@ -86,6 +86,12 @@ void ACYasuo::SetLocalInit(ACPlayerController* InPC)
 	}
 }
 
+void ACYasuo::DieProcess()
+{
+	Super::DieProcess();
+	Anim->PlayDieAnimation();
+}
+
 
 void ACYasuo::PrintNetLog()
 {
@@ -104,6 +110,8 @@ void ACYasuo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsDead) return;
+
 	if (!Anim && GetMesh() && GetMesh()->GetAnimInstance())
 	{
 		Anim = Cast<UCYasuoAnim>(GetMesh()->GetAnimInstance());
@@ -112,7 +120,7 @@ void ACYasuo::Tick(float DeltaTime)
 	if (PC && PC->IsLocalController())
 		CRPC_SetAttackFrontVector();
 
-	PrintNetLog();
+	//PrintNetLog();
 
 	// 기본 공격
 	if (PC && PC->IsLocalController() && YasuoMoveInfo.ID > 0)
@@ -275,6 +283,7 @@ void ACYasuo::SRPC_ChargePassiveEnergy_Implementation()
 
 void ACYasuo::SRPC_ChargePassiveEnergy_Timer_Implementation()
 {
+	if (bIsDead) return;
 	int32 NewEnergy = FMath::Clamp(PassiveEnergy + PassiveEnergyRegen, 0.f, 100.f);
 	MRPC_ChargePassiveEnergy(NewEnergy);
 }

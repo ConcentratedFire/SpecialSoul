@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/CPlayerController.h"
+#include "Player/Anim/JinxAnim.h"
 #include "Player/Components/CMovementComponent.h"
 #include "Player/Components/SkillComponent.h"
 #include "Skill/Jinx/Jinx_Attack.h"
@@ -76,6 +77,12 @@ float AJinx::GetDamage(bool& OutbIsCri) const
 {
 	float CalcDamage = PS->CalcDamage(JinxAttackData.Damage, OutbIsCri);
 	return CalcDamage;
+}
+
+void AJinx::DieProcess()
+{
+	Super::DieProcess();
+	Cast<UJinxAnim>(AnimInstance)->PlayDieAnimation();
 }
 
 void AJinx::Attack()

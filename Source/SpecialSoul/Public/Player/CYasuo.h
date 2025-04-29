@@ -119,5 +119,6 @@ public:
 
 public:
 	virtual void SetLocalInit(class ACPlayerController* InPC) override;
+	virtual void DieProcess() override;
 };
 

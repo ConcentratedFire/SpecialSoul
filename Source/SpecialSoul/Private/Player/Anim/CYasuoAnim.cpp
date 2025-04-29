@@ -43,6 +43,11 @@ void UCYasuoAnim::PlayRSkillMontage()
 	Owner->PlayAnimMontage(RSkillMontage, 1, FName("WindWall"));
 }
 
+void UCYasuoAnim::PlayDieAnimation()
+{
+	Montage_Play(DieAnim);
+}
+
 void UCYasuoAnim::AnimNotify_YasuoDefaultAttack()
 {
 	Owner->Attack();

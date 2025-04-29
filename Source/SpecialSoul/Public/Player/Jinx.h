@@ -68,5 +68,7 @@ public:
 	virtual void SetLocalInit(class ACPlayerController* InPC) override;
 
 	float GetDamage(bool& OutbIsCri) const;
+
+	virtual void DieProcess() override;
 };
 

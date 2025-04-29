@@ -81,4 +81,8 @@ public:
 
 public:
 	void UpdateStatUI();
+
+public:
+	UFUNCTION(Server, Reliable)
+	void SRPC_EndDieProcess();
 };

@@ -18,6 +18,7 @@ public:
 	void PlayAttackMontage();
 	void PlayESkillMontage(bool bAnimStart);
 	void PlayRSkillMontage();
+	void PlayDieAnimation();
 
 private:
 	virtual void NativeBeginPlay() override;
@@ -45,4 +46,8 @@ private: // Skill
 	void AnimNotify_ESkillEnd();
 	UFUNCTION()
 	void AnimNotify_WindWallSkill();
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = DieAnim)
+	class UAnimMontage* DieAnim;
 };

@@ -20,4 +20,19 @@ private:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void DieEndAction() override;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	class UBoxComponent* AttackComp;
+
+	UFUNCTION()
+	void OnMyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(VisibleAnywhere, Category = "Projectile")
+	float Damage{ 30.f }; // µ¥¹ÌÁö
+
+public:
+	void SetAttackCollision(bool bInEnable);
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 };

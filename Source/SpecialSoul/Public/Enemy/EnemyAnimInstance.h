@@ -33,4 +33,10 @@ protected:
 
 	UFUNCTION()
 	virtual void AnimNotify_DieEnd();
+
+	UFUNCTION()
+	virtual void AnimNotify_BeginMeleeAttack();
+
+	UFUNCTION()
+	virtual void AnimNotify_EndMeleeAttack();
 };

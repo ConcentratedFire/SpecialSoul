@@ -4,6 +4,7 @@
 #include "Enemy/CMeleeEnemy.h"
 
 #include "SpecialSoul.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "ObjectPool/CObjectPoolManager.h"
 
@@ -26,6 +27,15 @@ ACMeleeEnemy::ACMeleeEnemy()
 		TEXT("/Script/Engine.AnimMontage'/Game/Asset/MeleeMinion/Anim/AM_MeleeDeath.AM_MeleeDeath'"));
 	if (tmpDieMontage.Succeeded())
 		DieMontage = tmpDieMontage.Object;
+
+	AttackComp = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackComp"));
+	AttackComp->SetupAttachment(GetMesh(), FName("AttackSocket"));
+	AttackComp->SetCollisionProfileName(FName("Enemy"));
+	AttackComp->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+	AttackComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+	AttackComp->SetCollisionResponseToChannel(ECC_GameTraceChannel7, ECR_Ignore);
+	AttackComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttackComp->OnComponentBeginOverlap.AddDynamic(this, &ACMeleeEnemy::OnMyOverlap);
 }
 
 void ACMeleeEnemy::BeginPlay()
@@ -42,4 +52,28 @@ void ACMeleeEnemy::DieEndAction()
 {
 	if (!ObjectPoolManager) return;
 	ObjectPoolManager->ReturnEnemy(this);
+}
+
+void ACMeleeEnemy::OnMyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (auto player = Cast<ACBasePlayer>(OtherActor))
+	{
+		player->DamageProcess(Damage);
+	}
+}
+
+void ACMeleeEnemy::SetAttackCollision(bool bInEnable)
+{
+	AttackComp->SetCollisionEnabled(bInEnable ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+}
+
+void ACMeleeEnemy::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+
+	if (!bNewHidden)
+	{
+		AttackComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }

@@ -4,6 +4,7 @@
 #include "Enemy/EnemyAnimInstance.h"
 
 #include "Enemy/BaseEnemy.h"
+#include "Enemy/CMeleeEnemy.h"
 #include "Enemy/CMiddleBoss.h"
 
 void UEnemyAnimInstance::NativeInitializeAnimation()
@@ -35,4 +36,18 @@ void UEnemyAnimInstance::AnimNotify_DieEnd()
 	ABaseEnemy* OwnerPawn = Cast<ABaseEnemy>(TryGetPawnOwner());
 	if (OwnerPawn && OwnerPawn->HasAuthority())
 		OwnerPawn->DieEndAction();
+}
+
+void UEnemyAnimInstance::AnimNotify_BeginMeleeAttack()
+{
+	ACMeleeEnemy* OwnerPawn = Cast<ACMeleeEnemy>(TryGetPawnOwner());
+	if (OwnerPawn && OwnerPawn->HasAuthority())
+		OwnerPawn->SetAttackCollision(true);
+}
+
+void UEnemyAnimInstance::AnimNotify_EndMeleeAttack()
+{
+	ACMeleeEnemy* OwnerPawn = Cast<ACMeleeEnemy>(TryGetPawnOwner());
+	if (OwnerPawn && OwnerPawn->HasAuthority())
+		OwnerPawn->SetAttackCollision(false);
 }

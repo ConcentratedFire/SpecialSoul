@@ -71,3 +71,8 @@ void UJinxAnim::AnimNotify_SkillEnd()
 	Jinx->ActivateSkillMovement(false, false);
 	Jinx->bUsingSkill = false;
 }
+
+void UJinxAnim::PlayDieAnimation()
+{
+	Montage_Play(DieAnim);
+}

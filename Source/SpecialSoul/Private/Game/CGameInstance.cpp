@@ -71,7 +71,7 @@ void UCGameInstance::OnCreateSessionComplete(FName sessionName, bool bWasSuccess
 
 	if( bWasSuccessful == true )
 	{
-		GetWorld()->ServerTravel(TEXT("/Game/Level/StandbyLevel?listen"));
+		GetWorld()->ServerTravel(TEXT("/Game/Level/BattleMap?listen"));
 	}
 }
 

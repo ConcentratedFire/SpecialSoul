@@ -74,7 +74,7 @@ public:
 	bool bSelectPlayer = false;
 
 	UFUNCTION(Server, Reliable)
-	void SRPC_SelectPlayer(bool _bPlayYasuo);
+	void SRPC_SelectPlayer(const bool bInPlayYasuo);
 	
 	UFUNCTION(Server, Reliable)
 	void SRPC_ReadyToPlay();
@@ -85,4 +85,8 @@ public:
 
 public:
 	void UpdateStatUI();
+
+public:
+	UFUNCTION(Server, Reliable)
+	void SRPC_EndDieProcess();
 };

@@ -171,9 +171,9 @@ void ACPlayerController::SRPC_ReadyToPlay_Implementation()
 		--GS->ReadyPlayer;
 }
 
-void ACPlayerController::SRPC_SelectPlayer_Implementation(bool _bPlayYasuo)
+void ACPlayerController::SRPC_SelectPlayer_Implementation(const bool bInPlayYasuo)
 {
-	bPlayYasuo = _bPlayYasuo;
+	bPlayYasuo = bInPlayYasuo;
 }
 
 void ACPlayerController::ServerRequestSpawn()

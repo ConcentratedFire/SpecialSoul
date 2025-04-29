@@ -100,7 +100,7 @@ public:
 	UPROPERTY()
 	class ACObjectPoolManager* ObjectPoolManager;
 
-protected:
+public:
 	UPROPERTY(BlueprintReadOnly, Category = "Enemy", Replicated)
 	bool bIsDead{false};
 

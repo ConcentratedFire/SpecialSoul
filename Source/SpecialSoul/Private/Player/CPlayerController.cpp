@@ -11,6 +11,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/CBasePlayer.h"
 #include "Player/CYasuo.h"
+#include "UI/GameEndingWidget.h"
 #include "UI/GameWidget.h"
 #include "UI/HUD/GameHUD.h"
 #include "UI/Standby/CStandbyWidget.h"
@@ -224,6 +225,48 @@ void ACPlayerController::SetBossHPPercent(float percent)
 	{
 		hud->SetBossHPBarPercent(percent);
 	}
+}
+
+// void ACPlayerController::ShowGameEndingUI(bool bWin)
+// {
+// 	if (IsLocalController())
+// 	{
+// 		if (bWin)
+// 		{
+// 			auto winUI = CreateWidget<UGameEndingWidget>(this, WinWidgetClass);
+// 			winUI->AddToViewport();
+// 		}
+// 		else
+// 		{
+// 			auto defeatUI = CreateWidget<UGameEndingWidget>(this, DefeatWidgetClass);
+// 			defeatUI->AddToViewport();
+// 		}
+// 	}
+// }
+
+void ACPlayerController::CRPC_ShowGameEndingUI_Implementation(bool bWin)
+{
+	if (!IsLocalController()) return;
+	
+	auto widgetClass = bWin ? WinWidgetClass : DefeatWidgetClass;
+	if (widgetClass)
+	{
+		auto* ui = CreateWidget<UGameEndingWidget>(this, widgetClass);
+		if (ui)
+			ui->AddToViewport();
+	}
+}
+
+void ACPlayerController::ClientTravelToBattleMap()
+{
+	FString url = TEXT("/Game/Level/BattleMap.BattleMap");
+	ClientTravel(url, TRAVEL_Absolute);
+}
+
+void ACPlayerController::ServerTravelToBattleMap()
+{
+	FString url = TEXT("/Game/Level/BattleMap.BattleMap");
+	GetWorld()->ServerTravel(url, TRAVEL_Absolute);
 }
 
 void ACPlayerController::SRPC_EndDieProcess_Implementation()

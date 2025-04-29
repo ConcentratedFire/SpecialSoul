@@ -6,6 +6,7 @@
 #include "NetworkReplayStreaming.h"
 #include "OnlineSessionSettings.h"
 #include "SpecialSoul.h"
+#include "Kismet/GameplayStatics.h"
 #include "Online/OnlineSessionNames.h"
 
 void UCGameInstance::Init()
@@ -206,13 +207,38 @@ void UCGameInstance::MRPC_ExitRoom_Implementation()
 	// ExitRoom 3 끝 ) 세션에서 퇴장
 	// OnDestroySessionCompleteDelegates 브로드캐스트함
 	sessionInterface->DestroySession(FName(*MySessionName));
+
+	//세션 삭제 후 수동 이동
+	ENetMode NetMode = GetWorld()->GetNetMode();
+	if (NetMode == NM_Client)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PC && PC->IsLocalController())
+		{
+			PC->ClientTravel(FString(TEXT("/Game/Level/BattleMap.BattleMap")), ETravelType::TRAVEL_Absolute);
+		}
+	}
+	else if (NetMode == NM_ListenServer)
+	{
+		GetWorld()->ServerTravel(FString(TEXT("/Game/Level/BattleMap.BattleMap?listen"), ETravelType::TRAVEL_Absolute));
+	}
 }
 
 void UCGameInstance::OnExitRoomComplete(FName sessionName, bool bWasSuccessful)
 {
-	auto pc = GetWorld()->GetFirstPlayerController();
-	FString url = TEXT("/Game/Level/StandbyLevel.StandbyLevel");
-	pc->ClientTravel(url, TRAVEL_Absolute);
+	// auto pc = GetWorld()->GetFirstPlayerController();
+	// FString url = TEXT("/Game/Level/StandbyLevel.StandbyLevel");
+	// pc->ClientTravel(url, TRAVEL_Absolute);
+
+	// ENetMode NetMode = GetWorld()->GetNetMode();
+	// if (NetMode == NM_Client)
+	// {
+	// 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	// 	if (PC && PC->IsLocalController())
+	// 	{
+	// 		PC->ClientTravel(FString(TEXT("/Game/Level/BattleMap.BattleMap")), ETravelType::TRAVEL_Absolute);
+	// 	}
+	// }
 }
 
 FString UCGameInstance::StringBase64Encode(const FString& str)

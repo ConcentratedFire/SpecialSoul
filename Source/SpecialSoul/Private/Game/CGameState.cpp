@@ -26,6 +26,12 @@ ACGameState::ACGameState()
 	{
 		MainBossClass = MainBossClassFinder.Class;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveFinder(TEXT("/Game/Micellaneous/C_TimeDilation.C_TimeDilation"));
+	if (CurveFinder.Succeeded())
+	{
+		TimeDilationCurve = CurveFinder.Object;
+	}
 }
 
 void ACGameState::BeginPlay()
@@ -50,6 +56,23 @@ void ACGameState::BeginPlay()
 			ObjectPoolManager->InitSettings();
 		}
 	}
+
+	// 시간지연(보스 사망 시 사용됨)
+	if (TimeDilationCurve)
+	{
+		FOnTimelineFloat timelineCallback;
+		 // "UpdateTimeDilation" 함수에 대한 콜백 등록
+		timelineCallback.BindUFunction(this, FName("UpdateTimeDilation"));
+		TimeDilationTimeline.AddInterpFloat(TimeDilationCurve, timelineCallback);
+
+		 // 타임라인 끝난 후 콜백
+		FOnTimelineEvent timelineFinishCallback;
+		timelineFinishCallback.BindUFunction(this, FName("OnTimeDilationFinished"));
+		TimeDilationTimeline.SetTimelineFinishedFunc(timelineFinishCallback);
+		
+		TimeDilationTimeline.SetLooping(false);
+	}
+	
 }
 
 void ACGameState::Tick(float DeltaSeconds)
@@ -125,6 +148,41 @@ void ACGameState::Tick(float DeltaSeconds)
 		curExp -= ExpInfo.XP;
 		UpdateExpInfo(ExpInfo.ID + 1);
 		UpdateExpUI();
+	}
+
+	// 시간 조작
+	TimeDilationTimeline.TickTimeline(DeltaSeconds);
+}
+
+void ACGameState::OnMainBossDie()
+{
+	GameEndProcess();
+}
+
+void ACGameState::GameEndProcess()
+{
+	// 천천히 시간 늦추기 -> 게임종료 UI 띄우기
+	// UpdateTimeDilation -> OnTimeDilationFinished
+	if (TimeDilationCurve)
+	{
+		TimeDilationTimeline.PlayFromStart();
+	}
+}
+
+void ACGameState::UpdateTimeDilation(float value)
+{
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), value);
+}
+
+void ACGameState::OnTimeDilationFinished()
+{
+	for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
+	{
+		if (auto myPC = Cast<ACPlayerController>(*it))
+		{
+			const bool bWin = !SpawnedBoss || SpawnedBoss->bIsDead;
+			myPC->CRPC_ShowGameEndingUI(bWin);
+		}
 	}
 }
 
@@ -278,7 +336,7 @@ void ACGameState::SpawnMainBoss(int32& finalBossCount)
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	if (MainBossClass)
 	{
-		AMainBoss* SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
+		SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
 		if (SpawnedBoss)
 		{
 			--FinalBossCount;
@@ -290,13 +348,6 @@ void ACGameState::SpawnMainBoss(int32& finalBossCount)
 		else
 			UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
 	}
-}
-
-void ACGameState::OnMainBossDie()
-{
-	// 천천히 시간 늦추기
-	
-	// n초 후에 게임종료 UI 띄우기
 }
 
 

@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "CPlayerController.generated.h"
 
+class UGameEndingWidget;
 /**
  * 
  */
@@ -25,6 +26,12 @@ public:
 	class UCStandbyWidget* SelectPlayerWidget;
 	UPROPERTY()
 	class UCSelectUpgradeWidget* SelectUpgradeWidget;
+	
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UGameEndingWidget> WinWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UGameEndingWidget> DefeatWidgetClass;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -33,6 +40,12 @@ public:
 	
 	void ShowBossUI(AMainBoss* mainBoss, bool bShow);
 	void SetBossHPPercent(float percent);
+	//void ShowGameEndingUI(bool bWin);
+	void ClientTravelToBattleMap();
+	void ServerTravelToBattleMap();
+
+	UFUNCTION(Client, Reliable)
+	void CRPC_ShowGameEndingUI(bool bWin);
 
 private:
 	ACPlayerController();

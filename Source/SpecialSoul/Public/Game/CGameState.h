@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SpecialSoulGameMode.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "CGameState.generated.h"
 
@@ -132,6 +133,22 @@ private:
 
 	UFUNCTION()
 	void OnMainBossDie();
+	
 	void SpawnMainBoss(int32& finalBossCount);
 	
+	UPROPERTY(VisibleAnywhere, Category = "MainBoss")
+	class AMainBoss* SpawnedBoss;
+
+private:
+	UPROPERTY()
+	UCurveFloat* TimeDilationCurve;
+
+	FTimeline TimeDilationTimeline;
+	UFUNCTION()
+	void UpdateTimeDilation(float value);
+
+	UFUNCTION()
+	void OnTimeDilationFinished();
+
+	void GameEndProcess();
 };

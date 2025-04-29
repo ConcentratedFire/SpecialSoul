@@ -17,6 +17,7 @@
 #include "UI/Standby/CStandbyWidget.h"
 #include "Game/SpecialSoulGameMode.h"
 #include "GameFramework/SpectatorPawn.h"
+#include "UI/CFailEndingWidget.h"
 
 
 ACPlayerController::ACPlayerController()
@@ -62,7 +63,7 @@ void ACPlayerController::OnPossess(APawn* InPawn)
 		MyPlayerState->SetPlayerCharacterInfo(this);
 
 	// if (IsLocalController())
-		// MyPlayer->SetLocalInit(this);
+	// MyPlayer->SetLocalInit(this);
 }
 
 void ACPlayerController::UpgradeWeapon(const int32 Level)
@@ -128,8 +129,8 @@ void ACPlayerController::CRPC_UpdateLevelUI_Implementation(int32 PlayerLevel)
 	{
 		gameHUD->SetLevel(PlayerLevel);
 	}
-	
-	
+
+
 	// if (auto overheadUI = Cast<UOverheadStatusWidget>(OverheadUIComp->GetWidget()))
 	// {
 	// 	overheadUI->SetLevel(PlayerLevel);
@@ -209,7 +210,8 @@ void ACPlayerController::MRPC_PlayGame_Implementation()
 }
 
 void ACPlayerController::UpdateStatUI()
-{}
+{
+}
 
 void ACPlayerController::ShowBossUI(AMainBoss* mainBoss, bool bShow)
 {
@@ -247,13 +249,22 @@ void ACPlayerController::SetBossHPPercent(float percent)
 void ACPlayerController::CRPC_ShowGameEndingUI_Implementation(bool bWin)
 {
 	if (!IsLocalController()) return;
-	
+
 	auto widgetClass = bWin ? WinWidgetClass : DefeatWidgetClass;
 	if (widgetClass)
 	{
-		auto* ui = CreateWidget<UGameEndingWidget>(this, widgetClass);
-		if (ui)
-			ui->AddToViewport();
+		if (bWin)
+		{
+			UGameEndingWidget* ui = CreateWidget<UGameEndingWidget>(this, widgetClass);
+			if (ui)
+				ui->AddToViewport();
+		}
+		else
+		{
+			UCFailEndingWidget* ui = CreateWidget<UCFailEndingWidget>(this, widgetClass);
+			if (ui)
+				ui->AddToViewport();
+		}
 	}
 }
 
@@ -289,7 +300,20 @@ void ACPlayerController::SRPC_EndDieProcess_Implementation()
 
 			// 이전 플레이어 제거
 			player->Destroy();
-		}		
+		}
 	}
 }
 
+void ACPlayerController::SRPC_AddDeadPlayer_Implementation()
+{
+	++GS->DeadPlayer;
+	ServerRequestPlayEnd();
+}
+
+void ACPlayerController::ServerRequestPlayEnd()
+{
+	TArray<APlayerState*> playerArr = GetWorld()->GetGameState()->PlayerArray;
+	if (playerArr.Num() > GS->DeadPlayer) return;
+
+	GS->PlayFail();
+}

@@ -169,6 +169,17 @@ void ACGameState::GameEndProcess()
 	}
 }
 
+void ACGameState::PlayFail()
+{
+	for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
+	{
+		if (auto myPC = Cast<ACPlayerController>(*it))
+		{
+			myPC->CRPC_ShowGameEndingUI(false);
+		}
+	}
+}
+
 void ACGameState::UpdateTimeDilation(float value)
 {
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), value);
@@ -308,6 +319,7 @@ void ACGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ACGameState, GamePlayTime);
 	DOREPLIFETIME(ACGameState, UpgradeSelectPlayerCount);
 	DOREPLIFETIME(ACGameState, ReadyPlayer);
+	DOREPLIFETIME(ACGameState, DeadPlayer);
 }
 
 void ACGameState::OnRep_PlayTime()

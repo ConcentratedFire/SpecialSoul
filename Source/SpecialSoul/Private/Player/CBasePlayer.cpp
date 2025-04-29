@@ -631,7 +631,10 @@ void ACBasePlayer::DieProcess()
 {
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
 	if (IsLocallyControlled())
+	{
 		PC->SRPC_EndDieProcess();
+		PC->SRPC_AddDeadPlayer();
+	}
 }
 
 float ACBasePlayer::GetHP()

@@ -8,6 +8,7 @@
 #include "CPlayerController.generated.h"
 
 class UGameEndingWidget;
+class UCFailEndingWidget;
 /**
  * 
  */
@@ -31,7 +32,7 @@ public:
 	TSubclassOf<UGameEndingWidget> WinWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = UI)
-	TSubclassOf<UGameEndingWidget> DefeatWidgetClass;
+	TSubclassOf<UCFailEndingWidget> DefeatWidgetClass;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -102,4 +103,9 @@ public:
 public:
 	UFUNCTION(Server, Reliable)
 	void SRPC_EndDieProcess();
+
+public:
+	UFUNCTION(Server, Reliable)
+	void SRPC_AddDeadPlayer();
+	void ServerRequestPlayEnd();
 };

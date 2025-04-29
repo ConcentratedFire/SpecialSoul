@@ -129,7 +129,7 @@ private:
 	bool bMainBossSpawned {false};
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void MRPC_ShowMainBossUI(AMainBoss* spawnedBoss);
+	void MRPC_ShowMainBossUI(class AMainBoss* spawnedBoss);
 
 	UFUNCTION()
 	void OnMainBossDie();
@@ -151,4 +151,10 @@ private:
 	void OnTimeDilationFinished();
 
 	void GameEndProcess();
+
+public:
+	UPROPERTY(Replicated)
+	int32 DeadPlayer=0;
+
+	void PlayFail();
 };

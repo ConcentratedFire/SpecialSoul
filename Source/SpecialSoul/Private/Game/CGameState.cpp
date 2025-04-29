@@ -20,7 +20,7 @@
 ACGameState::ACGameState()
 {
 	PrimaryActorTick.bCanEverTick = true;
- 
+
 	static ConstructorHelpers::FClassFinder<AActor> MainBossClassFinder(TEXT("/Game/Enemy/MainBoss/BP_MainBoss.BP_MainBoss_C"));
 	if (MainBossClassFinder.Succeeded())
 	{
@@ -68,9 +68,9 @@ void ACGameState::Tick(float DeltaSeconds)
 
 			OnRep_PlayTime();
 			LOG_SCREEN_IDX(0, FColor::Blue,
-			               "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f",
-			               curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
-			LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp/(float)ExpInfo.XP * 100);
+				"Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f",
+				curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
+			LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp / (float)ExpInfo.XP * 100);
 			LOG_SCREEN_IDX(2, FColor::Red, "RegenCount : %d, CurRegenCount : %d", RegenCount, CurRegenCount);
 			if (CurRegenTime >= RegenTime)
 			{
@@ -86,6 +86,7 @@ void ACGameState::Tick(float DeltaSeconds)
 			{
 				ObjectPoolManager->MiddleBossSpawn();
 				++MiddleBossCount;
+				MiddleBossRegenTime = 0.f;
 			}
 
 			if (FinalBossCount > 0 && CurStageTime >= FinalBossRegenTime && FinalBossCount > CurFinalBossCount)
@@ -103,7 +104,7 @@ void ACGameState::Tick(float DeltaSeconds)
 					else
 						UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
 				}
-				
+				FinalBossRegenTime = 0.f;
 			}
 
 			if (CurStageTime >= StageTime)
@@ -136,7 +137,7 @@ void ACGameState::UpdateExpUI()
 	{
 		HUD->SetEXP(curExp, ExpInfo.XP); // 리슨서버 직접 갱신
 	}
-	
+
 	if (HasAuthority())
 	{
 		for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)

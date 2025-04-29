@@ -21,13 +21,15 @@ ACGameState::ACGameState()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	static ConstructorHelpers::FClassFinder<AActor> MainBossClassFinder(TEXT("/Game/Enemy/MainBoss/BP_MainBoss.BP_MainBoss_C"));
+	static ConstructorHelpers::FClassFinder<AActor> MainBossClassFinder(
+		TEXT("/Game/Enemy/MainBoss/BP_MainBoss.BP_MainBoss_C"));
 	if (MainBossClassFinder.Succeeded())
 	{
 		MainBossClass = MainBossClassFinder.Class;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveFinder(TEXT("/Game/Micellaneous/C_TimeDilation.C_TimeDilation"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveFinder(
+		TEXT("/Game/Micellaneous/C_TimeDilation.C_TimeDilation"));
 	if (CurveFinder.Succeeded())
 	{
 		TimeDilationCurve = CurveFinder.Object;
@@ -61,18 +63,17 @@ void ACGameState::BeginPlay()
 	if (TimeDilationCurve)
 	{
 		FOnTimelineFloat timelineCallback;
-		 // "UpdateTimeDilation" 함수에 대한 콜백 등록
+		// "UpdateTimeDilation" 함수에 대한 콜백 등록
 		timelineCallback.BindUFunction(this, FName("UpdateTimeDilation"));
 		TimeDilationTimeline.AddInterpFloat(TimeDilationCurve, timelineCallback);
 
-		 // 타임라인 끝난 후 콜백
+		// 타임라인 끝난 후 콜백
 		FOnTimelineEvent timelineFinishCallback;
 		timelineFinishCallback.BindUFunction(this, FName("OnTimeDilationFinished"));
 		TimeDilationTimeline.SetTimelineFinishedFunc(timelineFinishCallback);
-		
+
 		TimeDilationTimeline.SetLooping(false);
 	}
-	
 }
 
 void ACGameState::Tick(float DeltaSeconds)
@@ -91,8 +92,8 @@ void ACGameState::Tick(float DeltaSeconds)
 
 			OnRep_PlayTime();
 			LOG_SCREEN_IDX(0, FColor::Blue,
-				"Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f",
-				curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
+			               "Stage : %d\nStage Time: %.2f\nRegenTime : %.2f\nMiddle Boss Time : %.2f\nFinal Boss Time : %.2f",
+			               curStage, CurStageTime, RegenTime, MiddleBossRegenTime, FinalBossRegenTime);
 			LOG_SCREEN_IDX(1, FColor::Green, "EXP : %.2f", (float)curExp / (float)ExpInfo.XP * 100);
 			LOG_SCREEN_IDX(2, FColor::Red, "RegenCount : %d, CurRegenCount : %d", RegenCount, CurRegenCount);
 			if (CurRegenTime >= RegenTime)
@@ -120,17 +121,17 @@ void ACGameState::Tick(float DeltaSeconds)
 				//FActorSpawnParameters SpawnParams;
 				//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 				//if (MainBossClass)
-			//	{
-			//		AMainBoss* SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
-			//		if (SpawnedBoss)
-			//			--FinalBossCount;
-			//		else
-			//			UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
-			//	}
+				//	{
+				//		AMainBoss* SpawnedBoss = GetWorld()->SpawnActor<AMainBoss>(MainBossClass, SpawnLocation, SpawnRotation, SpawnParams);
+				//		if (SpawnedBoss)
+				//			--FinalBossCount;
+				//		else
+				//			UE_LOG(LogTemp, Error, TEXT("Failed to spawn BP_MainBoss"));
+				//	}
 				if (!bMainBossSpawned)
 				{
 					SpawnMainBoss(FinalBossCount);
-    				FinalBossRegenTime = 0.f;
+					FinalBossRegenTime = 0.f;
 				}
 			}
 
@@ -303,11 +304,11 @@ void ACGameState::MRPC_UpdateLevelUI_Implementation(int32 Level)
 	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
 	{
 		ACBasePlayer* Player = *It;
-		if (Player/* && Player->IsLocallyControlled()*/)  // 각 클라이언트에서 갱신
+		if (Player/* && Player->IsLocallyControlled()*/) // 각 클라이언트에서 갱신
 		{
 			if (auto OverheadUI = Cast<UOverheadStatusWidget>(Player->OverheadUIComp->GetWidget()))
 			{
-				OverheadUI->SetLevel(Level);  // 레벨 갱신
+				OverheadUI->SetLevel(Level); // 레벨 갱신
 			}
 		}
 	}
@@ -320,6 +321,7 @@ void ACGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ACGameState, UpgradeSelectPlayerCount);
 	DOREPLIFETIME(ACGameState, ReadyPlayer);
 	DOREPLIFETIME(ACGameState, DeadPlayer);
+	DOREPLIFETIME(ACGameState, AlivePlayer);
 }
 
 void ACGameState::OnRep_PlayTime()
@@ -329,7 +331,7 @@ void ACGameState::OnRep_PlayTime()
 
 void ACGameState::OnRep_UpgradeSelectPlayerCount()
 {
-	if (UpgradeSelectPlayerCount < PlayerArray.Num()) return;
+	if (UpgradeSelectPlayerCount < AlivePlayer) return;
 	for (TActorIterator<ACBasePlayer> It(GetWorld(), ACBasePlayer::StaticClass()); It; ++It)
 	{
 		(*It)->SRPC_UnPause();
@@ -341,7 +343,7 @@ void ACGameState::OnRep_UpgradeSelectPlayerCount()
 void ACGameState::SpawnMainBoss(int32& finalBossCount)
 {
 	if (bMainBossSpawned) return;
-	
+
 	FVector SpawnLocation(2064.554874f, -2316.554872f, 115.0f);
 	FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
 	FActorSpawnParameters SpawnParams;
@@ -373,7 +375,7 @@ void ACGameState::MRPC_ShowMainBossUI_Implementation(AMainBoss* spawnedBoss)
 	if (auto myPC = Cast<ACPlayerController>(pc))
 	{
 		LOG_S(Log, TEXT("MRPC_ShowMainBossUI"));
-		
+
 		myPC->ShowBossUI(spawnedBoss, true);
 		myPC->SetBossHPPercent(1.f); // progress bar 꽉 채우기
 	}

@@ -185,7 +185,8 @@ void ACPlayerController::ServerRequestSpawn()
 {
 	TArray<APlayerState*> playerArr = GetWorld()->GetGameState()->PlayerArray;
 	if (playerArr.Num() > GS->ReadyPlayer) return;
-
+	GS->AlivePlayer = playerArr.Num();
+	
 	// GameMode를 통해 Pawn 스폰
 	if (ASpecialSoulGameMode* GM = GetWorld()->GetAuthGameMode<ASpecialSoulGameMode>())
 		GM->SpawnPlayerCharacter();
@@ -307,6 +308,7 @@ void ACPlayerController::SRPC_EndDieProcess_Implementation()
 void ACPlayerController::SRPC_AddDeadPlayer_Implementation()
 {
 	++GS->DeadPlayer;
+	--GS->AlivePlayer;
 	ServerRequestPlayEnd();
 }
 

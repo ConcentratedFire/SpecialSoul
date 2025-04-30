@@ -109,7 +109,7 @@ void ACGameState::Tick(float DeltaSeconds)
 			if (MiddleBossCount > 0 && CurStageTime >= MiddleBossRegenTime && MiddleBossCount > CurMiddleBossCount)
 			{
 				ObjectPoolManager->MiddleBossSpawn();
-				++MiddleBossCount;
+				++CurMiddleBossCount;
 				MiddleBossRegenTime = 0.f;
 			}
 

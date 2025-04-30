@@ -52,6 +52,7 @@ void ACTornado_E::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!OwnerYasuo) return;
 	if (!OwnerYasuo->IsLocallyControlled()) return;
 	SRPC_MoveTornado();
 }

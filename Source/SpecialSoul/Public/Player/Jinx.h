@@ -54,7 +54,8 @@ private:
 	void UpdateJinxAttackStat(int32 PlayerLevel);
 	
 	FTimerHandle AttackTimer;
-
+	FTimerHandle AttackDelayTimer;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;
 

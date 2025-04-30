@@ -59,6 +59,7 @@ void AJinx::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	// 	FTimerHandle AttackTimer; 끄기
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+	GetWorld()->GetTimerManager().ClearTimer(AttackDelayTimer);
 }
 
 void AJinx::SetLocalInit(ACPlayerController* InPC)
@@ -149,7 +150,7 @@ void AJinx::SRPC_UseSkill_Implementation(ESkillKey Key)
 				}
 				
 				// 0.3초 후 Attack()
-				FTimerHandle AttackDelayTimer;
+				
 				GetWorld()->GetTimerManager().SetTimer(AttackDelayTimer, FTimerDelegate::CreateLambda([this]()
 				{
 					Attack();

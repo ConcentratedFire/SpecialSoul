@@ -12,8 +12,8 @@
 ARangedEnemyProjectile::ARangedEnemyProjectile()
 {
 	bReplicates = true;
-	SetReplicatingMovement(false); // 클라에선 코드로 위치 보간해주기
-	SetNetUpdateFrequency(40.0f);
+	SetReplicatingMovement(true); // 클라에선 코드로 위치 보간해주기
+	SetNetUpdateFrequency(100.0f);
 	
 	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (TempMesh.Succeeded())
@@ -90,16 +90,16 @@ void ARangedEnemyProjectile::Tick(float DeltaTime)
 			// 만약 120ms의 게임일 때
 			// NetUpdateFrequency=100(즉, 100ms로 동기화처리)이면 동기화처리가 느림
 			// 그렇기에 클라에서 추가로 보간해줘야함
-		elapsedTime += DeltaTime;
-		if (lastElapsedTime < KINDA_SMALL_NUMBER)
-			return;
-
-
-		FVector newLocation = ServerLocation + GetVelocity() * lastElapsedTime; 
-		float lerpRatio = elapsedTime / lastElapsedTime;
-		
-		FVector lerpLocation = FMath::Lerp(ServerLocation, newLocation, lerpRatio);
-		SetActorLocation(lerpLocation);
+		// elapsedTime += DeltaTime;
+		// if (lastElapsedTime < KINDA_SMALL_NUMBER)
+		// 	return;
+		//
+		//
+		// FVector newLocation = ServerLocation + GetVelocity() * lastElapsedTime; 
+		// float lerpRatio = elapsedTime / lastElapsedTime;
+		//
+		// FVector lerpLocation = FMath::Lerp(ServerLocation, newLocation, lerpRatio);
+		// SetActorLocation(lerpLocation);
 
 		// FVector TargetLocation = ServerLocation + GetVelocity() * lastElapsedTime;
 
@@ -168,7 +168,7 @@ void ARangedEnemyProjectile::OnRep_ServerLocation()
 	// 클라 영역
 	//SetActorLocation(ServerLocation);
 
-	lastElapsedTime = elapsedTime;
-
-	elapsedTime = 0.0f;
+	// lastElapsedTime = elapsedTime;
+	//
+	// elapsedTime = 0.0f;
 }

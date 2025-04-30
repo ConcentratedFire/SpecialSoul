@@ -12,6 +12,7 @@ class ABaseEnemy;
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
+	Idle,
 	Move,
 	Attack,
 	Die
@@ -75,7 +76,7 @@ private:
 	TScriptInterface<IPathFindingStrategy> PFStrategy;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM", meta = (AllowPrivateAccess = "true"))
-	EEnemyState CurrentState { EEnemyState::Move};
+	EEnemyState CurrentState { EEnemyState::Idle };
 
 public: // GET SET
 	virtual void SetState(EEnemyState NewState);

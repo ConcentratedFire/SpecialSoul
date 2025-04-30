@@ -40,11 +40,12 @@ ARangedEnemy::ARangedEnemy()
 void ARangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	if (AnimInstance)
+	if (HasAuthority() && AnimInstance)
 	{
 		AnimInstance->StopAllMontages(0.f);
-		AnimInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+		//AnimInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
 		GetMesh()->bPauseAnims = true;
+		FSMComponent->SetState(EEnemyState::Idle);
 	}
 }
 
@@ -72,18 +73,20 @@ void ARangedEnemy::Tick(float DeltaTime)
 void ARangedEnemy::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
-	if (AnimInstance)
+	if (HasAuthority() && AnimInstance)
 	{
 		if (bNewHidden)
 		{
 			AnimInstance->StopAllMontages(0.f);
-			AnimInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+			//AnimInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
 			GetMesh()->bPauseAnims = true;
+			FSMComponent->SetState(EEnemyState::Idle);
 		}
 		else
 		{
 			GetMesh()->bPauseAnims = false;
-			AnimInstance->SetRootMotionMode(ERootMotionMode::RootMotionFromMontagesOnly);
+			//AnimInstance->SetRootMotionMode(ERootMotionMode::RootMotionFromMontagesOnly);
+			FSMComponent->SetState(EEnemyState::Move);
 		}
 	}
 }

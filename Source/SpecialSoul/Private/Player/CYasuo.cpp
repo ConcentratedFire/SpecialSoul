@@ -162,7 +162,9 @@ float ACYasuo::GetDamage(bool& OutbIsCri) const
 void ACYasuo::Attack()
 {
 	if (!HasAuthority()) return;
+	// LOG_S(Warning, TEXT("Attack Begin"));
 	CRPC_GetAttackVectors();
+	// GetAttackVectors();
 }
 
 void ACYasuo::WindWall()
@@ -184,7 +186,7 @@ void ACYasuo::CRPC_GetWindWallTransfrom_Implementation()
 
 void ACYasuo::SRPC_WindWall_Implementation(const FTransform& Transform)
 {
-	ObjectPoolManager->WindWallSpawn(Transform);
+	ObjectPoolManager->WindWallSpawn(Transform, this);
 }
 
 void ACYasuo::CRPC_SetAttackFrontVector_Implementation()
@@ -220,12 +222,49 @@ void ACYasuo::OnRep_RotateArrow()
 	ArrowWidgetComp->SetWorldRotation(newRot);
 }
 
+void ACYasuo::GetAttackVectors()
+{
+	int32 AttackCnt = YasuoStat.ProjectileCount;
+	// LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
+	AttackCnt = PS->CalcProjectile(AttackCnt);
+	LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
+	float AngleStep = 360.f / static_cast<float>(AttackCnt);
+	TArray<FVector> AttackVectors;
+
+	for (int32 i = 0; i < AttackCnt; ++i)
+	{
+		float AngleOffset = -AngleStep * (AttackCnt - 1) / 2 + AngleStep * i;
+		FRotator RotationOffset(0.0f, AngleOffset, 0.0f);
+		FVector RotatedVector = RotationOffset.RotateVector(AttackFrontVector);
+		AttackVectors.Add(RotatedVector);
+	}
+
+	TryDefaultAttack(AttackVectors);
+}
+
+void ACYasuo::TryDefaultAttack(const TArray<FVector>& AttackVectors)
+{
+	for (const FVector& Vector : AttackVectors)
+	{
+		FTransform Transform;
+		FVector curLocation = GetActorLocation();
+		curLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		Transform.SetLocation(curLocation);
+		Transform.SetRotation(Vector.Rotation().Quaternion());
+		Transform.SetScale3D(FVector(1.f));
+		ObjectPoolManager->TornadoSpawn(Transform, this);
+	}
+
+	MRPC_EndDefaultAttack();
+	bAttacking = false;
+}
+
 void ACYasuo::CRPC_GetAttackVectors_Implementation()
 {
 	int32 AttackCnt = YasuoStat.ProjectileCount;
-	LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
+	// LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
 	AttackCnt = PS->CalcProjectile(AttackCnt);
-	LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
+	// LOG_S(Warning, TEXT("AttackCnt: %d"), AttackCnt);
 	float AngleStep = 360.f / static_cast<float>(AttackCnt);
 	TArray<FVector> AttackVectors;
 

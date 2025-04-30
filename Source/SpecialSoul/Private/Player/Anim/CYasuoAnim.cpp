@@ -50,6 +50,7 @@ void UCYasuoAnim::PlayDieAnimation()
 
 void UCYasuoAnim::AnimNotify_YasuoDefaultAttack()
 {
+	if (Owner && !Owner->HasAuthority()) return;
 	Owner->Attack();
 }
 

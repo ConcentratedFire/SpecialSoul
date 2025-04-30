@@ -185,7 +185,8 @@ void ACPlayerController::ServerRequestSpawn()
 {
 	TArray<APlayerState*> playerArr = GetWorld()->GetGameState()->PlayerArray;
 	if (playerArr.Num() > GS->ReadyPlayer) return;
-
+	GS->AlivePlayer = playerArr.Num();
+	
 	// GameMode를 통해 Pawn 스폰
 	if (ASpecialSoulGameMode* GM = GetWorld()->GetAuthGameMode<ASpecialSoulGameMode>())
 		GM->SpawnPlayerCharacter();
@@ -204,6 +205,11 @@ void ACPlayerController::MRPC_PlayGame_Implementation()
 		SelectPlayerWidget->RemoveFromParent();
 		if (AGameHUD* hud = Cast<AGameHUD>(GetHUD()))
 			hud->ShowWidget();
+	}
+
+	if (IsLocalController() && BGM)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), BGM);
 	}
 
 	SetPause(false);
@@ -309,6 +315,7 @@ void ACPlayerController::SRPC_EndDieProcess_Implementation()
 void ACPlayerController::SRPC_AddDeadPlayer_Implementation()
 {
 	++GS->DeadPlayer;
+	--GS->AlivePlayer;
 	ServerRequestPlayEnd();
 }
 

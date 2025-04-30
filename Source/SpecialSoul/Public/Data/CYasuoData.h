@@ -68,6 +68,15 @@ struct FYasuoMoveData // 야스오 이동거리 기류 획득 데이터
 	}
 };
 
+template<>
+struct TStructOpsTypeTraits<FYasuoMoveData> : public TStructOpsTypeTraitsBase2<FYasuoMoveData>
+{
+	enum 
+	{
+		WithCopy = true // 구조체 복사를 허용합니다
+	};
+};
+
 /**
  * 
  */
@@ -92,6 +101,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AOEDamageCoolTime;
 };
+
+template<>
+struct TStructOpsTypeTraits<FCYasuoData> : public TStructOpsTypeTraitsBase2<FCYasuoData>
+{
+	enum 
+	{
+		WithCopy = true // 구조체 복사를 허용합니다
+	};
+};
+
 
 USTRUCT(BlueprintType)
 struct FCardStruct

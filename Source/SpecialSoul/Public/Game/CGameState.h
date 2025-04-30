@@ -121,6 +121,8 @@ public:
 public:
 	UPROPERTY(Replicated)
 	int32 ReadyPlayer=0;
+	UPROPERTY(Replicated)
+	int32 AlivePlayer=0;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "MainBoss")

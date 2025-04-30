@@ -108,4 +108,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SRPC_AddDeadPlayer();
 	void ServerRequestPlayEnd();
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	class USoundBase* BGM;
 };

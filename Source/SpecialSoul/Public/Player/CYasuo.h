@@ -63,6 +63,9 @@ public:
 	UFUNCTION()
 	void OnRep_RotateArrow();
 
+	void GetAttackVectors();
+	void TryDefaultAttack(const TArray<FVector>& AttackVectors);
+	
 	UFUNCTION(Client, Reliable)
 	void CRPC_GetAttackVectors();
 	UFUNCTION(Server, Reliable)

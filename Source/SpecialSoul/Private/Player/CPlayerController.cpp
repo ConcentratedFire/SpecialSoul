@@ -207,6 +207,11 @@ void ACPlayerController::MRPC_PlayGame_Implementation()
 			hud->ShowWidget();
 	}
 
+	if (IsLocalController() && BGM)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), BGM);
+	}
+
 	SetPause(false);
 }
 

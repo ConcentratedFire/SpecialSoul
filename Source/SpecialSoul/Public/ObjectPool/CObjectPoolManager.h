@@ -56,7 +56,7 @@ public:
 	void TornadoESpawn(FTransform SpawnTransform, AActor* NewOwner);
 
 	// Wind Wall
-	void WindWallSpawn(FTransform SpawnTransform);
+	void WindWallSpawn(FTransform SpawnTransform, AActor* NewOwner);
 
 	// Object Setting
 	void ExpSpawn(FTransform SpawnTransform);

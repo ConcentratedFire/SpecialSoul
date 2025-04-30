@@ -150,9 +150,9 @@ void ACObjectPoolManager::TornadoESpawn(FTransform SpawnTransform, AActor* NewOw
 	PlaceActorSetPlace(TornadoEPool, AppendTornadoEPoolSize, TornadoEActor, SpawnTransform, NewOwner);
 }
 
-void ACObjectPoolManager::WindWallSpawn(FTransform SpawnTransform)
+void ACObjectPoolManager::WindWallSpawn(FTransform SpawnTransform, AActor* NewOwner)
 {
-	PlaceActorSetPlace(WindWallPool, AppendWindWallPoolSize, WindWallActor, SpawnTransform);
+	PlaceActorSetPlace(WindWallPool, AppendWindWallPoolSize, WindWallActor, SpawnTransform, NewOwner);
 }
 
 

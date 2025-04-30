@@ -60,7 +60,7 @@ void ACTornado::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
 
-	if (HasAuthority() &&!bNewHidden)
+	if (HasAuthority() && !bNewHidden)
 	{
 		FVector UpLocation = GetActorLocation();
 		UpLocation.Z += TornadoBox->GetScaledBoxExtent().Z;
@@ -69,6 +69,8 @@ void ACTornado::SetActorHiddenInGame(bool bNewHidden)
 		Range = OwnerYasuo->GetRange();
 		Damage = OwnerYasuo->GetDamage(IsCri);
 		TornadoStartLocation = GetActorLocation();
+
+		// LOG_S(Warning, TEXT("Name: %s, Location : %s, Rotation : %s"), *GetName(), *GetActorLocation().ToString(), *GetActorRotation().ToString());
 	}
 }
 

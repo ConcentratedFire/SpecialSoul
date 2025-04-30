@@ -28,7 +28,8 @@ AJinx::AJinx()
 	}
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -68.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f,  -90.f, 0.f));
-	GetMesh()->SetCollisionProfileName(TEXT("Player"));
+	//GetMesh()->SetCollisionProfileName(TEXT("Player"));
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(68.f);
 	GetCapsuleComponent()->SetCapsuleRadius(28.f);
@@ -50,6 +51,14 @@ void AJinx::BeginPlay()
 
 	SkillComponent->CoolTimeMap.Add(ESkillKey::E, FSkillCooltime(1.f, 0.f));
 	SkillComponent->CoolTimeMap.Add(ESkillKey::R, FSkillCooltime(2.f, 0.f));
+}
+
+void AJinx::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// 	FTimerHandle AttackTimer; 끄기
+	GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
 }
 
 void AJinx::SetLocalInit(ACPlayerController* InPC)
@@ -92,20 +101,12 @@ void AJinx::Attack()
 
 void AJinx::UseESkill()
 {
-	// if (!SkillComponent->bUsingSkill)
-	// {
-	// 	SkillComponent->bUsingSkill = true;
-		SkillComponent->SRPC_CastSkill_Implementation(ESkillKey::E);
-	// }
+	SkillComponent->SRPC_CastSkill_Implementation(ESkillKey::E);
 }
 
 void AJinx::UseRSkill()
 {
-	// if (!SkillComponent->bUsingSkill)
-	// {
-	// 	SkillComponent->bUsingSkill = true;
-		SkillComponent->SRPC_CastSkill_Implementation(ESkillKey::R);
-	// }
+	SkillComponent->SRPC_CastSkill_Implementation(ESkillKey::R);
 }
 
 void AJinx::UpdatePlayerData(const int32 PlayerLevel)
@@ -224,14 +225,14 @@ void AJinx::ActivateSkillMovement(bool bActive, bool bAttack)
 	if (!bAttack)
 		MoveComp->bCanMove = true;
 }
-
-void AJinx::StartAttack()
-{
-	if (HasAuthority())
-	{
-		SRPC_UseSkill(ESkillKey::Attack);
-	}
-}
+//
+// void AJinx::StartAttack()
+// {
+// 	if (HasAuthority())
+// 	{
+// 		SRPC_UseSkill(ESkillKey::Attack);
+// 	}
+// }
 
 
 void AJinx::RotateToMouseCursor()

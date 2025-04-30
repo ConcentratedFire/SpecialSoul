@@ -4,6 +4,7 @@
 #include "UI/CFailEndingWidget.h"
 
 #include "Components/Button.h"
+#include "Game/CGameInstance.h"
 
 void UCFailEndingWidget::NativeConstruct()
 {
@@ -25,4 +26,5 @@ void UCFailEndingWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 
 void UCFailEndingWidget::OnExitClicked()
 {
+	Cast<UCGameInstance>(GetGameInstance())->ExitRoom();
 }

@@ -22,7 +22,6 @@ class SPECIALSOUL_API AMainBoss : public ABaseEnemy
 
 public:
 	AMainBoss();
-	virtual void DieEndAction() override;
 	void ResetLeftCooltime_DarkinBlade();
 
 protected:
@@ -61,11 +60,16 @@ public: // ==== 몽타쥬 ===========
 	void MRPC_UpdateMainBossHPBar();
 	virtual void MyDamage(int32 DamageAmount) override;
 	
-	void ChangePhase();
+	// void ChangePhase();
 	
 	float GetHpPercent() const { return HP / MaxHP; }
 
 	UPROPERTY(VisibleAnywhere, Category = "MainBoss")
 	bool bIsUlt {false}; // 궁 쓴 상태
+
+protected:
+	virtual void SRPC_Damage(int32 DamageAmount) override;
+	virtual void MRPC_Die() override;
+	
 	
 };

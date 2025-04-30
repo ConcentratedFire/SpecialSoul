@@ -15,6 +15,12 @@ class SPECIALSOUL_API UGameDefeatWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Exit;
+
+	
+	UFUNCTION()
+	void OnExitClicked();
 };

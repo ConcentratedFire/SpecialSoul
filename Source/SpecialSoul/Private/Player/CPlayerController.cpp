@@ -249,6 +249,8 @@ void ACPlayerController::SetBossHPPercent(float percent)
 void ACPlayerController::CRPC_ShowGameEndingUI_Implementation(bool bWin)
 {
 	if (!IsLocalController()) return;
+	
+	//SetInputMode(FInputModeUIOnly()); // 입력모드 UI로 바꾸기
 
 	auto widgetClass = bWin ? WinWidgetClass : DefeatWidgetClass;
 	if (widgetClass)
@@ -276,7 +278,7 @@ void ACPlayerController::ClientTravelToBattleMap()
 
 void ACPlayerController::ServerTravelToBattleMap()
 {
-	FString url = TEXT("/Game/Level/BattleMap.BattleMap");
+	FString url = TEXT("/Game/Level/BattleMap.BattleMap?listen");
 	GetWorld()->ServerTravel(url, TRAVEL_Absolute);
 }
 

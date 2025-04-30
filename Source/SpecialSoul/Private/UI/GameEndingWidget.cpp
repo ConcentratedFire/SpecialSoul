@@ -20,18 +20,4 @@ void UGameEndingWidget::NativeConstruct()
 void UGameEndingWidget::OnExitClicked()
 {
 	Cast<UCGameInstance>(GetGameInstance())->ExitRoom();
-	/*auto pc = GetOwningPlayer();
-	if (!pc) return;
-
-	if (auto myPC = Cast<ACPlayerController>(pc))
-	{
-		if (myPC->HasAuthority())
-		{
-			myPC->ServerTravelToBattleMap();
-		}
-		else
-		{
-			myPC->ClientTravelToBattleMap();
-		}
-	}*/
 }

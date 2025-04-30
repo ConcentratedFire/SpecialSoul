@@ -596,7 +596,8 @@ void ACBasePlayer::DamageProcess(float damage)
 {
 	if (HasAuthority())
 	{
-		HP -= damage; // SetHP setter 호출
+		if (bCanTakeDamage)
+			HP -= damage; // SetHP setter 호출
 	}
 	else
 	{
@@ -617,7 +618,7 @@ void ACBasePlayer::OnRep_HP()
 	{
 		if (AGameHUD* hud = Cast<AGameHUD>(PC->GetHUD()))
 		{
-			hud->SetHP(HP, MaxHP);
+			hud->SetHP(HP, MaxHP); // HP vs hp...?
 		}
 	}
 	
@@ -646,4 +647,10 @@ void ACBasePlayer::SetHP(float value)
 {
 	hp = value;
 	OnRep_HP();
+}
+void ACBasePlayer::GameEnd()
+{
+	// MoveComp->bCanMove = false; // 못 움직이게 하기
+	GetMovementComponent()->Velocity = FVector::ZeroVector; // 움직임 멈춤
+	bCanTakeDamage = false; // 무적으�
 }

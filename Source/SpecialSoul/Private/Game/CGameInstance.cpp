@@ -22,7 +22,7 @@ void UCGameInstance::Init()
 		sessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UCGameInstance::OnCreateSessionComplete);
 		sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UCGameInstance::OnFindSessionsComplete);
 		sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UCGameInstance::OnJoinSessionComplete);
-		sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UCGameInstance::OnExitRoomComplete);
+		//sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UCGameInstance::OnExitRoomComplete);
 	}
 }
 
@@ -206,39 +206,30 @@ void UCGameInstance::MRPC_ExitRoom_Implementation()
 	// 클라 영역 (리슨서버/클라)
 	// ExitRoom 3 끝 ) 세션에서 퇴장
 	// OnDestroySessionCompleteDelegates 브로드캐스트함
-	sessionInterface->DestroySession(FName(*MySessionName));
+	if (sessionInterface.IsValid())
+	{
+		sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UCGameInstance::OnExitRoomComplete);
+		sessionInterface->DestroySession(FName(*MySessionName));
+	}
+}
 
-	//세션 삭제 후 수동 이동
+void UCGameInstance::OnExitRoomComplete(FName sessionName, bool bWasSuccessful)
+{
+	sessionInterface->OnDestroySessionCompleteDelegates.RemoveAll(this);
+
 	ENetMode NetMode = GetWorld()->GetNetMode();
 	if (NetMode == NM_Client)
 	{
 		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (PC && PC->IsLocalController())
 		{
-			PC->ClientTravel(FString(TEXT("/Game/Level/BattleMap.BattleMap")), ETravelType::TRAVEL_Absolute);
+			PC->ClientTravel(TEXT("/Game/Level/LobbyMap"), ETravelType::TRAVEL_Absolute);
 		}
 	}
 	else if (NetMode == NM_ListenServer)
 	{
-		GetWorld()->ServerTravel(FString(TEXT("/Game/Level/BattleMap.BattleMap?listen"), ETravelType::TRAVEL_Absolute));
+		GetWorld()->ServerTravel(TEXT("/Game/Level/LobbyMap?listen"), ETravelType::TRAVEL_Absolute);
 	}
-}
-
-void UCGameInstance::OnExitRoomComplete(FName sessionName, bool bWasSuccessful)
-{
-	// auto pc = GetWorld()->GetFirstPlayerController();
-	// FString url = TEXT("/Game/Level/StandbyLevel.StandbyLevel");
-	// pc->ClientTravel(url, TRAVEL_Absolute);
-
-	// ENetMode NetMode = GetWorld()->GetNetMode();
-	// if (NetMode == NM_Client)
-	// {
-	// 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	// 	if (PC && PC->IsLocalController())
-	// 	{
-	// 		PC->ClientTravel(FString(TEXT("/Game/Level/BattleMap.BattleMap")), ETravelType::TRAVEL_Absolute);
-	// 	}
-	// }
 }
 
 FString UCGameInstance::StringBase64Encode(const FString& str)

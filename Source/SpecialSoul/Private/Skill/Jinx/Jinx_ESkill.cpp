@@ -89,6 +89,7 @@ void UJinx_ESkill::StartUseSkill(AJinx* Jinx)
 
 void UJinx_ESkill::EndUseSkill(AJinx* Jinx)
 {
+	if (!IsValid(Jinx)) return;
 	FiredBulletNum = 0;
 	Jinx->GetWorld()->GetTimerManager().ClearTimer(CastingTimer);
 	//Jinx->GetWorld()->GetTimerManager().ClearTimer(FireTimer);

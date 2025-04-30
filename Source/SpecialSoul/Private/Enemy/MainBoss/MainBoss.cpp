@@ -74,24 +74,27 @@ void AMainBoss::PossessedBy(AController* NewController)
 	MyController = Cast<AMainBossController>(NewController);
 }
 
-void AMainBoss::HandleDie()
+void AMainBoss::HandleDie() // MRPC에서 처리됨
 {
-	Super::HandleDie();
-	MyController->SetActorTickEnabled(false);
+	if (MyController)
+	{
+		MyController->SetActorTickEnabled(false);
 
-	 // BT 중단
-	auto btComp = Cast<UBehaviorTreeComponent>(MyController->GetComponentByClass(UBehaviorTreeComponent::StaticClass()));
-	btComp->StopTree(EBTStopMode::Safe);
+		 // BT 중단
+		auto btComp = Cast<UBehaviorTreeComponent>(MyController->GetComponentByClass(UBehaviorTreeComponent::StaticClass()));
+		btComp->StopTree(EBTStopMode::Safe);
 
-	 // 이동 중단
-	AMainBossController* mbController = Cast<AMainBossController>(GetOwner());
-	if (mbController)
-		mbController->StopMovement();
+		 // 이동 중단
+		AMainBossController* mbController = Cast<AMainBossController>(GetOwner());
+		if (mbController)
+			mbController->StopMovement();
 
-	 // 충돌 설정
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore); // PlayerAttack
+		 // 충돌 설정
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore); // PlayerAttack
+	}
 
 	OnMainBossDie.Broadcast();
+	Super::HandleDie();
 }
 
 void AMainBoss::OnBladeHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -123,38 +126,41 @@ void AMainBoss::MRPC_UpdateMainBossHPBar_Implementation()
 
 	if (auto myPC = Cast<ACPlayerController>(pc))
 	{
-		LOG_S(Log, TEXT("MRPC_UpdateMainBossHPBar %d/%d"), HP, MaxHP);
+		//LOG_S(Log, TEXT("MRPC_UpdateMainBossHPBar %d/%d"), HP, MaxHP);
 		myPC->SetBossHPPercent(static_cast<float>(HP)/MaxHP);
 	}
 }
 
 void AMainBoss::MyDamage(int32 DamageAmount)
 {
-	if (!HasAuthority()) return; // 서버에서만 데미지 처리
-	
+	SRPC_Damage(DamageAmount);  // 서버에서 데미지 처리
+}
+
+void AMainBoss::SRPC_Damage(int32 DamageAmount)
+{
 	HP -= DamageAmount;
+	MRPC_UpdateMainBossHPBar();
+	
 	if (HP <= 0)
 	{
 		HP = 0.f;
 		
 		bIsDead = true;
-		HandleDie(); 
+		MRPC_Die(); 
 	}
-	MRPC_UpdateMainBossHPBar();
 }
 
-void AMainBoss::ChangePhase()
+void AMainBoss::MRPC_Die()
 {
-	// 부활 + 궁
-	bIsUlt = true;
-	// HP = 1;
+	Super::MRPC_Die();
 }
 
-void AMainBoss::DieEndAction()
-{
-	// TODO : 미션 클리어 && 게임 종료
-	
-}
+// void AMainBoss::ChangePhase()
+// {
+// 	// 부활 + 궁
+// 	bIsUlt = true;
+// 	// HP = 1;
+// }
 
 void AMainBoss::ResetLeftCooltime_DarkinBlade()
 {

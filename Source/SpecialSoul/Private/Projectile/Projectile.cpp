@@ -13,6 +13,7 @@
 AProjectile::AProjectile()
 {
 	bReplicates = true;
+	SetNetUpdateFrequency(100.0f);
 	SetReplicatingMovement(true); 
 	
 	PrimaryActorTick.bCanEverTick = true;

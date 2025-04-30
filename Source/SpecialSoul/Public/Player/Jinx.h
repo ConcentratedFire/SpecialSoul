@@ -24,6 +24,7 @@ public:
 	AJinx();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void Attack() override;
 	void UseESkill();
@@ -39,7 +40,7 @@ public:
 	
 	void ActivateSkillMovement(bool bActive, bool bAttack); // 스킬 사용 중 캐릭터 회전 관련
 	
-	void StartAttack();
+	// void StartAttack();
 
 	void RotateToMouseCursor();
 	

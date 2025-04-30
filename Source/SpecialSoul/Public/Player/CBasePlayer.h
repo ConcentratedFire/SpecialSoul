@@ -55,6 +55,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void UpdateLevelUI(int32 Level);
 
+
 public: // Input
 	FInputBindingDelegate OnInputBindingDel;
 
@@ -240,6 +241,7 @@ public:
 
 	void DamageProcess(float damage);
 	bool bIsDead{ false };
+	bool bCanTakeDamage { true }; // 데미지를 받을지 여부
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI)
@@ -247,4 +249,7 @@ public:
 
 protected:
 	virtual void DieProcess();
+
+public:
+	virtual void GameEnd();
 };

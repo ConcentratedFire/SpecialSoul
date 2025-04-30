@@ -107,13 +107,13 @@ public:
 public:
 	bool GetIsPlayerInRange(const float Range) const;
 
-private:
+protected:
 	UFUNCTION(Server, Reliable)
 	void SRPC_PlayAttackAnim();
 	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_PlayAttackAnim();
 	UFUNCTION(Server, Reliable)
-	void SRPC_Damage(int32 DamageAmount);
+	virtual void SRPC_Damage(int32 DamageAmount);
 	UFUNCTION(NetMulticast, Reliable)
-	void MRPC_Die();
+	virtual void MRPC_Die();
 };

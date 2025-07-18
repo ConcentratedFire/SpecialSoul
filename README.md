@@ -24,14 +24,6 @@
 
 ---
 
-## 📈 성과
-
-- `Object Pool`, `Behavior Tree`, `Google Sheet API`, `멀티 세션 처리` 등 고급 기술 실전 적용
-- 네트워크 동기화 문제 해결 경험 (`DOREPLIFETIME_CONDITION` 활용)
-- 리팩토링 기반 구조 설계로 유지보수성 확보
-
----
-
 ## 👨‍💻 팀원 & 역할
 
 | 이름 | 주요 담당 업무 |
@@ -105,15 +97,7 @@
 
 ---
 
-## 💬 회고
-
-- 다양한 언리얼 기술을 실전에서 적용하며, 구조화된 개발 방식에 대한 감각을 익혔음  
-- 멀티플레이 UI 동기화와 같은 실질적인 문제 해결 경험 축적  
-- 추후엔 테스트 및 디버깅 프로세스를 정식 루틴에 포함하고 싶음
-
----
-
 ## 📚 레퍼런스
 
 - Riot Games - *League of Legends: 집중포화 모드*
-
+![Image](https://github.com/user-attachments/assets/830b7c53-12e5-4299-9e8f-8b545cd7e753)

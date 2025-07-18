@@ -79,7 +79,7 @@
 | 스킬 선택 | 캐릭터 스폰 → 스킬 입력 및 실행 흐름 |
 | 오브젝트 풀링 | 적/스킬 액터 재사용 관리 구조 |
 
-{"https://github.com/user-attachments/assets/bc9d9c63-c47c-4f3b-a8b2-89cf549756b7"}
+<img width="1171" height="491" alt="Image" src="https://github.com/user-attachments/assets/bc9d9c63-c47c-4f3b-a8b2-89cf549756b7" />
 
 ---
 

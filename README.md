@@ -39,7 +39,7 @@
 
 - **엔진** : Unreal Engine 5.5  
 - **언어** : C++  
-- **Network** : Listen Server, `OnlineSubsystemSteam`  
+- **Network** : Listen Server, OnlineSubsystemSteam
 - **Data 연동** : Google Sheet API (HTTP 기반)  
 - **AI** : Behavior Tree, Flow Field Navigation  
 - **패턴** : 전략 패턴  
@@ -92,8 +92,6 @@
 - 탑다운 전투 화면
 - 업그레이드 카드 선택 UI
 - 승리/패배 UI
-
-> 📸 실제 인게임 캡처는 `/Assets/Screenshots` 폴더 참고
 
 ---
 
